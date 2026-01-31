@@ -3,9 +3,6 @@ const BUTTONCLICKSOUND = new Sound([
 	0.04, 0.05, 350,
 ]);
 
-const SANDRED = new Color(0.78, 0.28, 0.03);
-const SANDLIGHTBROWN = new Color(0.97, 0.88, 0.63);
-
 gases = {
 	square: {
 		emitterData: [
@@ -79,6 +76,7 @@ function emitGas(position, gas) {
 	emitterConfig[0] = position;
 
 	gas.emitter = new ParticleEmitter(...emitterConfig);
+	gas.emitter.renderOrder = -500;
 	return gas;
 }
 
@@ -92,40 +90,48 @@ function gameInit() {
 	squareGasCloud = emitGas(vec2(6), gases.square);
 	circleGasCloud = emitGas(vec2(-6), gases.triangle);
 
+	const gameTile = (i, size = 16) => tile(i, size);
+	spriteAtlas = {
+		circle: gameTile(0),
+		crate: gameTile(1),
+		icon: gameTile(2),
+		circleBig: gameTile(2, 128),
+		iconBig: gameTile(3, 128),
+	};
+	canvasClearColor = GRAY;
+
 	// create tile layer
 	const pos = vec2(-16);
 	const tileLayer = new TileCollisionLayer(pos, vec2(32));
 	tileLayer.renderOrder = -10000;
 	for (pos.x = tileLayer.size.x; pos.x--; )
 		for (pos.y = tileLayer.size.y; pos.y--; ) {
-			// check if tile should be solid
 			if (randBool(0.7)) continue;
 
-			// set tile data
 			const tileIndex = 11;
 			const direction = randInt(4);
 			const mirror = randBool();
-			// const color = randColor(WHITE, hsl(0,0,.2));
 			const data = new TileLayerData(tileIndex, direction, mirror, GRAY);
 			tileLayer.setData(pos, data);
 			tileLayer.setCollisionData(pos);
 		}
-	tileLayer.redraw(); // redraw tile layer with new data
+	tileLayer.redraw();
 }
 
 function gameUpdate() {}
 
 function gameRender() {
 	drawRect(vec2(), vec2(32), WHITE);
+
+	// draw more sprites from the atlas
+	drawTile(vec2(-7, 4), vec2(5), spriteAtlas.crate);
+	drawTile(vec2(0, 4), vec2(5), spriteAtlas.circle);
+	drawTile(vec2(7, 4), vec2(5), spriteAtlas.circleBig);
 }
 
 function postGameRender() {}
 
 class GameObject extends EngineObject {
-	update() {
-		this.renderOrder = -this.pos.y; // sort by y position
-	}
-
 	render() {
 		// adjust draw position to be at the bottom of the object
 		const drawSize = this.drawSize || this.size;
