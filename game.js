@@ -81,9 +81,8 @@ function emitGas(position, gas) {
 }
 
 function gameInit() {
-	// setup level
 	objectDefaultDamping = 0.7;
-	const player = new Player(vec2(), vec2(0.7), tile(0), 0, RED);
+	const player = new Player(vec2(), vec2(0.5), tile(vec2(), vec2(19, 21), 1));
 	player.drawSize = vec2(1);
 
 	setCanvasFixedSize(vec2(512, 512));
@@ -92,6 +91,7 @@ function gameInit() {
 
 	const gameTile = (i, size = 16) => tile(i, size);
 	spriteAtlas = {
+		player: gameTile(0),
 		circle: gameTile(0),
 		crate: gameTile(1),
 		icon: gameTile(2),
@@ -108,10 +108,9 @@ function gameInit() {
 		for (pos.y = tileLayer.size.y; pos.y--; ) {
 			if (randBool(0.7)) continue;
 
-			const tileIndex = 11;
 			const direction = randInt(4);
 			const mirror = randBool();
-			const data = new TileLayerData(tileIndex, direction, mirror, GRAY);
+			const data = new TileLayerData(randInt(6, 8));
 			tileLayer.setData(pos, data);
 			tileLayer.setCollisionData(pos);
 		}
@@ -121,12 +120,12 @@ function gameInit() {
 function gameUpdate() {}
 
 function gameRender() {
-	drawRect(vec2(), vec2(32), WHITE);
+	drawRect(vec2(), vec2(32), new Color().setHex("#bbc3ca"));
 
 	// draw more sprites from the atlas
-	drawTile(vec2(-7, 4), vec2(5), spriteAtlas.crate);
-	drawTile(vec2(0, 4), vec2(5), spriteAtlas.circle);
-	drawTile(vec2(7, 4), vec2(5), spriteAtlas.circleBig);
+	// drawTile(vec2(-7, 4), vec2(5), spriteAtlas.crate);
+	// drawTile(vec2(0, 4), vec2(5), spriteAtlas.circle);
+	// drawTile(vec2(7, 4), vec2(5), spriteAtlas.circleBig);
 }
 
 function postGameRender() {}
@@ -135,7 +134,7 @@ class GameObject extends EngineObject {
 	render() {
 		// adjust draw position to be at the bottom of the object
 		const drawSize = this.drawSize || this.size;
-		const offset = this.getUp(drawSize.y / 6);
+		const offset = this.getUp(drawSize.y / 4);
 		const pos = this.pos.add(offset);
 		drawTile(
 			pos,
@@ -144,7 +143,7 @@ class GameObject extends EngineObject {
 			undefined,
 			undefined,
 			this.angle,
-			BLACK,
+			undefined,
 			100,
 		);
 	}
@@ -157,9 +156,11 @@ class Player extends GameObject {
 		// apply movement controls
 		const moveInput = keyDirection().clampLength(1).scale(0.1);
 		this.velocity = this.velocity.add(moveInput);
-		this.setCollision(); // make object collide
+		this.setCollision();
 
 		// move camera with player
 		cameraPos = this.pos.add(vec2(0, 2));
 	}
 }
+
+engineInit(gameInit, gameUpdate, null, gameRender, postGameRender, ["pipes.png", "gorm.png"])
