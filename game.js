@@ -71,46 +71,46 @@ gases = {
 
 function emitGas(position, gas) {
 	if (!gas || !gas.emitterData) {
-		console.error('Invalid gas object provided');
+		console.error("Invalid gas object provided");
 		return null;
 	}
 
 	const emitterConfig = [...gas.emitterData];
 	emitterConfig[0] = position;
 
-	gas.emitter = new ParticleEmitter(...emitterConfig)
-	return gas
+	gas.emitter = new ParticleEmitter(...emitterConfig);
+	return gas;
 }
 
 function gameInit() {
-    	// setup level
-    	objectDefaultDamping = .7;
-    	const player = new Player(vec2(), vec2(0.7), tile(0), 0, RED);
-    	player.drawSize = vec2(1);
+	// setup level
+	objectDefaultDamping = 0.7;
+	const player = new Player(vec2(), vec2(0.7), tile(0), 0, RED);
+	player.drawSize = vec2(1);
 
 	setCanvasFixedSize(vec2(512, 512));
-	squareGasCloud = emitGas(vec2(6), gases.square)
-	circleGasCloud = emitGas(vec2(-6), gases.triangle)
+	squareGasCloud = emitGas(vec2(6), gases.square);
+	circleGasCloud = emitGas(vec2(-6), gases.triangle);
 
-    	// create tile layer
-    	const pos = vec2(-16);
-    	const tileLayer = new TileCollisionLayer(pos, vec2(32));
-    	for (pos.x = tileLayer.size.x; pos.x--;)
-    	for (pos.y = tileLayer.size.y; pos.y--;)
-    	{
-    	    	// check if tile should be solid
-        	if (randBool(.7)) continue;
+	// create tile layer
+	const pos = vec2(-16);
+	const tileLayer = new TileCollisionLayer(pos, vec2(32));
+	tileLayer.renderOrder = -10000;
+	for (pos.x = tileLayer.size.x; pos.x--; )
+		for (pos.y = tileLayer.size.y; pos.y--; ) {
+			// check if tile should be solid
+			if (randBool(0.7)) continue;
 
-        	// set tile data
-        	const tileIndex = 11;
-        	const direction = randInt(4)
-        	const mirror = randBool();
-        	// const color = randColor(WHITE, hsl(0,0,.2));
-        	const data = new TileLayerData(tileIndex, direction, mirror, GRAY);
-        	tileLayer.setData(pos, data);
-        	tileLayer.setCollisionData(pos);
-    	}
-    	tileLayer.redraw(); // redraw tile layer with new data
+			// set tile data
+			const tileIndex = 11;
+			const direction = randInt(4);
+			const mirror = randBool();
+			// const color = randColor(WHITE, hsl(0,0,.2));
+			const data = new TileLayerData(tileIndex, direction, mirror, GRAY);
+			tileLayer.setData(pos, data);
+			tileLayer.setCollisionData(pos);
+		}
+	tileLayer.redraw(); // redraw tile layer with new data
 }
 
 function gameUpdate() {}
@@ -121,35 +121,39 @@ function gameRender() {
 
 function postGameRender() {}
 
-class GameObject extends EngineObject
-{
-    update()
-    {
-        this.renderOrder = -this.pos.y; // sort by y position
-    }
+class GameObject extends EngineObject {
+	update() {
+		this.renderOrder = -this.pos.y; // sort by y position
+	}
 
-    render()
-    {
-        // adjust draw position to be at the bottom of the object
-        const drawSize = this.drawSize || this.size;
-        const offset = this.getUp(drawSize.y/6);
-        const pos = this.pos.add(offset);
-        drawTile(pos, drawSize, this.tileInfo, this.color, this.angle);
-    }
+	render() {
+		// adjust draw position to be at the bottom of the object
+		const drawSize = this.drawSize || this.size;
+		const offset = this.getUp(drawSize.y / 6);
+		const pos = this.pos.add(offset);
+		drawTile(
+			pos,
+			drawSize,
+			this.tileInfo,
+			undefined,
+			undefined,
+			this.angle,
+			BLACK,
+			100,
+		);
+	}
 }
 
-class Player extends GameObject
-{
-    update()
-    {
-        super.update();
+class Player extends GameObject {
+	update() {
+		super.update();
 
-        // apply movement controls
-        const moveInput = keyDirection().clampLength(1).scale(.2);
-        this.velocity = this.velocity.add(moveInput);
-        this.setCollision(); // make object collide
+		// apply movement controls
+		const moveInput = keyDirection().clampLength(1).scale(0.1);
+		this.velocity = this.velocity.add(moveInput);
+		this.setCollision(); // make object collide
 
-        // move camera with player
-        cameraPos = this.pos.add(vec2(0,2));
-    }
+		// move camera with player
+		cameraPos = this.pos.add(vec2(0, 2));
+	}
 }
