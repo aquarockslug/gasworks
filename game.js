@@ -2,7 +2,6 @@ mask = (name) => ({
 	y: MASKS.indexOf(name) * 2,
 });
 
-
 function emptyPipeData() {
 	return Array(32)
 		.fill(null)
@@ -21,7 +20,6 @@ function addPipe(pipeData, x, y, pipe) {
 	return pipeData;
 }
 
-
 function emitGas(position, gas) {
 	if (!gas || !gas.emitterData) {
 		console.error("Invalid gas object provided");
@@ -35,7 +33,6 @@ function emitGas(position, gas) {
 	gas.emitter.renderOrder = -500;
 	return gas;
 }
-
 
 function pipeLayer(pipeData = null) {
 	const pos = vec2(-16);
@@ -59,7 +56,35 @@ function pipeLayer(pipeData = null) {
 	return pipeLayer;
 }
 
+function groundLayer() {
+	const pos = vec2(-16);
+	groundLayer = new TileCollisionLayer(pos, vec2(32));
+	groundLayer.renderOrder = -100000;
 
+	for (let y = 0; y <= 32; y++) {
+		for (let x = 0; x < 32; x++) {
+			let t =
+				rand() < 0.95
+					? [ground(0), ground(1), ground(3), ground(4)][randInt(0, 3)]
+					: ground(2);
+
+			if (y === 30) {
+				t = wall(9);
+				pipeLayer.setCollisionData(vec2(x, y));
+			}
+			if (y === 31) {
+				t = wall(3);
+				pipeLayer.setCollisionData(vec2(x, y));
+			}
+			const data = new TileLayerData(t);
+
+			groundLayer.setData(vec2(x, y), data);
+		}
+	}
+
+	groundLayer.redraw();
+	return groundLayer;
+}
 
 function gameInit() {
 	objectDefaultDamping = 0.7;
@@ -67,11 +92,13 @@ function gameInit() {
 	player.maskName = MASKS[0];
 	player.drawSize = vec2(1);
 
-	pipeData = level.pipes.reduce((acc, pipe) =>
-		addPipe(acc, pipe.x, pipe.y, pipe.value), emptyPipeData()
+	pipeData = level.pipes.reduce(
+		(acc, pipe) => addPipe(acc, pipe.x, pipe.y, pipe.value),
+		emptyPipeData(),
 	);
 
 	pipeLayer = pipeLayer(pipeData);
+	groundLayer = groundLayer();
 
 	setCanvasFixedSize(vec2(512, 512));
 	squareGasCloud = emitGas(vec2(6), gases.square);
@@ -84,16 +111,13 @@ function gameUpdate() {
 }
 
 function gameRender() {
-	drawRect(vec2(), vec2(32), new Color().setHex("#bbc3ca"));
+	// drawRect(vec2(), vec2(32), new Color().setHex("#bbc3ca"));
 }
 
 function postGameRender() {}
 
-
-
 class GameObject extends EngineObject {
 	render() {
-		
 		const drawSize = this.drawSize || this.size;
 		const offset = this.getUp(drawSize.y / 4);
 		const pos = this.pos.add(offset);
@@ -131,11 +155,9 @@ class Player extends GameObject {
 			vec2(0, mask(this.maskName).y + 1),
 			vec2(19, 21),
 			1,
-		).frame(((time * 8) % 4) | 0);
+		).frame(((time * 6) % 4) | 0);
 	}
 }
-
-
 
 engineInit(gameInit, gameUpdate, null, gameRender, postGameRender, [
 	"pipes.png",
