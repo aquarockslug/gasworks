@@ -1,4 +1,4 @@
-mask = (name) => ({
+maskData = (name) => ({
 	y: MASKS.indexOf(name) * 2,
 });
 
@@ -109,11 +109,11 @@ function groundLayer() {
 
 			if (y === 30) {
 				t = wall(9);
-				pipeLayer.setCollisionData(vec2(x, y));
+				pl.setCollisionData(vec2(x, y));
 			}
 			if (y === 31) {
 				t = wall(3);
-				pipeLayer.setCollisionData(vec2(x, y));
+				pl.setCollisionData(vec2(x, y));
 			}
 			const data = new TileLayerData(t);
 
@@ -131,6 +131,9 @@ function gameInit() {
 	player.maskName = MASKS[0];
 	player.drawSize = vec2(1);
 
+	lever = new Lever(vec2(-2.5, 0), vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
+	mask = new Mask(vec2(5, -5), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
+
 	pipeData = level.pipes.reduce(
 		(acc, pipe) => addPipe(acc, pipe.x, pipe.y, pipe.value),
 		emptyPipeData(),
@@ -141,9 +144,9 @@ function gameInit() {
 		emptyGasData(),
 	);
 
-	pipeLayer = pipeLayer(pipeData);
-	gasLayer = gasLayer(gasData);
-	groundLayer = groundLayer();
+	pl = pipeLayer(pipeData);
+	gl = gasLayer(gasData);
+	grl = groundLayer();
 
 	setCanvasFixedSize(vec2(512, 512));
 	// squareGasCloud = emitGas(vec2(6), gases.square);
@@ -151,8 +154,14 @@ function gameInit() {
 }
 
 function gameUpdate() {
-	if (keyWasPressed("Space"))
-		player.maskName = MASKS[MASKS.indexOf(player.maskName) + 1];
+	if (keyWasPressed("Space") && player.pos.distance(lever.pos) < 1)
+		lever.toggle()
+
+	gl.pos = vec2(-16).add(vec2(lever.on ? 0 : 1000))
+
+	if (keyWasPressed("Space") && player.pos.distance(mask.pos) < 1) {
+		player.maskName = player.maskName === "red" ? "none" : "red"
+	}
 }
 
 function gameRender() {
@@ -170,15 +179,42 @@ class GameObject extends EngineObject {
 	}
 }
 
+class Lever extends GameObject {
+	constructor(...args) {
+		super(...args);
+		this.renderOrder = -500
+		this.on = true
+	}
+	toggle() {
+		this.on = !this.on
+		this.tileInfo = tile(vec2(9, 10), vec2(16)).frame(this.on ? 1 : 0)
+	}
+}
+
+class Mask extends GameObject {
+	constructor(...args) {
+		super(...args);
+		this.renderOrder = -500
+		this.collideWithTile = true
+	}
+	update() {
+		this.tileInfo = vec2(0)
+	}
+}
+
 class Player extends GameObject {
 	constructor(...args) {
 		super(...args);
 		this.lastEmitTime = 0;
 		this.emitInterval = 0.1;
+		this.inGas = false
 	}
 
 	update() {
 		super.update();
+
+		this.inGas = gl.getData(this.pos.floor().add(vec2(16))).tile
+		if (lever.on && this.inGas && this.maskName != "red") this.pos = vec2(0)
 
 		const moveInput = keyDirection().clampLength(1).scale(0.075);
 		this.velocity = this.velocity.add(moveInput);
@@ -206,14 +242,14 @@ class Player extends GameObject {
 	}
 
 	idle() {
-		this.tileInfo = tile(vec2(0, mask(this.maskName).y), vec2(19, 21), 1).frame(
+		this.tileInfo = tile(vec2(0, maskData(this.maskName).y), vec2(19, 21), 1).frame(
 			((time * 4) % 2) | 0,
 		);
 	}
 
 	walk() {
 		this.tileInfo = tile(
-			vec2(0, mask(this.maskName).y + 1),
+			vec2(0, maskData(this.maskName).y + 1),
 			vec2(19, 21),
 			1,
 		).frame(((time * 6) % 4) | 0);
@@ -223,4 +259,5 @@ class Player extends GameObject {
 engineInit(gameInit, gameUpdate, null, gameRender, postGameRender, [
 	"pipes.png",
 	"gorm.png",
+	"masks.png",
 ]);

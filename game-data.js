@@ -44,6 +44,18 @@ wall = (index) =>
 		2 + 36,
 	][index];
 
+cloud = (x, y) => [
+		{ x: x, y: y, value: gas("red", 6) },
+		{ x: x + 1, y: y, value: gas("red", 7) },
+		{ x: x + 2, y: y, value: gas("red", 8) },
+		{ x: x, y: y + 1, value: gas("red", 3) },
+		{ x: x + 1, y: y + 1, value: gas("red", 4) },
+		{ x: x + 2, y: y + 1, value: gas("red", 5) },
+		{ x: x, y: y + 2, value: gas("red", 0) },
+		{ x: x + 1, y: y + 2, value: gas("red", 1) },
+		{ x: x + 2, y: y + 2, value: gas("red", 2) },
+]
+
 const level = {
 	pipes: [
 		{ x: 16, y: 14, value: pipe(false, false, 1) },
@@ -59,10 +71,12 @@ const level = {
 		{ x: 15, y: 20, value: pipe(false, false, 1) },
 		{ x: 16, y: 20, value: pipe(false, false, 6) },
 		{ x: 17, y: 20, value: pipe(false, false, 6) },
-		{ x: 18, y: 20, value: pipe(true, false, 0) },
+		{ x: 18, y: 20, value: pipe(false, false, 6) },
 		{ x: 19, y: 20, value: pipe(false, false, 6) },
 		{ x: 20, y: 20, value: pipe(false, false, 6) },
 		{ x: 21, y: 20, value: pipe(false, false, 6) },
+		{ x: 22, y: 20, value: pipe(true, false, 0) },
+		{ x: 23, y: 20, value: pipe(false, false, 6) },
 		{ x: 15, y: 14, value: pipe(false, false, 6) },
 		{ x: 17, y: 12, value: pipe(false, false, 4) },
 		{ x: 17, y: 11, value: pipe(false, false, 4) },
@@ -74,17 +88,10 @@ const level = {
 		{ x: 17, y: 5, value: pipe(false, false, 4) },
 	],
 	gases: [
-		{ x: 17, y: 19, value: gas("red", 0) },
-		{ x: 18, y: 19, value: gas("red", 1) },
-		{ x: 19, y: 19, value: gas("red", 2) },
-		{ x: 17, y: 18, value: gas("red", 3) },
-		{ x: 18, y: 18, value: gas("red", 4) },
-		{ x: 19, y: 18, value: gas("red", 5) },
-		{ x: 17, y: 17, value: gas("red", 6) },
-		{ x: 18, y: 17, value: gas("red", 7) },
-		{ x: 19, y: 17, value: gas("red", 8) },
+		...cloud(21, 17),
 	]
 };
+
 
 gases = {
 	square: {
