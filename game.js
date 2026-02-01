@@ -2,22 +2,22 @@ maskData = (name) => ({
 	y: MASKS.indexOf(name) * 2,
 });
 
-function emptyPipeData() {
-	return Array(32)
+function createEmptyGrid(width = 32, height = 32) {
+	return Array(height)
 		.fill(null)
-		.map(() => Array(32).fill(null));
+		.map(() => Array(width).fill(null));
 }
 
-function addPipe(pipeData, x, y, pipe) {
-	if (x < 0 || x >= 32 || y < 0 || y >= 32) {
+function addToGrid(gridData, x, y, value, gridName = "grid") {
+	if (x < 0 || x >= gridData[0].length || y < 0 || y >= gridData.length) {
 		console.warn(
-			`Invalid pipe position: (${x}, ${y}). Must be within 0-31 range.`,
+			`Invalid ${gridName} position: (${x}, ${y}). Must be within bounds.`,
 		);
-		return pipeData;
+		return gridData;
 	}
 
-	pipeData[y][x] = pipe;
-	return pipeData;
+	gridData[y][x] = value;
+	return gridData;
 }
 
 function emitGas(position, gas) {
@@ -34,70 +34,33 @@ function emitGas(position, gas) {
 	return gas;
 }
 
-function pipeLayer(pipeData = null) {
-	const pos = vec2(-16);
-	const pipeLayer = new TileCollisionLayer(pos, vec2(32));
-	pipeLayer.renderOrder = -10000;
+function createTileLayer(data = null, isCollision = false, renderOrder = -10000, position = vec2(-16), size = vec2(32)) {
+	const layerClass = isCollision ? TileCollisionLayer : TileLayer;
+	const layer = new layerClass(position, size);
+	layer.renderOrder = renderOrder;
 
-	pipeArray = pipeData || emptyPipeData();
+	const dataArray = data || createEmptyGrid();
 
-	for (let y = 0; y < 32; y++) {
-		for (let x = 0; x < 32; x++) {
-			const pipeValue = pipeArray[y][x];
-			if (pipeValue) {
-				const data = new TileLayerData(pipeValue);
-				pipeLayer.setData(vec2(x, y), data);
-				pipeLayer.setCollisionData(vec2(x, y));
+	for (let y = 0; y < size.y; y++) {
+		for (let x = 0; x < size.x; x++) {
+			const value = dataArray[y][x];
+			if (value) {
+				const tileData = new TileLayerData(value);
+				layer.setData(vec2(x, y), tileData);
+				if (isCollision) {
+					layer.setCollisionData(vec2(x, y));
+				}
 			}
 		}
 	}
 
-	pipeLayer.redraw();
-	return pipeLayer;
-}
-
-function emptyGasData() {
-	return Array(32)
-		.fill(null)
-		.map(() => Array(32).fill(null));
-}
-
-function addGas(gasData, x, y, gas) {
-	if (x < 0 || x >= 32 || y < 0 || y >= 32) {
-		console.warn(
-			`Invalid gas position: (${x}, ${y}). Must be within 0-31 range.`,
-		);
-		return gasData;
-	}
-
-	gasData[y][x] = gas;
-	return gasData;
-}
-
-function gasLayer(gasData = null) {
-	const pos = vec2(-16);
-	const gasLayer = new TileLayer(pos, vec2(32));
-	gasLayer.renderOrder = -9999;
-
-	gasArray = gasData || emptyGasData();
-
-	for (let y = 0; y < 32; y++) {
-		for (let x = 0; x < 32; x++) {
-			const gasValue = gasArray[y][x];
-			if (gasValue) {
-				const data = new TileLayerData(gasValue);
-				gasLayer.setData(vec2(x, y), data);
-			}
-		}
-	}
-
-	gasLayer.redraw();
-	return gasLayer;
+	layer.redraw();
+	return layer;
 }
 
 function groundLayer() {
 	const pos = vec2(-16);
-	groundLayer = new TileCollisionLayer(pos, vec2(32));
+	const groundLayer = new TileCollisionLayer(pos, vec2(32));
 	groundLayer.renderOrder = -100000;
 
 	for (let y = 0; y <= 32; y++) {
@@ -109,11 +72,11 @@ function groundLayer() {
 
 			if (y === 30) {
 				t = wall(9);
-				pl.setCollisionData(vec2(x, y));
+				groundLayer.setCollisionData(vec2(x, y));
 			}
 			if (y === 31) {
 				t = wall(3);
-				pl.setCollisionData(vec2(x, y));
+				groundLayer.setCollisionData(vec2(x, y));
 			}
 			const data = new TileLayerData(t);
 
@@ -135,17 +98,21 @@ function gameInit() {
 	mask = new Mask(vec2(5, -5), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
 
 	pipeData = level.pipes.reduce(
-		(acc, pipe) => addPipe(acc, pipe.x, pipe.y, pipe.value),
-		emptyPipeData(),
+		(acc, pipe) => addToGrid(acc, pipe.x, pipe.y, pipe.value, "pipe"),
+		createEmptyGrid(),
 	);
 
 	gasData = level.gases.reduce(
-		(acc, gas) => addGas(acc, gas.x, gas.y, gas.value),
-		emptyGasData(),
+		(acc, gas) => addToGrid(acc, gas.x, gas.y, gas.value, "gas"),
+		createEmptyGrid(),
 	);
 
-	pl = pipeLayer(pipeData);
-	gl = gasLayer(gasData);
+	pl = createTileLayer(pipeData, true, -10000);
+	gl = createTileLayer(gasData, false, -9999);
+
+	// gasData[16][16] = 10
+	// gl = createTileLayer(gasData, false, -9999);
+
 	grl = groundLayer();
 
 	setCanvasFixedSize(vec2(512, 512));
@@ -241,18 +208,26 @@ class Player extends GameObject {
 		}
 	}
 
+	setAnimation(state) {
+		const animations = {
+			idle: { rowOffset: 0, frames: 2, speed: 4 },
+			walk: { rowOffset: 1, frames: 4, speed: 6 }
+		};
+
+		const anim = animations[state];
+		this.tileInfo = tile(
+			vec2(0, maskData(this.maskName).y + anim.rowOffset),
+			vec2(19, 21),
+			1,
+		).frame(((time * anim.speed) % anim.frames) | 0);
+	}
+
 	idle() {
-		this.tileInfo = tile(vec2(0, maskData(this.maskName).y), vec2(19, 21), 1).frame(
-			((time * 4) % 2) | 0,
-		);
+		this.setAnimation('idle');
 	}
 
 	walk() {
-		this.tileInfo = tile(
-			vec2(0, maskData(this.maskName).y + 1),
-			vec2(19, 21),
-			1,
-		).frame(((time * 6) % 4) | 0);
+		this.setAnimation('walk');
 	}
 }
 

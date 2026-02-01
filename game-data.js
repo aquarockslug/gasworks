@@ -5,44 +5,46 @@ const BUTTONCLICKSOUND = new Sound([
 
 const MASKS = ["none", "red", "blue", "green", "yellow"];
 
-pipe = (broken, gas, index) => {
-	let w = 18;
-	workingPipes = [6, 7, 8, 6 + w, 8 + w, 6 + w * 2, 7 + w * 2, 8 + w * 2];
-	brokenPipes = [7 + w, 6 + (3 * w), 7 + (3 * w), 8 + (3 * w)];
-	if (!broken && !gas) return workingPipes[index];
-	if (broken && !gas) return brokenPipes[index];
-
+const TILE_INDEXES = {
+	pipes: {
+		working: [6, 7, 8, 24, 26, 42, 43, 44],
+		broken: [25, 60, 61, 62]
+	},
+	gas: {
+		red: [72, 73, 74, 90, 91, 92, 108, 109, 110],
+		blue: [74, 75, 92, 93]
+	},
+	ground: [38, 39, 56, 57],
+	wall: [0, 1, 2, 3, 4, 5, 18, 19, 20, 21, 22, 23, 36, 37, 38]
 };
 
-gas = (color, index) => {
-	let w = 18;
-	if (color === "red") {
-		return [0, 1, 2, 0 + w, 1 + w, 2 + w, 0 + (w * 2), 1 + (w * 2), 2 + (w * 2)].map((i) => i + (w * 4))[index]
+function getTileIndex(category, type, index) {
+	const categoryData = TILE_INDEXES[category];
+	if (!categoryData) return undefined;
+	
+	if (typeof categoryData === 'object' && !Array.isArray(categoryData)) {
+		return categoryData[type]?.[index];
 	}
-	if (color === "blue") {
-		return [2, 3, 2 + w, 3 + w].map((i) => i + (w * 4))[index]
-	}
+	return categoryData[index];
 }
 
-ground = (index) => [38, 39, 38 + 18, 39 + 18][index];
-wall = (index) =>
-	[
-		0,
-		1,
-		2,
-		3,
-		4,
-		5,
-		18,
-		1 + 18,
-		2 + 18,
-		3 + 18,
-		4 + 18,
-		5 + 18,
-		36,
-		1 + 36,
-		2 + 36,
-	][index];
+// Backward compatibility functions
+function pipe(broken, gas, index) {
+	if (!broken && !gas) return getTileIndex('pipes', 'working', index);
+	if (broken && !gas) return getTileIndex('pipes', 'broken', index);
+}
+
+function gas(color, index) {
+	return getTileIndex('gas', color, index);
+}
+
+function ground(index) {
+	return getTileIndex('ground', null, index);
+}
+
+function wall(index) {
+	return getTileIndex('wall', null, index);
+}
 
 cloud = (x, y) => [
 		{ x: x, y: y, value: gas("red", 6) },

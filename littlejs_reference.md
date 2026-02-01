@@ -31,7 +31,7 @@ rgb(r=1, g=1, b=1, a=1)                       // Create a color object with RGBA
 hsl(h=0, s=0, l=1, a=1)                       // Create a color object with HSLA values
 tile(pos, size=(16,16), texture=0, padding=0) // Create a tile info object
 
-// Helper functions 
+// Helper functions
 abs(value)                                    // Get absolute value
 min(...values)                                // Get lowest of values
 max(...values)                                // Get highest of values
@@ -50,7 +50,7 @@ nearestPowerOfTwo(value)                      // Returns the nearest power of tw
 isOverlapping(pointA, sizeA, pointB, sizeB)   // Checks if bounding boxes overlap
 isIntersecting(start, end, pos, size)         // Checks if ray intersects box
 wave(frequency=1, amplitude=1, t=time)        // Returns oscillating wave
-formatTime(t)                                 // Formats seconds for display 
+formatTime(t)                                 // Formats seconds for display
 
 // Random functions
 rand(valueA=1, valueB=0)             // Random float between values
@@ -63,13 +63,13 @@ randColor(colorA, colorB, linear)    // Random color between values
 
 // 2D vector math
 Vector2(x=0, y=0)                         // Create a 2D vector
-Vector2.copy()                            // Copy this vector    
+Vector2.copy()                            // Copy this vector
 Vector2.add(v)                            // Add a vector
 Vector2.subtract(v)                       // Subtract a vector
-Vector2.multiply(v)                       // Multiply by a vector 
+Vector2.multiply(v)                       // Multiply by a vector
 Vector2.divide(v)                         // Divide by a vector
 Vector2.scale(s)                          // Scale by a float
-Vector2.length()                          // Get length 
+Vector2.length()                          // Get length
 Vector2.lengthSquared()                   // Get length squared
 Vector2.distance(v)                       // Get distance to vector
 Vector2.distanceSquared(v)                // Get distance to vector squared
@@ -262,7 +262,7 @@ mousePos                              // World space mouse position
 mousePosScreen                        // Screen space mouse position
 mouseDelta                            // World space mouse movement delta
 mouseDeltaScreen                      // Screen space mouse movement delta
-mouseWheel                            // Delta mouse wheel this frame    
+mouseWheel                            // Delta mouse wheel this frame
 mouseIsDown(button)                   // Is mouse button down?
 mouseWasPressed(button)               // Was mouse button pressed this frame?
 mouseWasReleased(button)              // Was mouse button released this frame?
@@ -432,7 +432,7 @@ debugText(text, pos, size=1, color='#fff', time=0, angle=0) // Draw debug text
 debugAABB(pA, sA, pB, sB, color) // Draw a debug axis aligned box
 debugClear()                     // Clear all debug primitives
 saveCanvas(canvas, filename)     // Save canvas to a file
-saveText(text, filename)         // Save text to a file 
+saveText(text, filename)         // Save text to a file
 saveDataURL(dataURL, filename)   // Save url to a file
 
 // Debug settings
