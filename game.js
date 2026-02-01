@@ -1,17 +1,7 @@
-const BUTTONCLICKSOUND = new Sound([
-	0.08, 0, 250, 0.01, 0.01, 0.02, 1, 0.8, 0, 0, 0, 0, 0, 0.3, 0, 0, 0, 0.3,
-	0.04, 0.05, 350,
-]);
-
-const MASKS = ["none", "red", "blue", "green", "yellow"];
-let pipeArray = [];
-
 mask = (name) => ({
 	y: MASKS.indexOf(name) * 2,
 });
 
-
-ground = (index) => [38, 39, 38 + 18, 39 + 18][index];
 
 function emptyPipeData() {
 	return Array(32)
@@ -31,68 +21,6 @@ function addPipe(pipeData, x, y, pipe) {
 	return pipeData;
 }
 
-gases = {
-	square: {
-		emitterData: [
-			vec2(0, 0),
-			0, // pos, angle
-			1,
-			undefined,
-			100,
-			PI, // emitSize, emitTime, rate, cone
-			0, // tileInfo
-			rgb(0, 0, 1, 0.5),
-			hsl(0, 0, 1, 0.5), // colorStartA, colorStartB
-			hsl(1, 0, 0, 0),
-			hsl(0, 0, 1, 0), // colorEndA, colorEndB
-			1,
-			1,
-			5,
-			0.2,
-			0.01, // time, sizeStart, sizeEnd, speed, angleSpeed
-			0.85,
-			1,
-			-1,
-			PI,
-			0.3, // damp, angleDamp, gravity, particleCone, fade
-			0.5,
-			0,
-			0,
-			1, // randomness, collide, additive, colorLinear
-		],
-		effects: (player) => ({}),
-	},
-	triangle: {
-		emitterData: [
-			vec2(0, 0),
-			0, // pos, angle
-			1,
-			undefined,
-			100,
-			PI, // emitSize, emitTime, rate, cone
-			0, // tileInfo
-			rgb(1, 0, 0, 0.5),
-			hsl(0, 0, 1, 0.5), // colorStartA, colorStartB
-			hsl(1, 0, 0, 0),
-			hsl(0, 0, 1, 0), // colorEndA, colorEndB
-			1,
-			1,
-			5,
-			0.2,
-			0.01, // time, sizeStart, sizeEnd, speed, angleSpeed
-			0.85,
-			1,
-			-1,
-			PI,
-			0.3, // damp, angleDamp, gravity, particleCone, fade
-			0.5,
-			0,
-			0,
-			1, // randomness, collide, additive, colorLinear
-		],
-		effects: (player) => ({}),
-	},
-};
 
 function emitGas(position, gas) {
 	if (!gas || !gas.emitterData) {
@@ -108,7 +36,8 @@ function emitGas(position, gas) {
 	return gas;
 }
 
-function initPipeLayer(pipeData = null) {
+
+function pipeLayer(pipeData = null) {
 	const pos = vec2(-16);
 	const pipeLayer = new TileCollisionLayer(pos, vec2(32));
 	pipeLayer.renderOrder = -10000;
@@ -130,18 +59,19 @@ function initPipeLayer(pipeData = null) {
 	return pipeLayer;
 }
 
+
+
 function gameInit() {
 	objectDefaultDamping = 0.7;
 	player = new Player(vec2(), vec2(0.5), tile(vec2(), vec2(19, 21), 1));
 	player.maskName = MASKS[0];
 	player.drawSize = vec2(1);
 
-	pipeData = emptyPipeData();
 	pipeData = level.pipes.reduce((acc, pipe) =>
-		addPipe(acc, pipe.x, pipe.y, pipe.value), pipeData
+		addPipe(acc, pipe.x, pipe.y, pipe.value), emptyPipeData()
 	);
 
-	pipeLayer = initPipeLayer(pipeData);
+	pipeLayer = pipeLayer(pipeData);
 
 	setCanvasFixedSize(vec2(512, 512));
 	squareGasCloud = emitGas(vec2(6), gases.square);
@@ -159,9 +89,11 @@ function gameRender() {
 
 function postGameRender() {}
 
+
+
 class GameObject extends EngineObject {
 	render() {
-		// adjust draw position to be at the bottom of the object
+		
 		const drawSize = this.drawSize || this.size;
 		const offset = this.getUp(drawSize.y / 4);
 		const pos = this.pos.add(offset);
@@ -202,6 +134,8 @@ class Player extends GameObject {
 		).frame(((time * 8) % 4) | 0);
 	}
 }
+
+
 
 engineInit(gameInit, gameUpdate, null, gameRender, postGameRender, [
 	"pipes.png",
