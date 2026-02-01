@@ -3,25 +3,39 @@ const BUTTONCLICKSOUND = new Sound([
 	0.04, 0.05, 350,
 ]);
 
-MASKS = ["none", "red", "blue", "green", "yellow"]
+const MASKS = ["none", "red", "blue", "green", "yellow"];
+let pipeArray = [];
 
 mask = (name) => ({
-		y: MASKS.indexOf(name) * 2
-})
-
+	y: MASKS.indexOf(name) * 2,
+});
 
 pipe = (broken, gas, index) => {
-	working = [6, 7, 8, 6 + 18, 8 + 18, 6 + 36, 7 + 36, 8 + 36]
-	pipes = {
-		topLeftCorner: 6,
-		banded: 8,
-		horizontal: 8,
-	}
-	if (!broken && !gas) return working[randInt(0, working.length)]
+	let w = 18;
+	working = [6, 7, 8, 6 + w, 8 + w, 6 + w * 2, 7 + w * 2, 8 + w * 2];
+	if (!broken && !gas) return working[index];
+	if (broken && !gas) return 7 + w;
+};
+
+ground = (index) => [38, 39, 38 + 18, 39 + 18][index];
+
+function emptyPipeData() {
+	return Array(32)
+		.fill(null)
+		.map(() => Array(32).fill(null));
 }
 
-ground = (index)
+function addPipe(pipeData, x, y, pipe) {
+	if (x < 0 || x >= 32 || y < 0 || y >= 32) {
+		console.warn(
+			`Invalid pipe position: (${x}, ${y}). Must be within 0-31 range.`,
+		);
+		return pipeData;
+	}
 
+	pipeData[y][x] = pipe;
+	return pipeData;
+}
 
 gases = {
 	square: {
@@ -100,34 +114,71 @@ function emitGas(position, gas) {
 	return gas;
 }
 
+function initPipeLayer(pipeData = null) {
+	const pos = vec2(-16);
+	const pipeLayer = new TileCollisionLayer(pos, vec2(32));
+	pipeLayer.renderOrder = -10000;
+
+	pipeArray = pipeData || emptyPipeData();
+
+	for (let y = 0; y < 32; y++) {
+		for (let x = 0; x < 32; x++) {
+			const pipeValue = pipeArray[y][x];
+			if (pipeValue) {
+				const data = new TileLayerData(pipeValue);
+				pipeLayer.setData(vec2(x, y), data);
+				pipeLayer.setCollisionData(vec2(x, y));
+			}
+		}
+	}
+
+	pipeLayer.redraw();
+	return pipeLayer;
+}
+
+// TODO allow saving a level with this format
+level = {
+	pipes: [
+		{ x: 16, y: 14, value: pipe(false, false, 1) },
+		{ x: 17, y: 14, value: pipe(false, false, 2) },
+		{ x: 17, y: 13, value: pipe(false, false, 3) },
+		{ x: 14, y: 15, value: pipe(false, false, 4) },
+		{ x: 14, y: 14, value: pipe(false, false, 5) },
+		{ x: 15, y: 14, value: pipe(false, false, 6) },
+		// vertical 
+		{ x: 17, y: 12, value: pipe(false, false, 4) },
+		{ x: 17, y: 11, value: pipe(false, false, 4) },
+		{ x: 17, y: 10, value: pipe(false, false, 4) },
+		{ x: 17, y: 9, value: pipe(false, false, 4) },
+		{ x: 17, y: 8, value: pipe(false, false, 4) },
+		{ x: 17, y: 7, value: pipe(false, false, 4) },
+		{ x: 17, y: 6, value: pipe(false, false, 4) },
+		{ x: 17, y: 5, value: pipe(false, false, 4) },
+		{ x: 17, y: 4, value: pipe(false, false, 4) },
+	],
+};
+
 function gameInit() {
 	objectDefaultDamping = 0.7;
 	player = new Player(vec2(), vec2(0.5), tile(vec2(), vec2(19, 21), 1));
-	player.maskName = MASKS[0]
+	player.maskName = MASKS[0];
 	player.drawSize = vec2(1);
+
+	pipeData = emptyPipeData();
+	pipeData = level.pipes.reduce((acc, pipe) =>
+		addPipe(acc, pipe.x, pipe.y, pipe.value), pipeData
+	);
+
+	pipeLayer = initPipeLayer(pipeData);
 
 	setCanvasFixedSize(vec2(512, 512));
 	squareGasCloud = emitGas(vec2(6), gases.square);
 	circleGasCloud = emitGas(vec2(-6), gases.triangle);
-
-	// create tile layer
-	const pos = vec2(-16);
-	const pipeLayer = new TileCollisionLayer(pos, vec2(32));
-	pipeLayer.renderOrder = -10000;
-	for (pos.x = pipeLayer.size.x; pos.x--; )
-		for (pos.y = pipeLayer.size.y; pos.y--; ) {
-			if (randBool(0.7)) continue;
-
-			const data = new TileLayerData(pipe(false, false));
-			pipeLayer.setData(pos, data);
-			pipeLayer.setCollisionData(pos);
-		}
-	pipeLayer.redraw();
 }
 
 function gameUpdate() {
 	if (keyWasPressed("Space"))
-		player.maskName = MASKS[MASKS.indexOf(player.maskName) + 1]
+		player.maskName = MASKS[MASKS.indexOf(player.maskName) + 1];
 }
 
 function gameRender() {
@@ -142,44 +193,45 @@ class GameObject extends EngineObject {
 		const drawSize = this.drawSize || this.size;
 		const offset = this.getUp(drawSize.y / 4);
 		const pos = this.pos.add(offset);
-		drawTile(
-			pos,
-			drawSize,
-			this.tileInfo,
-			undefined,
-			undefined,
-			this.mirror,
-		);
+		drawTile(pos, drawSize, this.tileInfo, undefined, undefined, this.mirror);
 	}
 }
 
 class Player extends GameObject {
-
 	update() {
 		super.update();
 
 		const moveInput = keyDirection().clampLength(1).scale(0.075);
 		this.velocity = this.velocity.add(moveInput);
-		this.mirror = this.velocity.x < 0
+		this.mirror = this.velocity.x < 0;
 		this.setCollision();
 
 		cameraPos = this.pos.add(vec2(0, 2));
 
-		if (moveInput.length() === 0){
-			this.state = this.idle
+		if (moveInput.length() === 0) {
+			this.state = this.idle;
 		} else {
-			this.state = this.walk
+			this.state = this.walk;
 		}
-		this.state()
+		this.state();
 	}
 
 	idle() {
-		this.tileInfo = tile(vec2(0, mask(this.maskName).y), vec2(19, 21), 1).frame(time*4%2|0);
+		this.tileInfo = tile(vec2(0, mask(this.maskName).y), vec2(19, 21), 1).frame(
+			((time * 4) % 2) | 0,
+		);
 	}
 
 	walk() {
-		this.tileInfo = tile(vec2(0, mask(this.maskName).y + 1), vec2(19, 21), 1).frame(time*8%4|0);
+		this.tileInfo = tile(
+			vec2(0, mask(this.maskName).y + 1),
+			vec2(19, 21),
+			1,
+		).frame(((time * 8) % 4) | 0);
 	}
 }
 
-engineInit(gameInit, gameUpdate, null, gameRender, postGameRender, ["pipes.png", "gorm.png"])
+engineInit(gameInit, gameUpdate, null, gameRender, postGameRender, [
+	"pipes.png",
+	"gorm.png",
+]);
