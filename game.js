@@ -56,6 +56,45 @@ function pipeLayer(pipeData = null) {
 	return pipeLayer;
 }
 
+function emptyGasData() {
+	return Array(32)
+		.fill(null)
+		.map(() => Array(32).fill(null));
+}
+
+function addGas(gasData, x, y, gas) {
+	if (x < 0 || x >= 32 || y < 0 || y >= 32) {
+		console.warn(
+			`Invalid gas position: (${x}, ${y}). Must be within 0-31 range.`,
+		);
+		return gasData;
+	}
+
+	gasData[y][x] = gas;
+	return gasData;
+}
+
+function gasLayer(gasData = null) {
+	const pos = vec2(-16);
+	const gasLayer = new TileLayer(pos, vec2(32));
+	gasLayer.renderOrder = -9999;
+
+	gasArray = gasData || emptyGasData();
+
+	for (let y = 0; y < 32; y++) {
+		for (let x = 0; x < 32; x++) {
+			const gasValue = gasArray[y][x];
+			if (gasValue) {
+				const data = new TileLayerData(gasValue);
+				gasLayer.setData(vec2(x, y), data);
+			}
+		}
+	}
+
+	gasLayer.redraw();
+	return gasLayer;
+}
+
 function groundLayer() {
 	const pos = vec2(-16);
 	groundLayer = new TileCollisionLayer(pos, vec2(32));
@@ -97,7 +136,13 @@ function gameInit() {
 		emptyPipeData(),
 	);
 
+	gasData = level.gases.reduce(
+		(acc, gas) => addGas(acc, gas.x, gas.y, gas.value),
+		emptyGasData(),
+	);
+
 	pipeLayer = pipeLayer(pipeData);
+	gasLayer = gasLayer(gasData);
 	groundLayer = groundLayer();
 
 	setCanvasFixedSize(vec2(512, 512));

@@ -8,11 +8,21 @@ const MASKS = ["none", "red", "blue", "green", "yellow"];
 pipe = (broken, gas, index) => {
 	let w = 18;
 	workingPipes = [6, 7, 8, 6 + w, 8 + w, 6 + w * 2, 7 + w * 2, 8 + w * 2];
-	brokenPipes = [7 + w];
+	brokenPipes = [7 + w, 6 + (3 * w), 7 + (3 * w), 8 + (3 * w)];
 	if (!broken && !gas) return workingPipes[index];
 	if (broken && !gas) return brokenPipes[index];
 
 };
+
+gas = (color, index) => {
+	let w = 18;
+	if (color === "red") {
+		return [0, 1, 2, 0 + w, 1 + w, 2 + w, 0 + (w * 2), 1 + (w * 2), 2 + (w * 2)].map((i) => i + (w * 4))[index]
+	}
+	if (color === "blue") {
+		return [2, 3, 2 + w, 3 + w].map((i) => i + (w * 4))[index]
+	}
+}
 
 ground = (index) => [38, 39, 38 + 18, 39 + 18][index];
 wall = (index) =>
@@ -62,8 +72,18 @@ const level = {
 		{ x: 17, y: 7, value: pipe(false, false, 4) },
 		{ x: 17, y: 6, value: pipe(false, false, 4) },
 		{ x: 17, y: 5, value: pipe(false, false, 4) },
-		{ x: 17, y: 4, value: pipe(false, false, 4) },
 	],
+	gases: [
+		{ x: 17, y: 19, value: gas("red", 0) },
+		{ x: 18, y: 19, value: gas("red", 1) },
+		{ x: 19, y: 19, value: gas("red", 2) },
+		{ x: 17, y: 18, value: gas("red", 3) },
+		{ x: 18, y: 18, value: gas("red", 4) },
+		{ x: 19, y: 18, value: gas("red", 5) },
+		{ x: 17, y: 17, value: gas("red", 6) },
+		{ x: 18, y: 17, value: gas("red", 7) },
+		{ x: 19, y: 17, value: gas("red", 8) },
+	]
 };
 
 gases = {
