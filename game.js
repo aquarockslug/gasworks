@@ -101,8 +101,8 @@ function gameInit() {
 	groundLayer = groundLayer();
 
 	setCanvasFixedSize(vec2(512, 512));
-	squareGasCloud = emitGas(vec2(6), gases.square);
-	circleGasCloud = emitGas(vec2(-6), gases.triangle);
+	// squareGasCloud = emitGas(vec2(6), gases.square);
+	// circleGasCloud = emitGas(vec2(-6), gases.triangle);
 }
 
 function gameUpdate() {

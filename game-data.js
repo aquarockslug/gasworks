@@ -49,7 +49,7 @@ const level = {
 		{ x: 15, y: 20, value: pipe(false, false, 1) },
 		{ x: 16, y: 20, value: pipe(false, false, 6) },
 		{ x: 17, y: 20, value: pipe(false, false, 6) },
-		{ x: 18, y: 20, value: pipe(false, false, 6) },
+		{ x: 18, y: 20, value: pipe(true, false, 0) },
 		{ x: 19, y: 20, value: pipe(false, false, 6) },
 		{ x: 20, y: 20, value: pipe(false, false, 6) },
 		{ x: 21, y: 20, value: pipe(false, false, 6) },
