@@ -47,15 +47,15 @@ function wall(index) {
 }
 
 cloud = (x, y) => [
-		{ x: x, y: y, value: gas("red", 6) },
-		{ x: x + 1, y: y, value: gas("red", 7) },
-		{ x: x + 2, y: y, value: gas("red", 8) },
-		{ x: x, y: y + 1, value: gas("red", 3) },
-		{ x: x + 1, y: y + 1, value: gas("red", 4) },
-		{ x: x + 2, y: y + 1, value: gas("red", 5) },
-		{ x: x, y: y + 2, value: gas("red", 0) },
-		{ x: x + 1, y: y + 2, value: gas("red", 1) },
-		{ x: x + 2, y: y + 2, value: gas("red", 2) },
+		{ x: x, y: y, value: { tile: gas("red", 6), animSpeed: 4, frames: 4 } },
+		{ x: x + 1, y: y, value: { tile: gas("red", 7), animSpeed: 4, frames: 4 } },
+		{ x: x + 2, y: y, value: { tile: gas("red", 8), animSpeed: 4, frames: 4 } },
+		{ x: x, y: y + 1, value: { tile: gas("red", 3), animSpeed: 4, frames: 4 } },
+		{ x: x + 1, y: y + 1, value: { tile: gas("red", 4), animSpeed: 4, frames: 4 } },
+		{ x: x + 2, y: y + 1, value: { tile: gas("red", 5), animSpeed: 4, frames: 4 } },
+		{ x: x, y: y + 2, value: { tile: gas("red", 0), animSpeed: 4, frames: 4 } },
+		{ x: x + 1, y: y + 2, value: { tile: gas("red", 1), animSpeed: 4, frames: 4 } },
+		{ x: x + 2, y: y + 2, value: { tile: gas("red", 2), animSpeed: 4, frames: 4 } },
 ]
 
 level = {

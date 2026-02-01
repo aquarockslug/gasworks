@@ -96,18 +96,19 @@ function createTileLayer(data = null, isCollision = false, renderOrder = -10000,
 
 	const dataArray = data || createEmptyGrid();
 
-	for (let y = 0; y < size.y; y++) {
-		for (let x = 0; x < size.x; x++) {
-			const value = dataArray[y][x];
-			if (value) {
-				const tileData = new TileLayerData(value);
-				layer.setData(vec2(x, y), tileData);
-				if (isCollision) {
-					layer.setCollisionData(vec2(x, y));
+		for (let y = 0; y < size.y; y++) {
+			for (let x = 0; x < size.x; x++) {
+				const value = dataArray[y][x];
+				if (value) {
+					const tileIndex = typeof value === 'object' && value.tile ? value.tile : value;
+					const tileData = new TileLayerData(tileIndex);
+					layer.setData(vec2(x, y), tileData);
+					if (isCollision) {
+						layer.setCollisionData(vec2(x, y));
+					}
 				}
 			}
 		}
-	}
 
 	layer.redraw();
 	return layer;
@@ -143,6 +144,8 @@ function groundLayer() {
 	return groundLayer;
 }
 
+let gasAnimTime = 0;
+
 function gameInit() {
 	objectDefaultDamping = 0.7;
 	player = new Player(vec2(), vec2(0.5), tile(vec2(), vec2(19, 21), 1));
@@ -176,6 +179,24 @@ function gameInit() {
 }
 
 function gameUpdate() {
+	gasAnimTime += timeDelta;
+
+	// Animate gas tiles
+	const frame = ((gasAnimTime * 6) | 0) % 3; // 3-frame loop
+
+	for (let y = 0; y < 32; y++) {
+		for (let x = 0; x < 32; x++) {
+			const gas = gasData[y][x];
+			if (!gas) continue;
+
+			const tileIndex = typeof gas === 'object' ? gas.tile : gas;
+			const data = new TileLayerData(tileIndex + ( frame * 3 ));
+			gl.setData(vec2(x, y), data);
+		}
+	}
+
+	gl.redraw();
+
 	if (keyWasPressed("Space") && player.pos.distance(lever.pos) < 1)
 		lever.toggle()
 
@@ -236,7 +257,8 @@ class Player extends GameObject {
 	update() {
 		super.update();
 
-		this.inGas = gl.getData(this.pos.floor().add(vec2(16))).tile
+		const gasDataAtPos = gl.getData(this.pos.floor().add(vec2(16)));
+		this.inGas = gasDataAtPos.tile;
 		if (lever.on && this.inGas && this.maskName != "red") this.pos = vec2(0)
 
 		const moveInput = keyDirection().clampLength(1).scale(0.075);
