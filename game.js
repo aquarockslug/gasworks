@@ -1,6 +1,61 @@
-maskData = (name) => ({
-	y: MASKS.indexOf(name) * 2,
+/* Option 1 (Recommended): Animate gas tiles by cycling tile frames
+
+Your gasLayer is a TileLayer, so the correct way to animate it is to change the tile’s frame over time and redraw.
+
+Key idea
+
+Store a base tile index for gas
+
+Every frame (or every N frames), update the tile’s frame()
+
+Call gasLayer.redraw()
+
+Why this works well
+
+Cheap (no particles needed)
+
+Deterministic
+
+Matches grid-based gas
+
+Minimal change example
+1. Store animation info per gas tile
+
+Instead of storing just a tile index, store an object:
+
+addGas(gasData, x, y, {
+    tile: gas,
+    animSpeed: 4,
 });
+
+2. Animate in gameUpdate
+let gasAnimTime = 0;
+
+function gameUpdate() {
+    gasAnimTime += timeDelta;
+
+    const frame = ((gasAnimTime * 6) | 0) % 4; // 4-frame loop
+
+    for (let y = 0; y < 32; y++) {
+        for (let x = 0; x < 32; x++) {
+            const gas = gasArray[y][x];
+            if (!gas) continue;
+
+            const data = new TileLayerData(
+                gas.tile.frame(frame)
+            );
+            gl.setData(vec2(x, y), data);
+        }
+    }
+
+    gl.redraw();
+}
+
+
+💡 This assumes your gas tiles are laid out as animation frames horizontally in the tileset.
+	*/
+
+
 
 function createEmptyGrid(width = 32, height = 32) {
 	return Array(height)
@@ -217,7 +272,7 @@ class Player extends GameObject {
 
 		const anim = animations[state];
 		this.tileInfo = tile(
-			vec2(0, maskData(this.maskName).y + anim.rowOffset),
+			vec2(0, MASKS.indexOf(this.maskName) * 2 + anim.rowOffset),
 			vec2(19, 21),
 			1,
 		).frame(((time * anim.speed) % anim.frames) | 0);
