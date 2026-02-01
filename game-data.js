@@ -58,7 +58,7 @@ cloud = (x, y) => [
 		{ x: x + 2, y: y + 2, value: gas("red", 2) },
 ]
 
-const level = {
+level = {
 	pipes: [
 		{ x: 16, y: 14, value: pipe(false, false, 1) },
 		{ x: 17, y: 14, value: pipe(false, false, 2) },

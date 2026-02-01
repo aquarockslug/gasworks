@@ -165,7 +165,8 @@ class Mask extends GameObject {
 		this.collideWithTile = true
 	}
 	update() {
-		this.tileInfo = vec2(0)
+		let step = time*6%8|0;
+		this.tileInfo = tile(vec2(0, step < 4 ? 0 : step - 4), vec2(8, 10), 2)
 	}
 }
 
