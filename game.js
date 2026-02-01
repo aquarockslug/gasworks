@@ -3,12 +3,32 @@ const BUTTONCLICKSOUND = new Sound([
 	0.04, 0.05, 350,
 ]);
 
+MASKS = ["none", "red", "blue", "green", "yellow"]
+
+mask = (name) => ({
+		y: MASKS.indexOf(name) * 2
+})
+
+
+pipe = (broken, gas, index) => {
+	working = [6, 7, 8, 6 + 18, 8 + 18, 6 + 36, 7 + 36, 8 + 36]
+	pipes = {
+		topLeftCorner: 6,
+		banded: 8,
+		horizontal: 8,
+	}
+	if (!broken && !gas) return working[randInt(0, working.length)]
+}
+
+ground = (index)
+
+
 gases = {
 	square: {
 		emitterData: [
 			vec2(0, 0),
 			0, // pos, angle
-			6,
+			1,
 			undefined,
 			100,
 			PI, // emitSize, emitTime, rate, cone
@@ -38,7 +58,7 @@ gases = {
 		emitterData: [
 			vec2(0, 0),
 			0, // pos, angle
-			6,
+			1,
 			undefined,
 			100,
 			PI, // emitSize, emitTime, rate, cone
@@ -82,50 +102,36 @@ function emitGas(position, gas) {
 
 function gameInit() {
 	objectDefaultDamping = 0.7;
-	const player = new Player(vec2(), vec2(0.5), tile(vec2(), vec2(19, 21), 1));
+	player = new Player(vec2(), vec2(0.5), tile(vec2(), vec2(19, 21), 1));
+	player.maskName = MASKS[0]
 	player.drawSize = vec2(1);
 
 	setCanvasFixedSize(vec2(512, 512));
 	squareGasCloud = emitGas(vec2(6), gases.square);
 	circleGasCloud = emitGas(vec2(-6), gases.triangle);
 
-	const gameTile = (i, size = 16) => tile(i, size);
-	spriteAtlas = {
-		player: gameTile(0),
-		circle: gameTile(0),
-		crate: gameTile(1),
-		icon: gameTile(2),
-		circleBig: gameTile(2, 128),
-		iconBig: gameTile(3, 128),
-	};
-	canvasClearColor = GRAY;
-
 	// create tile layer
 	const pos = vec2(-16);
-	const tileLayer = new TileCollisionLayer(pos, vec2(32));
-	tileLayer.renderOrder = -10000;
-	for (pos.x = tileLayer.size.x; pos.x--; )
-		for (pos.y = tileLayer.size.y; pos.y--; ) {
+	const pipeLayer = new TileCollisionLayer(pos, vec2(32));
+	pipeLayer.renderOrder = -10000;
+	for (pos.x = pipeLayer.size.x; pos.x--; )
+		for (pos.y = pipeLayer.size.y; pos.y--; ) {
 			if (randBool(0.7)) continue;
 
-			const direction = randInt(4);
-			const mirror = randBool();
-			const data = new TileLayerData(randInt(6, 8));
-			tileLayer.setData(pos, data);
-			tileLayer.setCollisionData(pos);
+			const data = new TileLayerData(pipe(false, false));
+			pipeLayer.setData(pos, data);
+			pipeLayer.setCollisionData(pos);
 		}
-	tileLayer.redraw();
+	pipeLayer.redraw();
 }
 
-function gameUpdate() {}
+function gameUpdate() {
+	if (keyWasPressed("Space"))
+		player.maskName = MASKS[MASKS.indexOf(player.maskName) + 1]
+}
 
 function gameRender() {
 	drawRect(vec2(), vec2(32), new Color().setHex("#bbc3ca"));
-
-	// draw more sprites from the atlas
-	// drawTile(vec2(-7, 4), vec2(5), spriteAtlas.crate);
-	// drawTile(vec2(0, 4), vec2(5), spriteAtlas.circle);
-	// drawTile(vec2(7, 4), vec2(5), spriteAtlas.circleBig);
 }
 
 function postGameRender() {}
@@ -142,24 +148,37 @@ class GameObject extends EngineObject {
 			this.tileInfo,
 			undefined,
 			undefined,
-			this.angle,
-			undefined,
-			100,
+			this.mirror,
 		);
 	}
 }
 
 class Player extends GameObject {
+
 	update() {
 		super.update();
 
-		// apply movement controls
-		const moveInput = keyDirection().clampLength(1).scale(0.1);
+		const moveInput = keyDirection().clampLength(1).scale(0.075);
 		this.velocity = this.velocity.add(moveInput);
+		this.mirror = this.velocity.x < 0
 		this.setCollision();
 
-		// move camera with player
 		cameraPos = this.pos.add(vec2(0, 2));
+
+		if (moveInput.length() === 0){
+			this.state = this.idle
+		} else {
+			this.state = this.walk
+		}
+		this.state()
+	}
+
+	idle() {
+		this.tileInfo = tile(vec2(0, mask(this.maskName).y), vec2(19, 21), 1).frame(time*4%2|0);
+	}
+
+	walk() {
+		this.tileInfo = tile(vec2(0, mask(this.maskName).y + 1), vec2(19, 21), 1).frame(time*8%4|0);
 	}
 }
 
