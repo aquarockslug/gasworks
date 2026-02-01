@@ -127,4 +127,34 @@ gases = {
 		],
 		effects: (player) => ({}),
 	},
+	dust: {
+		emitterData: [
+			vec2(0, 0),
+			0, // pos, angle
+			0.3,
+			0.2,
+			30,
+			PI/3, // emitSize, emitTime, rate, cone
+			0, // tileInfo
+			rgb(0.6, 0.4, 0.2, 0.7),
+			rgb(0.7, 0.5, 0.3, 0.7), // colorStartA, colorStartB
+			hsl(0.1, 0.3, 0.3, 0),
+			hsl(0.1, 0.2, 0.2, 0), // colorEndA, colorEndB
+			0.4,
+			0.05,
+			0.08,
+			0.03,
+			0.01, // time, sizeStart, sizeEnd, speed, angleSpeed
+			0.95,
+			0.9,
+			0.05,
+			PI/4,
+			0.9, // damp, angleDamp, gravity, particleCone, fade
+			0.2,
+			1,
+			0,
+			1, // randomness, collide, additive, colorLinear
+		],
+		effects: (player) => ({}),
+	},
 };

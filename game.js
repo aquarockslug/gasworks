@@ -126,6 +126,12 @@ class GameObject extends EngineObject {
 }
 
 class Player extends GameObject {
+	constructor(...args) {
+		super(...args);
+		this.lastEmitTime = 0;
+		this.emitInterval = 0.1;
+	}
+
 	update() {
 		super.update();
 
@@ -141,8 +147,17 @@ class Player extends GameObject {
 			this.state = this.idle;
 		} else {
 			this.state = this.walk;
+			this.emitDustParticles();
 		}
 		this.state();
+	}
+
+	emitDustParticles() {
+		if (time - this.lastEmitTime > this.emitInterval) {
+			const feetPos = this.pos.add(vec2(0, 0.4));
+			emitGas(feetPos, gases.dust);
+			this.lastEmitTime = time;
+		}
 	}
 
 	idle() {
