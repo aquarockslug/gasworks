@@ -134,6 +134,7 @@ class Player extends GameObject {
 		this.mirror = this.velocity.x < 0;
 		this.setCollision();
 
+		// TODO clamp
 		cameraPos = this.pos.add(vec2(0, 2));
 
 		if (moveInput.length() === 0) {
