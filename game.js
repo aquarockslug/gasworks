@@ -30,26 +30,33 @@ function emitGas(position, gas) {
 	return gas;
 }
 
-function createTileLayer(data = null, isCollision = false, renderOrder = -10000, position = vec2(-16), size = vec2(32)) {
+function createTileLayer(
+	data = null,
+	isCollision = false,
+	renderOrder = -10000,
+	position = vec2(-16),
+	size = vec2(32),
+) {
 	const layerClass = isCollision ? TileCollisionLayer : TileLayer;
 	const layer = new layerClass(position, size);
 	layer.renderOrder = renderOrder;
 
 	const dataArray = data || createEmptyGrid();
 
-		for (let y = 0; y < size.y; y++) {
-			for (let x = 0; x < size.x; x++) {
-				const value = dataArray[y][x];
-				if (value) {
-					const tileIndex = typeof value === 'object' && value.tile ? value.tile : value;
-					const tileData = new TileLayerData(tileIndex);
-					layer.setData(vec2(x, y), tileData);
-					if (isCollision) {
-						layer.setCollisionData(vec2(x, y));
-					}
+	for (let y = 0; y < size.y; y++) {
+		for (let x = 0; x < size.x; x++) {
+			const value = dataArray[y][x];
+			if (value) {
+				const tileIndex =
+					typeof value === "object" && value.tile ? value.tile : value;
+				const tileData = new TileLayerData(tileIndex);
+				layer.setData(vec2(x, y), tileData);
+				if (isCollision) {
+					layer.setCollisionData(vec2(x, y));
 				}
 			}
 		}
+	}
 
 	layer.redraw();
 	return layer;
@@ -85,13 +92,13 @@ function groundLayer() {
 	return groundLayer;
 }
 
-let gasAnimTime = 0;
-
 function gameInit() {
 	objectDefaultDamping = 0.7;
 	player = new Player(vec2(), vec2(0.5), tile(vec2(), vec2(19, 21), 1));
 	player.maskName = MASKS[0];
 	player.drawSize = vec2(1);
+
+	gasAnimTime = 0;
 
 	lever = new Lever(vec2(-2.5, 0), vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
 	mask = new Mask(vec2(5, -5), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
@@ -108,6 +115,13 @@ function gameInit() {
 
 	pl = createTileLayer(pipeData, true, -10000);
 	gl = createTileLayer(gasData, false, -9999);
+
+	// for (let y = 0; y <= 32; y++) {
+	// 	for (let x = 0; x < 32; x++) {
+	// 		if (data.tile === pipe(true, "red", 2)) data = pipe(true, "red", 3);
+	// 		console.log("🪚 data.tile:", data.tile, pipe(true, "red", 2));
+	// 	}
+	// }
 
 	// gasData[16][16] = 10
 	// gl = createTileLayer(gasData, false, -9999);
@@ -131,8 +145,8 @@ function gameUpdate() {
 			const gas = gasData[y][x];
 			if (!gas) continue;
 
-			const tileIndex = typeof gas === 'object' ? gas.tile : gas;
-			const data = new TileLayerData(tileIndex + ( actualFrame * 3 ));
+			const tileIndex = typeof gas === "object" ? gas.tile : gas;
+			const data = new TileLayerData(tileIndex + actualFrame * 3);
 			gl.setData(vec2(x, y), data);
 		}
 	}
@@ -140,12 +154,12 @@ function gameUpdate() {
 	gl.redraw();
 
 	if (keyWasPressed("Space") && player.pos.distance(lever.pos) < 1)
-		lever.toggle()
+		lever.toggle();
 
-	gl.pos = vec2(-16).add(vec2(lever.on ? 0 : 1000))
+	gl.pos = vec2(-16).add(vec2(lever.on ? 0 : 1000));
 
 	if (keyWasPressed("Space") && player.pos.distance(mask.pos) < 1) {
-		player.maskName = player.maskName === "red" ? "none" : "red"
+		player.maskName = player.maskName === "red" ? "none" : "red";
 	}
 }
 
@@ -167,24 +181,24 @@ class GameObject extends EngineObject {
 class Lever extends GameObject {
 	constructor(...args) {
 		super(...args);
-		this.renderOrder = -500
-		this.on = true
+		this.renderOrder = -500;
+		this.on = true;
 	}
 	toggle() {
-		this.on = !this.on
-		this.tileInfo = tile(vec2(9, 10), vec2(16)).frame(this.on ? 1 : 0)
+		this.on = !this.on;
+		this.tileInfo = tile(vec2(9, 10), vec2(16)).frame(this.on ? 1 : 0);
 	}
 }
 
 class Mask extends GameObject {
 	constructor(...args) {
 		super(...args);
-		this.renderOrder = -500
-		this.collideWithTile = true
+		this.renderOrder = -500;
+		this.collideWithTile = true;
 	}
 	update() {
-		let step = time*6%8|0;
-		this.tileInfo = tile(vec2(0, step < 4 ? 0 : step - 4), vec2(8, 10), 2)
+		let step = ((time * 6) % 8) | 0;
+		this.tileInfo = tile(vec2(0, step < 4 ? 0 : step - 4), vec2(8, 10), 2);
 	}
 }
 
@@ -193,7 +207,7 @@ class Player extends GameObject {
 		super(...args);
 		this.lastEmitTime = 0;
 		this.emitInterval = 0.1;
-		this.inGas = false
+		this.inGas = false;
 	}
 
 	update() {
@@ -201,7 +215,7 @@ class Player extends GameObject {
 
 		const gasDataAtPos = gl.getData(this.pos.floor().add(vec2(16)));
 		this.inGas = gasDataAtPos.tile;
-		if (lever.on && this.inGas && this.maskName != "red") this.pos = vec2(0)
+		if (lever.on && this.inGas && this.maskName != "red") this.pos = vec2(0);
 
 		const moveInput = keyDirection().clampLength(1).scale(0.075);
 		this.velocity = this.velocity.add(moveInput);
@@ -231,7 +245,7 @@ class Player extends GameObject {
 	setAnimation(state) {
 		const animations = {
 			idle: { rowOffset: 0, frames: 2, speed: 4 },
-			walk: { rowOffset: 1, frames: 4, speed: 6 }
+			walk: { rowOffset: 1, frames: 4, speed: 6 },
 		};
 
 		const anim = animations[state];
@@ -243,11 +257,11 @@ class Player extends GameObject {
 	}
 
 	idle() {
-		this.setAnimation('idle');
+		this.setAnimation("idle");
 	}
 
 	walk() {
-		this.setAnimation('walk');
+		this.setAnimation("walk");
 	}
 }
 

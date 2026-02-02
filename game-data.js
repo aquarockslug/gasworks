@@ -8,21 +8,22 @@ const MASKS = ["none", "red", "blue", "green", "yellow"];
 const TILE_INDEXES = {
 	pipes: {
 		working: [6, 7, 8, 24, 26, 42, 43, 44],
-		broken: [25, 60, 61, 62]
+		broken: [25, 60, 61, 62],
+		red: [9, 9 + 36, 10, 10 + 36, 27, 27 + 36, 28, 28 + 36],
 	},
 	gas: {
 		red: [72, 73, 74, 90, 91, 92, 108, 109, 110],
-		blue: [74, 75, 92, 93]
+		blue: [74, 75, 92, 93],
 	},
 	ground: [38, 39, 56, 57],
-	wall: [0, 1, 2, 3, 4, 5, 18, 19, 20, 21, 22, 23, 36, 37, 38]
+	wall: [0, 1, 2, 3, 4, 5, 18, 19, 20, 21, 22, 23, 36, 37, 38],
 };
 
 function getTileIndex(category, type, index) {
 	const categoryData = TILE_INDEXES[category];
 	if (!categoryData) return undefined;
-	
-	if (typeof categoryData === 'object' && !Array.isArray(categoryData)) {
+
+	if (typeof categoryData === "object" && !Array.isArray(categoryData)) {
 		return categoryData[type]?.[index];
 	}
 	return categoryData[index];
@@ -30,33 +31,50 @@ function getTileIndex(category, type, index) {
 
 // Backward compatibility functions
 function pipe(broken, gas, index) {
-	if (!broken && !gas) return getTileIndex('pipes', 'working', index);
-	if (broken && !gas) return getTileIndex('pipes', 'broken', index);
+	if (!broken && !gas) return getTileIndex("pipes", "working", index);
+	if (broken && !gas) return getTileIndex("pipes", "broken", index);
+	if (broken && gas) return getTileIndex("pipes", gas, index);
 }
 
 function gas(color, index) {
-	return getTileIndex('gas', color, index);
+	return getTileIndex("gas", color, index);
 }
 
 function ground(index) {
-	return getTileIndex('ground', null, index);
+	return getTileIndex("ground", null, index);
 }
 
 function wall(index) {
-	return getTileIndex('wall', null, index);
+	return getTileIndex("wall", null, index);
 }
 
 cloud = (x, y) => [
-		{ x: x, y: y, value: { tile: gas("red", 6), animSpeed: 4, frames: 4 } },
-		{ x: x + 1, y: y, value: { tile: gas("red", 7), animSpeed: 4, frames: 4 } },
-		{ x: x + 2, y: y, value: { tile: gas("red", 8), animSpeed: 4, frames: 4 } },
-		{ x: x, y: y + 1, value: { tile: gas("red", 3), animSpeed: 4, frames: 4 } },
-		{ x: x + 1, y: y + 1, value: { tile: gas("red", 4), animSpeed: 4, frames: 4 } },
-		{ x: x + 2, y: y + 1, value: { tile: gas("red", 5), animSpeed: 4, frames: 4 } },
-		{ x: x, y: y + 2, value: { tile: gas("red", 0), animSpeed: 4, frames: 4 } },
-		{ x: x + 1, y: y + 2, value: { tile: gas("red", 1), animSpeed: 4, frames: 4 } },
-		{ x: x + 2, y: y + 2, value: { tile: gas("red", 2), animSpeed: 4, frames: 4 } },
-]
+	{ x: x, y: y, value: { tile: gas("red", 6), animSpeed: 4, frames: 4 } },
+	{ x: x + 1, y: y, value: { tile: gas("red", 7), animSpeed: 4, frames: 4 } },
+	{ x: x + 2, y: y, value: { tile: gas("red", 8), animSpeed: 4, frames: 4 } },
+	{ x: x, y: y + 1, value: { tile: gas("red", 3), animSpeed: 4, frames: 4 } },
+	{
+		x: x + 1,
+		y: y + 1,
+		value: { tile: gas("red", 4), animSpeed: 4, frames: 4 },
+	},
+	{
+		x: x + 2,
+		y: y + 1,
+		value: { tile: gas("red", 5), animSpeed: 4, frames: 4 },
+	},
+	{ x: x, y: y + 2, value: { tile: gas("red", 0), animSpeed: 4, frames: 4 } },
+	{
+		x: x + 1,
+		y: y + 2,
+		value: { tile: gas("red", 1), animSpeed: 4, frames: 4 },
+	},
+	{
+		x: x + 2,
+		y: y + 2,
+		value: { tile: gas("red", 2), animSpeed: 4, frames: 4 },
+	},
+];
 
 level = {
 	pipes: [
@@ -77,8 +95,8 @@ level = {
 		{ x: 19, y: 20, value: pipe(false, false, 6) },
 		{ x: 20, y: 20, value: pipe(false, false, 6) },
 		{ x: 21, y: 20, value: pipe(false, false, 6) },
-		{ x: 22, y: 20, value: pipe(true, false, 0) },
-		{ x: 23, y: 20, value: pipe(false, false, 6) },
+		{ x: 22, y: 20, value: pipe(true, "red", 2) },
+		{ x: 23, y: 20, value: pipe(true, "red", 3) },
 		{ x: 15, y: 14, value: pipe(false, false, 6) },
 		{ x: 17, y: 12, value: pipe(false, false, 4) },
 		{ x: 17, y: 11, value: pipe(false, false, 4) },
@@ -89,11 +107,8 @@ level = {
 		{ x: 17, y: 6, value: pipe(false, false, 4) },
 		{ x: 17, y: 5, value: pipe(false, false, 4) },
 	],
-	gases: [
-		...cloud(21, 17),
-	]
+	gases: [...cloud(21, 17)],
 };
-
 
 particles = {
 	square: {
@@ -163,7 +178,7 @@ particles = {
 			0.3,
 			0.2,
 			30,
-			PI/3, // emitSize, emitTime, rate, cone
+			PI / 3, // emitSize, emitTime, rate, cone
 			0, // tileInfo
 			rgb(0.6, 0.4, 0.2, 0.7),
 			rgb(0.7, 0.5, 0.3, 0.7), // colorStartA, colorStartB
@@ -177,7 +192,7 @@ particles = {
 			0.95,
 			0.9,
 			0.05,
-			PI/4,
+			PI / 4,
 			0.9, // damp, angleDamp, gravity, particleCone, fade
 			0.2,
 			1,
