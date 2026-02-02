@@ -8,7 +8,7 @@ const MASKS = ["none", "red", "blue", "green", "yellow"];
 const TILE_INDEXES = {
 	pipes: {
 		working: [6, 7, 8, 24, 26, 42, 43, 44],
-		broken: [25, 60, 61, 62],
+		broken: [62, 62, 25, 25, 60, 60, 61, 61],
 		red: [9, 9 + 36, 10, 10 + 36, 27, 27 + 36, 28, 28 + 36],
 	},
 	gas: {
@@ -29,7 +29,6 @@ function getTileIndex(category, type, index) {
 	return categoryData[index];
 }
 
-// Backward compatibility functions
 function pipe(broken, gas, index) {
 	if (!broken && !gas) return getTileIndex("pipes", "working", index);
 	if (broken && !gas) return getTileIndex("pipes", "broken", index);
@@ -96,7 +95,12 @@ level = {
 		{ x: 20, y: 20, value: pipe(false, false, 6) },
 		{ x: 21, y: 20, value: pipe(false, false, 6) },
 		{ x: 22, y: 20, value: pipe(true, "red", 2) },
-		{ x: 23, y: 20, value: pipe(true, "red", 3) },
+		{ x: 23, y: 20, value: pipe(false, false, 6) },
+		{ x: 24, y: 20, value: pipe(false, false, 6) },
+		{ x: 25, y: 20, value: pipe(false, false, 6) },
+		{ x: 26, y: 20, value: pipe(false, false, 6) },
+		{ x: 27, y: 20, value: pipe(false, false, 6) },
+		{ x: 28, y: 20, value: pipe(false, false, 6) },
 		{ x: 15, y: 14, value: pipe(false, false, 6) },
 		{ x: 17, y: 12, value: pipe(false, false, 4) },
 		{ x: 17, y: 11, value: pipe(false, false, 4) },

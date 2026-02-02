@@ -151,7 +151,23 @@ function gameUpdate() {
 		}
 	}
 
+	for (let y = 0; y < 32; y++) {
+		for (let x = 0; x < 32; x++) {
+			const pipeTile = pipeData[y][x];
+			if (!pipeTile) continue;
+
+			let tileIndex = typeof pipeTile === "object" ? pipeTile.tile : pipeTile;
+
+			if (tileIndex == pipe(true, "red", 2) || tileIndex == pipe(true, "red", 3))
+				tileIndex = pipe(true, "red", time % 2 > 1 ? 2 : 3)
+
+			const data = new TileLayerData(tileIndex);
+			gl.setData(vec2(x, y), data);
+		}
+	}
+
 	gl.redraw();
+	pl.redraw();
 
 	if (keyWasPressed("Space") && player.pos.distance(lever.pos) < 1)
 		lever.toggle();
