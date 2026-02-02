@@ -223,7 +223,7 @@ class Player extends GameObject {
 	emitDustParticles() {
 		if (time - this.lastEmitTime > this.emitInterval) {
 			const feetPos = this.pos.add(vec2(0, 0.4));
-			emitGas(feetPos, gases.dust);
+			emitGas(feetPos, particles.dust);
 			this.lastEmitTime = time;
 		}
 	}

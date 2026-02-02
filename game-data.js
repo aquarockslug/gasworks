@@ -95,7 +95,7 @@ level = {
 };
 
 
-gases = {
+particles = {
 	square: {
 		emitterData: [
 			vec2(0, 0),
