@@ -47,8 +47,8 @@ class Player extends GameObject {
 		this.inGas = gasDataAtPos.tile;
 		if (lever.on && this.inGas && this.maskName != "red") this.pos = vec2(0);
 
-		const moveInput = keyDirection().clampLength(1).scale(0.06);
-		this.velocity = this.velocity.add(moveInput);
+		const moveInput = keyDirection().clampLength(1);
+		this.velocity = this.velocity.add(moveInput.scale(0.05));
 		this.mirror = this.velocity.x < 0;
 		this.setCollision();
 
@@ -59,7 +59,6 @@ class Player extends GameObject {
 			this.state = this.idle;
 		} else {
 			this.state = this.walk;
-			this.emitDustParticles();
 		}
 		this.state();
 	}
@@ -92,10 +91,11 @@ class Player extends GameObject {
 
 	walk() {
 		this.setAnimation("walk");
+		this.emitDustParticles();
 	}
 
 	render() {
-		let offset = player.pos.subtract(cameraPos).multiply(vec2(0.15)).add(vec2(0, 0.6))
+		let offset = player.pos.subtract(cameraPos).multiply(vec2(0.15)).add(vec2(0, 0.5))
 		drawTile(this.pos.add(offset), vec2(1), tile(vec2(), vec2(19, 21), 1).frame(2))
 		super.render()
 	}
