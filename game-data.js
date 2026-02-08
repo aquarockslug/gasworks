@@ -29,9 +29,13 @@ const getTileIndex = (category, type, index) => {
 };
 
 const pipe = (broken, gas, index) =>
-	!broken && !gas ? getTileIndex("pipes", "working", index) :
-	broken && !gas ? getTileIndex("pipes", "broken", index) :
-	broken && gas ? getTileIndex("pipes", gas, index) : undefined;
+	!broken && !gas
+		? getTileIndex("pipes", "working", index)
+		: broken && !gas
+			? getTileIndex("pipes", "broken", index)
+			: broken && gas
+				? getTileIndex("pipes", gas, index)
+				: undefined;
 
 const gas = (color, index) => getTileIndex("gas", color, index);
 
@@ -67,6 +71,20 @@ const cloud = (x, y) => [
 	},
 ];
 
+function pipeLine(x, y, length, value = 1) {
+	if (length <= 0) return [];
+
+	// Use the provided value or default to pipe(false, false, 1)
+	const tileValue = value !== undefined ? value : pipe(false, false, 1);
+
+	// Create an array of coordinates for a horizontal line
+	return Array.from({ length }, (_, i) => ({
+		x: x + i,
+		y: y,
+		value,
+	}));
+}
+
 level = {
 	pipes: [
 		{ x: 16, y: 14, value: pipe(false, false, 1) },
@@ -78,25 +96,10 @@ level = {
 		{ x: 14, y: 17, value: pipe(false, false, 4) },
 		{ x: 14, y: 18, value: pipe(false, false, 4) },
 		{ x: 14, y: 19, value: pipe(false, false, 4) },
-		{ x: 14, y: 20, value: pipe(false, false, 0) },
-		{ x: 15, y: 20, value: pipe(false, false, 1) },
-		{ x: 16, y: 20, value: pipe(false, false, 6) },
-		{ x: 17, y: 20, value: pipe(false, false, 6) },
-		{ x: 18, y: 20, value: pipe(false, false, 6) },
-		{ x: 19, y: 20, value: pipe(false, false, 6) },
-		{ x: 20, y: 20, value: pipe(false, false, 6) },
-		{ x: 21, y: 20, value: pipe(false, false, 6) },
-		{ x: 22, y: 20, value: pipe(true, "red", 2) },
-		{ x: 23, y: 20, value: pipe(false, false, 6) },
-		{ x: 24, y: 20, value: pipe(false, false, 6) },
-		{ x: 25, y: 20, value: pipe(false, false, 6) },
-		{ x: 26, y: 20, value: pipe(false, false, 6) },
-		{ x: 27, y: 20, value: pipe(false, false, 6) },
-		{ x: 28, y: 20, value: pipe(false, false, 6) },
-		{ x: 29, y: 20, value: pipe(false, false, 6) },
-		{ x: 30, y: 20, value: pipe(false, false, 6) },
-		{ x: 31, y: 20, value: pipe(false, false, 6) },
 		{ x: 15, y: 14, value: pipe(false, false, 6) },
+		{ x: 14, y: 20, value: pipe(false, false, 0) },
+		...pipeLine(15, 20, 23, pipe(false, false, 6)),
+		{ x: 16, y: 20, value: pipe(false, false, 1) },
 		{ x: 17, y: 12, value: pipe(false, false, 4) },
 		{ x: 17, y: 11, value: pipe(false, false, 4) },
 		{ x: 17, y: 10, value: pipe(false, false, 4) },
@@ -122,14 +125,18 @@ const getTileData = (tileIndex) => {
 // Pre-cache commonly used tile data
 const initTileDataCache = () => {
 	// Cache all pipe tiles
-	Object.values(TILE_INDEXES.pipes).flat().forEach(index => {
-		index !== undefined && getTileData(index);
-	});
+	Object.values(TILE_INDEXES.pipes)
+		.flat()
+		.forEach((index) => {
+			index !== undefined && getTileData(index);
+		});
 
 	// Cache all gas tiles
-	Object.values(TILE_INDEXES.gas).flat().forEach(index => {
-		index !== undefined && getTileData(index);
-	});
+	Object.values(TILE_INDEXES.gas)
+		.flat()
+		.forEach((index) => {
+			index !== undefined && getTileData(index);
+		});
 
 	// Cache ground and wall tiles
 	TILE_INDEXES.ground.forEach(getTileData);
