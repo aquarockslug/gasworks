@@ -101,9 +101,9 @@ function groundLayer() {
 	}
 
 	groundLayer.setData(vec2(31, 31), getTileData(wall(11))); // upper right
-	groundLayer.setData(vec2(0, 31), getTileData(wall(11)));// upper left 
-	groundLayer.setData(vec2(31, 0), getTileData(wall(11))); // lower right
-	groundLayer.setData(vec2(0, 0), getTileData(wall(11))); // lower left
+	groundLayer.setData(vec2(0, 31), getTileData(wall(7)));// upper left
+	groundLayer.setData(vec2(31, 0), getTileData(wall(4))); // lower right
+	groundLayer.setData(vec2(0, 0), getTileData(wall(2))); // lower left
 
 	groundLayer.redraw();
 	return groundLayer;
@@ -147,6 +147,7 @@ function gameInit() {
 	grl = groundLayer();
 
 	setCanvasFixedSize(vec2(512, 512));
+	canvasClearColor = rgb().setHex("#a9b0ba")
 	// squareGasCloud = emitGas(vec2(6), gases.square);
 	// circleGasCloud = emitGas(vec2(-6), gases.triangle);
 }
