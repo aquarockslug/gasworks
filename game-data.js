@@ -103,18 +103,12 @@ level = {
 		{ x: 14, y: 19, value: pipe(false, false, 4) },
 		{ x: 15, y: 14, value: pipe(false, false, 6) },
 		{ x: 14, y: 20, value: pipe(false, false, 0) },
-		...pipeLine(15, 20, 23, pipe(false, false, 6, "horizontal")),
-		{ x: 16, y: 20, value: pipe(false, false, 1) },
-		{ x: 17, y: 12, value: pipe(false, false, 4) },
-		{ x: 17, y: 11, value: pipe(false, false, 4) },
-		{ x: 17, y: 10, value: pipe(false, false, 4) },
-		{ x: 17, y: 9, value: pipe(false, false, 4) },
-		{ x: 17, y: 8, value: pipe(false, false, 4) },
-		{ x: 17, y: 7, value: pipe(false, false, 4) },
-		{ x: 17, y: 6, value: pipe(false, false, 4) },
-		{ x: 17, y: 5, value: pipe(false, false, 4) },
+		...pipeLine(15, 20, 23, pipe(false, false, 6)),
+		...pipeLine(24, 16, 15, pipe(false, false, 6)),
+		{ x: 24, y: 16, value: pipe(false, false, 0) },
+		...pipeLine(24, 10, 6, pipe(false, false, 4), "vertical"),
 	],
-	gases: [...cloud(21, 17)],
+	gases: [...cloud(24, 17)],
 };
 
 // Pre-create TileLayerData objects for performance

@@ -43,6 +43,7 @@ function createTileLayer(
 
 	const dataArray = data || createEmptyGrid();
 
+
 	for (let y = 0; y < size.y; y++) {
 		for (let x = 0; x < size.x; x++) {
 			const value = dataArray[y][x];
@@ -70,7 +71,7 @@ function groundLayer() {
 	for (let y = 1; y < 31; y++) {
 		for (let x = 0; x < 32; x++) {
 			let t =
-				rand() < 0.975
+				(x % 4 || y % 5) || rand() < 0.5
 					? [ground(0), ground(1), ground(3), ground(4)][randInt(0, 3)]
 					: ground(2);
 

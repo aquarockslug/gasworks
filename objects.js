@@ -45,7 +45,7 @@ class Player extends GameObject {
 
 		const gasDataAtPos = gl.getData(this.pos.floor().add(vec2(16)));
 		this.inGas = gasDataAtPos.tile;
-		if (lever.on && this.inGas && this.maskName != "red") this.pos = vec2(0);
+		// if (lever.on && this.inGas && this.maskName != "red") this.pos = vec2(0);
 
 		const moveInput = keyDirection().clampLength(1);
 		this.velocity = this.velocity.add(moveInput.scale(0.05));
