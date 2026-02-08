@@ -63,14 +63,6 @@ class Player extends GameObject {
 		this.state();
 	}
 
-	emitDustParticles() {
-		if (time - this.lastEmitTime > this.emitInterval) {
-			const feetPos = this.pos.add(vec2(0, -0.3));
-			emitGas(feetPos, particles.dust);
-			this.lastEmitTime = time;
-		}
-	}
-
 	setAnimation(state) {
 		const animations = {
 			idle: { rowOffset: 0, frames: 2, speed: 4 },
@@ -91,12 +83,18 @@ class Player extends GameObject {
 
 	walk() {
 		this.setAnimation("walk");
-		this.emitDustParticles();
 	}
 
 	render() {
-		let offset = player.pos.subtract(cameraPos).multiply(vec2(0.15)).add(vec2(0, 0.5))
-		drawTile(this.pos.add(offset), vec2(1), tile(vec2(), vec2(19, 21), 1).frame(2))
-		super.render()
+		let offset = player.pos
+			.subtract(cameraPos)
+			.multiply(vec2(0.15))
+			.add(vec2(0, 0.5));
+		drawTile(
+			this.pos.add(offset),
+			vec2(1),
+			tile(vec2(), vec2(19, 21), 1).frame(2),
+		);
+		super.render();
 	}
 }

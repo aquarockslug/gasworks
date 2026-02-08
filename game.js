@@ -67,26 +67,43 @@ function groundLayer() {
 	const groundLayer = new TileCollisionLayer(pos, vec2(32));
 	groundLayer.renderOrder = -100000;
 
-	for (let y = 0; y <= 32; y++) {
+	for (let y = 1; y < 31; y++) {
 		for (let x = 0; x < 32; x++) {
 			let t =
-				rand() < 0.95
+				rand() < 0.975
 					? [ground(0), ground(1), ground(3), ground(4)][randInt(0, 3)]
 					: ground(2);
 
-			if (y === 30) {
-				t = wall(9);
+			// Add left border wall at x=0
+			if (x === 0) {
+				t = wall(13);
 				groundLayer.setCollisionData(vec2(x, y));
 			}
-			if (y === 31) {
-				t = wall(3);
+			// Add right border wall at x=31
+			else if (x === 31) {
+				t = wall(14);
 				groundLayer.setCollisionData(vec2(x, y));
 			}
-			const data = getTileData(t);
 
-			groundLayer.setData(vec2(x, y), data);
+			groundLayer.setData(vec2(x, y), getTileData(t));
 		}
 	}
+
+	// Add top and bottom border
+	for (let x = 1; x < 31; x++) {
+		groundLayer.setCollisionData(vec2(x, 31));
+		groundLayer.setData(
+			vec2(x, 31),
+			getTileData(wall(rand() < 0.2 ? (rand() < 0.5 ? 8 : 10) : 9)),
+		);
+		groundLayer.setCollisionData(vec2(x, 0));
+		groundLayer.setData(vec2(x, 0), getTileData(wall(3)));
+	}
+
+	groundLayer.setData(vec2(31, 31), getTileData(wall(11))); // upper right
+	groundLayer.setData(vec2(0, 31), getTileData(wall(11)));// upper left 
+	groundLayer.setData(vec2(31, 0), getTileData(wall(11))); // lower right
+	groundLayer.setData(vec2(0, 0), getTileData(wall(11))); // lower left
 
 	groundLayer.redraw();
 	return groundLayer;

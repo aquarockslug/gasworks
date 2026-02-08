@@ -16,7 +16,7 @@ const TILE_INDEXES = {
 		blue: [74, 75, 92, 93],
 	},
 	ground: [38, 39, 56, 57],
-	wall: [0, 1, 2, 3, 4, 5, 18, 19, 20, 21, 22, 23, 36, 37, 38],
+	wall: [0, 1, 2, 3, 4, 5, 18, 19, 20, 21, 22, 23, 36, 37, 41],
 };
 
 const getTileIndex = (category, type, index) => {
@@ -71,18 +71,20 @@ const cloud = (x, y) => [
 	},
 ];
 
-function pipeLine(x, y, length, value = 1) {
+function pipeLine(x, y, length, value = 1, direction = "horizontal") {
 	if (length <= 0) return [];
 
 	// Use the provided value or default to pipe(false, false, 1)
 	const tileValue = value !== undefined ? value : pipe(false, false, 1);
 
-	// Create an array of coordinates for a horizontal line
-	return Array.from({ length }, (_, i) => ({
-		x: x + i,
-		y: y,
+	let points;
+	points = Array.from({ length }, (_, i) => ({
+		x: direction === "horizontal" ? x + i : x,
+		y: direction === "horizontal" ? y : y + i,
 		value,
 	}));
+
+	return points;
 }
 
 level = {
@@ -98,7 +100,7 @@ level = {
 		{ x: 14, y: 19, value: pipe(false, false, 4) },
 		{ x: 15, y: 14, value: pipe(false, false, 6) },
 		{ x: 14, y: 20, value: pipe(false, false, 0) },
-		...pipeLine(15, 20, 23, pipe(false, false, 6)),
+		...pipeLine(15, 20, 23, pipe(false, false, 6, "horizontal")),
 		{ x: 16, y: 20, value: pipe(false, false, 1) },
 		{ x: 17, y: 12, value: pipe(false, false, 4) },
 		{ x: 17, y: 11, value: pipe(false, false, 4) },
