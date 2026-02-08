@@ -49,7 +49,7 @@ function createTileLayer(
 			if (value) {
 				const tileIndex =
 					typeof value === "object" && value.tile ? value.tile : value;
-				const tileData = new TileLayerData(tileIndex);
+				const tileData = getTileData(tileIndex);
 				layer.setData(vec2(x, y), tileData);
 				if (isCollision) {
 					layer.setCollisionData(vec2(x, y));
@@ -82,7 +82,7 @@ function groundLayer() {
 				t = wall(3);
 				groundLayer.setCollisionData(vec2(x, y));
 			}
-			const data = new TileLayerData(t);
+			const data = getTileData(t);
 
 			groundLayer.setData(vec2(x, y), data);
 		}
@@ -93,6 +93,7 @@ function groundLayer() {
 }
 
 function gameInit() {
+	initTileDataCache();
 	objectDefaultDamping = 0.7;
 	player = new Player(vec2(), vec2(0.5, 0.25), tile(vec2(), vec2(19, 21), 1));
 	player.maskName = MASKS[0];
@@ -146,7 +147,7 @@ function gameUpdate() {
 			if (!gas) continue;
 
 			const tileIndex = typeof gas === "object" ? gas.tile : gas;
-			const data = new TileLayerData(tileIndex + actualFrame * 3);
+			const data = getTileData(tileIndex + actualFrame * 3);
 			gl.setData(vec2(x, y), data);
 		}
 	}
@@ -164,7 +165,7 @@ function gameUpdate() {
 			)
 				tileIndex = pipe(true, "red", time % 2 > 1 ? 2 : 3);
 
-			const data = new TileLayerData(tileIndex);
+			const data = getTileData(tileIndex);
 			gl.setData(vec2(x, y), data);
 		}
 	}

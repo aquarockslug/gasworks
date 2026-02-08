@@ -19,35 +19,27 @@ const TILE_INDEXES = {
 	wall: [0, 1, 2, 3, 4, 5, 18, 19, 20, 21, 22, 23, 36, 37, 38],
 };
 
-function getTileIndex(category, type, index) {
+const getTileIndex = (category, type, index) => {
 	const categoryData = TILE_INDEXES[category];
 	if (!categoryData) return undefined;
 
-	if (typeof categoryData === "object" && !Array.isArray(categoryData)) {
-		return categoryData[type]?.[index];
-	}
-	return categoryData[index];
-}
+	return typeof categoryData === "object" && !Array.isArray(categoryData)
+		? categoryData[type]?.[index]
+		: categoryData[index];
+};
 
-function pipe(broken, gas, index) {
-	if (!broken && !gas) return getTileIndex("pipes", "working", index);
-	if (broken && !gas) return getTileIndex("pipes", "broken", index);
-	if (broken && gas) return getTileIndex("pipes", gas, index);
-}
+const pipe = (broken, gas, index) =>
+	!broken && !gas ? getTileIndex("pipes", "working", index) :
+	broken && !gas ? getTileIndex("pipes", "broken", index) :
+	broken && gas ? getTileIndex("pipes", gas, index) : undefined;
 
-function gas(color, index) {
-	return getTileIndex("gas", color, index);
-}
+const gas = (color, index) => getTileIndex("gas", color, index);
 
-function ground(index) {
-	return getTileIndex("ground", null, index);
-}
+const ground = (index) => getTileIndex("ground", null, index);
 
-function wall(index) {
-	return getTileIndex("wall", null, index);
-}
+const wall = (index) => getTileIndex("wall", null, index);
 
-cloud = (x, y) => [
+const cloud = (x, y) => [
 	{ x: x, y: y, value: { tile: gas("red", 6), animSpeed: 4, frames: 4 } },
 	{ x: x + 1, y: y, value: { tile: gas("red", 7), animSpeed: 4, frames: 4 } },
 	{ x: x + 2, y: y, value: { tile: gas("red", 8), animSpeed: 4, frames: 4 } },
@@ -115,6 +107,33 @@ level = {
 		{ x: 17, y: 5, value: pipe(false, false, 4) },
 	],
 	gases: [...cloud(21, 17)],
+};
+
+// Pre-create TileLayerData objects for performance
+const TILE_DATA_CACHE = {};
+
+const getTileData = (tileIndex) => {
+	if (!TILE_DATA_CACHE[tileIndex]) {
+		TILE_DATA_CACHE[tileIndex] = new TileLayerData(tileIndex);
+	}
+	return TILE_DATA_CACHE[tileIndex];
+};
+
+// Pre-cache commonly used tile data
+const initTileDataCache = () => {
+	// Cache all pipe tiles
+	Object.values(TILE_INDEXES.pipes).flat().forEach(index => {
+		index !== undefined && getTileData(index);
+	});
+
+	// Cache all gas tiles
+	Object.values(TILE_INDEXES.gas).flat().forEach(index => {
+		index !== undefined && getTileData(index);
+	});
+
+	// Cache ground and wall tiles
+	TILE_INDEXES.ground.forEach(getTileData);
+	TILE_INDEXES.wall.forEach(getTileData);
 };
 
 particles = {
