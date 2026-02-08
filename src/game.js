@@ -134,17 +134,6 @@ function gameInit() {
 
 	pl = createTileLayer(pipeData, true, -10000);
 	gl = createTileLayer(gasData, false, -9999);
-
-	// for (let y = 0; y <= 32; y++) {
-	// 	for (let x = 0; x < 32; x++) {
-	// 		if (data.tile === pipe(true, "red", 2)) data = pipe(true, "red", 3);
-	// 		console.log("🪚 data.tile:", data.tile, pipe(true, "red", 2));
-	// 	}
-	// }
-
-	// gasData[16][16] = 10
-	// gl = createTileLayer(gasData, false, -9999);
-
 	grl = groundLayer();
 
 	setCanvasFixedSize(vec2(512, 512));
@@ -209,7 +198,7 @@ function gameRender() {
 function postGameRender() {}
 
 engineInit(gameInit, gameUpdate, null, gameRender, postGameRender, [
-	"pipes.png",
-	"gorm.png",
-	"masks.png",
+	"assets/pipes.png",
+	"assets/gorm.png",
+	"assets/masks.png",
 ]);

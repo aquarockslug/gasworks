@@ -38,28 +38,23 @@ class Player extends GameObject {
 		this.lastEmitTime = 0;
 		this.emitInterval = 0.1;
 		this.inGas = false;
+		this.setCollision();
 	}
 
 	update() {
 		super.update();
 
-		const gasDataAtPos = gl.getData(this.pos.floor().add(vec2(16)));
-		this.inGas = gasDataAtPos.tile;
-		// if (lever.on && this.inGas && this.maskName != "red") this.pos = vec2(0);
+		this.inGas = gl.getData(this.pos.floor().add(vec2(16))).tile;
+		if (lever.on && this.inGas && this.maskName != "red") this.pos = vec2(0);
 
 		const moveInput = keyDirection().clampLength(1);
 		this.velocity = this.velocity.add(moveInput.scale(0.05));
 		this.mirror = this.velocity.x < 0;
-		this.setCollision();
 
 		// TODO clamp
 		cameraPos = this.pos.add(vec2(0, 2)).add(this.velocity.multiply(vec2(-1)));
 
-		if (moveInput.length() === 0) {
-			this.state = this.idle;
-		} else {
-			this.state = this.walk;
-		}
+		this.state = moveInput.length() > 0 ? this.walk : this.idle;
 		this.state();
 	}
 

@@ -85,7 +85,7 @@ function pipeLine(x, y, length, value = 1, direction = "horizontal") {
 	}));
 
 	// points = points.map((p) => x === p.x && y === p.x ? { x: p.x, y: p.y, value: 1 } : p)
-	points = points.map((p) => ({ x: p.x, y: p.y, value: p.value }))
+	points = points.map((p) => ({ x: p.x, y: p.y, value: p.value }));
 
 	return points;
 }
