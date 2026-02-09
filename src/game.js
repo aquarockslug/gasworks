@@ -1,3 +1,6 @@
+// Global game variables
+let player, lever, mask, gasAnimTime, pipeData, gasData, pl, gl, grl;
+
 function createEmptyGrid(width = 32, height = 32) {
 	return Array(height)
 		.fill(null)
@@ -114,8 +117,14 @@ function gameInit() {
 	initTileDataCache();
 	objectDefaultDamping = 0.7;
 	player = new Player(vec2(), vec2(0.5, 0.25), tile(vec2(), vec2(19, 21), 1));
-	player.maskName = MASKS[0];
 	player.drawSize = vec2(1);
+
+	// Initialize reactive player state
+	initializePlayerState();
+	playerState.value = {
+		...playerState.value,
+		maskName: MASKS[0]
+	};
 
 	gasAnimTime = 0;
 
@@ -187,7 +196,8 @@ function gameUpdate() {
 	gl.pos = vec2(-16).add(vec2(lever.on ? 0 : 1000));
 
 	if (keyWasPressed("Space") && player.pos.distance(mask.pos) < 1) {
-		player.maskName = player.maskName === "red" ? "none" : "red";
+		const currentMask = playerState.value.maskName;
+		updatePlayerMask(currentMask === "red" ? "none" : "red");
 	}
 }
 

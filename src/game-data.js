@@ -90,7 +90,7 @@ function pipeLine(x, y, length, value = 1, direction = "horizontal") {
 	return points;
 }
 
-level = {
+const level = {
 	pipes: [
 		{ x: 16, y: 14, value: pipe(false, false, 1) },
 		{ x: 17, y: 14, value: pipe(false, false, 2) },
@@ -142,7 +142,7 @@ const initTileDataCache = () => {
 	TILE_INDEXES.wall.forEach(getTileData);
 };
 
-particles = {
+const particles = {
 	square: {
 		emitterData: [
 			vec2(0, 0),
