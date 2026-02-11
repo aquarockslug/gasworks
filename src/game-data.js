@@ -7,7 +7,9 @@ const MASKS = ["none", "red", "blue", "green", "yellow"];
 
 const PIPE_TILES = {
 	STRAIGHT_HORIZONTAL: 43,
+	STRAIGHT_HORIZONTAL_BAND: 7,
 	STRAIGHT_VERTICAL: 26,
+	STRAIGHT_VERTICAL_BAND: 24,
 	CORNER_TOP_LEFT: 6,
 	CORNER_TOP_RIGHT: 8,
 	CORNER_BOTTOM_LEFT: 42,
@@ -27,10 +29,6 @@ const PIPE_TILES = {
 	GAS_CORNER_TOP_RIGHT_1: 28,
 	GAS_CORNER_TOP_RIGHT_2: 64, // 28 + 36
 };
-
-
-
-
 
 const gas = (color, index) => {
 	const gasTiles = {
@@ -81,29 +79,31 @@ const cloud = (x, y) => [
 function pipe(x, y, length, direction = "horizontal") {
 	if (length <= 0) return [];
 
-	const value = direction === "horizontal" ? PIPE_TILES.STRAIGHT_HORIZONTAL : PIPE_TILES.STRAIGHT_VERTICAL;
+	const straightValue = direction === "horizontal" ? PIPE_TILES.STRAIGHT_HORIZONTAL : PIPE_TILES.STRAIGHT_VERTICAL;
+	const bandValue = direction === "horizontal" ? PIPE_TILES.STRAIGHT_HORIZONTAL_BAND : PIPE_TILES.STRAIGHT_VERTICAL_BAND;
 
-	let points;
-	points = Array.from({ length }, (_, i) => ({
-		x: direction === "horizontal" ? x + i : x,
-		y: direction === "horizontal" ? y : y + i,
-		value,
-	}));
+	let points = Array.from({ length }, (_, i) => {
+		const isBand = (i === 0 || i === length - 1) && length > 1;
+		const value = isBand ? bandValue : straightValue;
+		return {
+			x: direction === "horizontal" ? x + i : x,
+			y: direction === "horizontal" ? y : y + i,
+			value,
+		};
+	});
 
-	points = points.map((p) => ({ x: p.x, y: p.y, value: p.value }));
-
-	return points;
+	return points.map((p) => ({ x: p.x, y: p.y, value: p.value }));
 }
 
 function pipeLine(coordinates) {
 	if (coordinates.length < 2) return [];
-	
+
 	const pipeline = [];
-	
+
 	for (let i = 0; i < coordinates.length - 1; i++) {
 		const start = coordinates[i];
 		const end = coordinates[i + 1];
-		
+
 		if (start.x === end.x) {
 			const length = Math.abs(end.y - start.y);
 			const startY = Math.min(start.y, end.y);
@@ -114,15 +114,15 @@ function pipeLine(coordinates) {
 			pipeline.push(pipe(startX, start.y, length, "horizontal"));
 		}
 	}
-	
+
 	// Add corner pieces at coordinate junctions
 	for (let i = 1; i < coordinates.length - 1; i++) {
 		const prev = coordinates[i - 1];
 		const curr = coordinates[i];
 		const next = coordinates[i + 1];
-		
+
 		let cornerTile = null;
-		
+
 		// Horizontal to vertical turn
 		if (prev.y === curr.y && curr.x === next.x) {
 			if (prev.x < curr.x && next.y > curr.y) cornerTile = PIPE_TILES.CORNER_BOTTOM_RIGHT;
@@ -137,12 +137,12 @@ function pipeLine(coordinates) {
 			else if (prev.y > curr.y && next.x > curr.x) cornerTile = PIPE_TILES.CORNER_TOP_LEFT;
 			else if (prev.y > curr.y && next.x < curr.x) cornerTile = PIPE_TILES.CORNER_BOTTOM_RIGHT;
 		}
-		
+
 		if (cornerTile) {
 			pipeline.push({ x: curr.x, y: curr.y, value: cornerTile });
 		}
 	}
-	
+
 	return pipeline.flat();
 }
 
