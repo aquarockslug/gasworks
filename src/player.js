@@ -20,7 +20,7 @@ const initializePlayerState = () => {
   playerState.effect(() => console.log('Player state updated:', playerState.value));
 };
 
-class Player extends EngineObject {
+class Player extends GameObject {
 	constructor(...args) {
 		super(...args);
 		this.lastEmitTime = 0;
