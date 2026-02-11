@@ -99,88 +99,45 @@ function mazePattern(width, height, startX = 2, startY = 2) {
 	const maze = [];
 	const cellSize = 8;
 	const visited = new Set();
+	const straightPipe = PIPE_TILES.STRAIGHT_HORIZONTAL;
 
-	const PIPE_TYPES = [
-		PIPE_TILES.STRAIGHT_HORIZONTAL,
-		PIPE_TILES.STRAIGHT_VERTICAL,
-		PIPE_TILES.CORNER_TOP_LEFT,
-		PIPE_TILES.CORNER_TOP_RIGHT,
-		PIPE_TILES.CORNER_BOTTOM_LEFT,
-	];
+	const isValid = (x, y) => x >= startX && x < startX + width * cellSize && y >= startY && y < startY + height * cellSize;
+	const isVisited = (x, y) => visited.has(`${x},${y}`);
+	const getRandomPipe = (tiles) => tiles[Math.floor(Math.random() * tiles.length)];
 
-	const HORIZONTAL_CONNECTORS = [PIPE_TILES.STRAIGHT_HORIZONTAL];
-	const VERTICAL_CONNECTORS = [PIPE_TILES.STRAIGHT_VERTICAL];
+	const getNeighbors = (x, y) => {
+		const dirs = [{ dx: 2, dy: 0 }, { dx: -2, dy: 0 }, { dx: 0, dy: 2 }, { dx: 0, dy: -2 }];
+		return dirs.filter(({ dx, dy }) => {
+			const nx = x + dx, ny = y + dy;
+			return isValid(nx, ny) && !isVisited(nx, ny);
+		}).map(({ dx, dy }) => ({ x: x + dx, y: y + dy, wallX: x + dx/2, wallY: y + dy/2 }));
+	};
 
-	function isValid(x, y) {
-		return x >= startX && x < startX + width * cellSize &&
-			   y >= startY && y < startY + height * cellSize;
-	}
-
-	function isVisited(x, y) {
-		return visited.has(`${x},${y}`);
-	}
-
-	function getNeighbors(x, y) {
-		const neighbors = [];
-		const directions = [
-			{ dx: 2, dy: 0 },  // right
-			{ dx: -2, dy: 0 }, // left
-			{ dx: 0, dy: 2 },  // down
-			{ dx: 0, dy: -2 }  // up
-		];
-
-		for (const { dx, dy } of directions) {
-			const nx = x + dx;
-			const ny = y + dy;
-			if (isValid(nx, ny) && !isVisited(nx, ny)) {
-				neighbors.push({ x: nx, y: ny, wallX: x + dx/2, wallY: y + dy/2 });
-			}
-		}
-		return neighbors;
-	}
-
-	function getRandomPipe(tiles) {
-		return tiles[Math.floor(Math.random() * tiles.length)];
-	}
-
-	function dfs(x, y) {
+	const dfs = (x, y) => {
 		visited.add(`${x},${y}`);
-
-		const pipeType = PIPE_TILES.STRAIGHT_HORIZONTAL
-
-		maze.push({ x, y, value: pipeType });
+		maze.push({ x, y, value: straightPipe });
 
 		const neighbors = getNeighbors(x, y);
-		while (neighbors.length > 0) {
-			const randomIndex = Math.floor(Math.random() * neighbors.length);
-			const neighbor = neighbors[randomIndex];
-			neighbors.splice(randomIndex, 1);
+		while (neighbors.length) {
+			const idx = Math.floor(Math.random() * neighbors.length);
+			const neighbor = neighbors.splice(idx, 1)[0];
 
 			if (!isVisited(neighbor.x, neighbor.y)) {
-				// Add pipe connecting to neighbor
 				const isHorizontal = neighbor.wallX !== x;
-				const connectorPipe = getRandomPipe(isHorizontal ? HORIZONTAL_CONNECTORS : VERTICAL_CONNECTORS);
-
-				maze.push({ x: neighbor.wallX, y: neighbor.wallY, value: connectorPipe });
-
+				const connector = getRandomPipe(isHorizontal ? [straightPipe] : [PIPE_TILES.STRAIGHT_VERTICAL]);
+				maze.push({ x: neighbor.wallX, y: neighbor.wallY, value: connector });
 				dfs(neighbor.x, neighbor.y);
 			}
 		}
-	}
+	};
 
-	// Start maze generation
-	const startXCell = startX;
-	const startYCell = startY;
-	dfs(startXCell, startYCell);
+	dfs(startX, startY);
 
-	// Add some random dead ends
 	for (let i = 0; i < Math.floor(width * height * 0.3); i++) {
 		const rx = startX + Math.floor(Math.random() * width * cellSize);
 		const ry = startY + Math.floor(Math.random() * height * cellSize);
-
 		if (isValid(rx, ry) && !isVisited(rx, ry)) {
-			const pipeType = PIPE_TILES.STRAIGHT_HORIZONTAL
-			maze.push({ x: rx, y: ry, value: pipeType });
+			maze.push({ x: rx, y: ry, value: straightPipe });
 		}
 	}
 
