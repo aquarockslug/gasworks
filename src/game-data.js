@@ -5,7 +5,7 @@ const BUTTONCLICKSOUND = new Sound([
 
 const MASKS = ["none", "red", "blue", "green", "yellow"];
 
-const TILE_INDEXES = {
+const TILE_INDICIES = {
 	pipes: {
 		working: [6, 7, 8, 24, 26, 42, 43, 44],
 		broken: [62, 62, 25, 25, 60, 60, 61, 61],
@@ -20,7 +20,7 @@ const TILE_INDEXES = {
 };
 
 const getTileIndex = (category, type, index) => {
-	const categoryData = TILE_INDEXES[category];
+	const categoryData = TILE_INDICIES[category];
 	if (!categoryData) return undefined;
 
 	return typeof categoryData === "object" && !Array.isArray(categoryData)
@@ -90,23 +90,97 @@ function pipeLine(x, y, length, value = 1, direction = "horizontal") {
 	return points;
 }
 
+function mazePattern(width, height, startX = 2, startY = 2) {
+	const maze = [];
+	const cellSize = 3;
+	const visited = new Set();
+	
+	function isValid(x, y) {
+		return x >= startX && x < startX + width * cellSize && 
+			   y >= startY && y < startY + height * cellSize;
+	}
+	
+	function isVisited(x, y) {
+		return visited.has(`${x},${y}`);
+	}
+	
+	function getNeighbors(x, y) {
+		const neighbors = [];
+		const directions = [
+			{ dx: 2, dy: 0 },  // right
+			{ dx: -2, dy: 0 }, // left
+			{ dx: 0, dy: 2 },  // down
+			{ dx: 0, dy: -2 }  // up
+		];
+		
+		for (const { dx, dy } of directions) {
+			const nx = x + dx;
+			const ny = y + dy;
+			if (isValid(nx, ny) && !isVisited(nx, ny)) {
+				neighbors.push({ x: nx, y: ny, wallX: x + dx/2, wallY: y + dy/2 });
+			}
+		}
+		return neighbors;
+	}
+	
+	function dfs(x, y) {
+		visited.add(`${x},${y}`);
+		
+		// Add pipe at current cell
+		const pipeType = Math.random() < 0.8 ? 
+			pipe(false, false, Math.floor(Math.random() * 8)) : 
+			pipe(false, "red", Math.floor(Math.random() * 8));
+		maze.push({ x, y, value: pipeType });
+		
+		const neighbors = getNeighbors(x, y);
+		while (neighbors.length > 0) {
+			const randomIndex = Math.floor(Math.random() * neighbors.length);
+			const neighbor = neighbors[randomIndex];
+			neighbors.splice(randomIndex, 1);
+			
+			if (!isVisited(neighbor.x, neighbor.y)) {
+				// Add pipe connecting to neighbor
+				const isHorizontal = neighbor.wallX !== x;
+				const connectorPipe = isHorizontal ? 
+					pipe(false, false, Math.random() < 0.5 ? 1 : 2) : // horizontal connectors
+					pipe(false, false, Math.random() < 0.5 ? 3 : 4); // vertical connectors
+				
+				maze.push({ x: neighbor.wallX, y: neighbor.wallY, value: connectorPipe });
+				
+				dfs(neighbor.x, neighbor.y);
+			}
+		}
+	}
+	
+	// Start maze generation
+	const startXCell = startX;
+	const startYCell = startY;
+	dfs(startXCell, startYCell);
+	
+	// Add some random dead ends
+	for (let i = 0; i < Math.floor(width * height * 0.3); i++) {
+		const rx = startX + Math.floor(Math.random() * width * cellSize);
+		const ry = startY + Math.floor(Math.random() * height * cellSize);
+		
+		if (isValid(rx, ry) && !isVisited(rx, ry)) {
+			const pipeType = Math.random() < 0.7 ? 
+				pipe(false, false, Math.floor(Math.random() * 8)) : 
+				pipe(true, false, Math.floor(Math.random() * 8));
+			maze.push({ x: rx, y: ry, value: pipeType });
+		}
+	}
+	
+	return maze;
+}
+
 const level = {
 	pipes: [
-		{ x: 16, y: 14, value: pipe(false, false, 1) },
-		{ x: 17, y: 14, value: pipe(false, false, 2) },
-		{ x: 17, y: 13, value: pipe(false, false, 3) },
-		{ x: 14, y: 15, value: pipe(false, false, 4) },
-		{ x: 14, y: 14, value: pipe(false, false, 5) },
-		{ x: 14, y: 16, value: pipe(false, false, 4) },
-		{ x: 14, y: 17, value: pipe(false, false, 4) },
-		{ x: 14, y: 18, value: pipe(false, false, 4) },
-		{ x: 14, y: 19, value: pipe(false, false, 4) },
-		{ x: 15, y: 14, value: pipe(false, false, 6) },
-		{ x: 14, y: 20, value: pipe(false, false, 0) },
 		...pipeLine(15, 20, 23, pipe(false, false, 6)),
 		...pipeLine(24, 16, 15, pipe(false, false, 6)),
 		{ x: 24, y: 16, value: pipe(false, false, 0) },
 		...pipeLine(24, 10, 6, pipe(false, false, 4), "vertical"),
+		...mazePattern(5, 5, 2, 2)
+
 	],
 	gases: [...cloud(24, 17)],
 };
@@ -124,22 +198,22 @@ const getTileData = (tileIndex) => {
 // Pre-cache commonly used tile data
 const initTileDataCache = () => {
 	// Cache all pipe tiles
-	Object.values(TILE_INDEXES.pipes)
+	Object.values(TILE_INDICIES.pipes)
 		.flat()
 		.forEach((index) => {
 			index !== undefined && getTileData(index);
 		});
 
 	// Cache all gas tiles
-	Object.values(TILE_INDEXES.gas)
+	Object.values(TILE_INDICIES.gas)
 		.flat()
 		.forEach((index) => {
 			index !== undefined && getTileData(index);
 		});
 
 	// Cache ground and wall tiles
-	TILE_INDEXES.ground.forEach(getTileData);
-	TILE_INDEXES.wall.forEach(getTileData);
+	TILE_INDICIES.ground.forEach(getTileData);
+	TILE_INDICIES.wall.forEach(getTileData);
 };
 
 const particles = {
