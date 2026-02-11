@@ -71,8 +71,9 @@ const cloud = (x, y) => [
 	},
 ];
 
-function pipeLine(x, y, length, value = 1, direction = "horizontal") {
+function pipeLine(x, y, length, direction = "horizontal") {
 	if (length <= 0) return [];
+	value = pipe(false, false, direction === "horizontal" ? 6 : 4) 
 
 	// Use the provided value or default to pipe(false, false, 1)
 	const tileValue = value !== undefined ? value : pipe(false, false, 1);
@@ -175,11 +176,11 @@ function mazePattern(width, height, startX = 2, startY = 2) {
 
 const level = {
 	pipes: [
-		...pipeLine(15, 20, 23, pipe(false, false, 6)),
-		...pipeLine(24, 16, 15, pipe(false, false, 6)),
+		...pipeLine(15, 20, 23),
+		...pipeLine(24, 16, 15),
 		{ x: 24, y: 16, value: pipe(false, false, 0) },
-		...pipeLine(24, 10, 6, pipe(false, false, 4), "vertical"),
-		...mazePattern(5, 5, 2, 2)
+		...pipeLine(24, 10, 6, "vertical"),
+		...mazePattern(5, 5)
 
 	],
 	gases: [...cloud(24, 17)],
