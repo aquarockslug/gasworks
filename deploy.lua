@@ -1,8 +1,22 @@
-local push = function(file, address, channel)
-	print(string.format("Uploading %s to %s:%s", file, address, channel))
-	os.execute(string.format("butler push %s %s:%s", file, address, channel))
+local function build(files)
+	print("Building game...")
+	os.execute("zip index.zip " .. table.concat(files, " "))
 end
 
-os.execute("zip index.zip ./index.html ./assets/masks.png ./assets/pipes.png ./assets/gorm.png ./src/game.js ./src/objects.js ./src/game-data.js ./lib/littlejs.js")
+local function push(file, address, channel)
+	local target = string.format("%s:%s", address, channel)
+	print(string.format("\nUploading %s to %s", file, target))
+	os.execute(string.format("butler push %s %s", file, target))
+end
 
+build({
+	"./index.html",
+	"./assets/masks.png",
+	"./assets/pipes.png",
+	"./assets/gorm.png",
+	"./src/game.js",
+	"./src/objects.js",
+	"./src/game-data.js",
+	"./lib/littlejs.js"
+})
 push("./index.zip", "aquarock/gas-game", "html5")
