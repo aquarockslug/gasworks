@@ -78,7 +78,7 @@ const cloud = (x, y) => [
 	},
 ];
 
-function pipeLine(x, y, length, direction = "horizontal") {
+function pipe(x, y, length, direction = "horizontal") {
 	if (length <= 0) return [];
 
 	const value = direction === "horizontal" ? PIPE_TILES.STRAIGHT_HORIZONTAL : PIPE_TILES.STRAIGHT_VERTICAL;
@@ -93,6 +93,29 @@ function pipeLine(x, y, length, direction = "horizontal") {
 	points = points.map((p) => ({ x: p.x, y: p.y, value: p.value }));
 
 	return points;
+}
+
+function pipeLine(coordinates) {
+	if (coordinates.length < 2) return [];
+	
+	const pipelines = [];
+	
+	for (let i = 0; i < coordinates.length - 1; i++) {
+		const start = coordinates[i];
+		const end = coordinates[i + 1];
+		
+		if (start.x === end.x) {
+			const length = Math.abs(end.y - start.y);
+			const startY = Math.min(start.y, end.y);
+			pipelines.push(pipe(start.x, startY, length, "vertical"));
+		} else if (start.y === end.y) {
+			const length = Math.abs(end.x - start.x);
+			const startX = Math.min(start.x, end.x);
+			pipelines.push(pipe(startX, start.y, length, "horizontal"));
+		}
+	}
+	
+	return pipelines.flat();
 }
 
 function mazePattern(width, height, startX = 2, startY = 2) {
@@ -146,11 +169,12 @@ function mazePattern(width, height, startX = 2, startY = 2) {
 
 const level = {
 	pipes: [
-		...pipeLine(15, 20, 23),
-		...pipeLine(24, 16, 15),
+		...pipe(15, 20, 23),
+		...pipe(24, 16, 15),
 		{ x: 24, y: 16, value: PIPE_TILES.CORNER_TOP_LEFT },
-		...pipeLine(24, 10, 6, "vertical"),
-		...mazePattern(2, 2)
+		...pipe(24, 10, 6, "vertical"),
+		...pipeLine([{x: 1, y: 5}, {x: 15, y: 5}, {x: 15, y: 12}]),
+		// ...mazePattern(2, 2)
 
 	],
 	gases: [...cloud(24, 17)],
