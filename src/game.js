@@ -177,10 +177,10 @@ function gameUpdate() {
 			let tileIndex = typeof pipeTile === "object" ? pipeTile.tile : pipeTile;
 
 			if (
-				tileIndex == pipe(true, "red", 2) ||
-				tileIndex == pipe(true, "red", 3)
+				tileIndex == 25 ||
+				tileIndex == 60
 			)
-				tileIndex = pipe(true, "red", time % 2 > 1 ? 2 : 3);
+				tileIndex = time % 2 > 1 ? 25 : 60;
 
 			const data = getTileData(tileIndex);
 			gl.setData(vec2(x, y), data);

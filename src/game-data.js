@@ -8,12 +8,10 @@ const MASKS = ["none", "red", "blue", "green", "yellow"];
 const PIPE_TILES = {
 	STRAIGHT_HORIZONTAL: 43,
 	STRAIGHT_VERTICAL: 26,
-	CORNER_TOP_LEFT: 8,
-	CORNER_TOP_RIGHT: 24,
-	CORNER_BOTTOM_LEFT: 26,
-	CROSS: 42,
-	T_TOP: 43,
-	T_BOTTOM: 44,
+	CORNER_TOP_LEFT: 6,
+	CORNER_TOP_RIGHT: 8,
+	CORNER_BOTTOM_LEFT: 40,
+	CORNER_BOTTOM_RIGHT: 42,
 
 	BROKEN_HORIZONTAL_1: 62,
 	BROKEN_HORIZONTAL_2: 25,
@@ -32,51 +30,7 @@ const PIPE_TILES = {
 
 
 
-// Direct tile access functions replacing getTileIndex
-const pipe = (broken, gas, index) => {
-	if (!broken && !gas) {
-		const workingPipes = [
-			PIPE_TILES.STRAIGHT_HORIZONTAL,
-			PIPE_TILES.STRAIGHT_VERTICAL,
-			PIPE_TILES.CORNER_TOP_LEFT,
-			PIPE_TILES.CORNER_TOP_RIGHT,
-			PIPE_TILES.CORNER_BOTTOM_LEFT,
-			PIPE_TILES.CROSS,
-			PIPE_TILES.T_TOP,
-			PIPE_TILES.T_BOTTOM
-		];
-		return workingPipes[index];
-	}
-	if (broken && !gas) {
-		const brokenPipes = [
-			PIPE_TILES.BROKEN_HORIZONTAL_1,
-			PIPE_TILES.BROKEN_HORIZONTAL_1,
-			PIPE_TILES.BROKEN_HORIZONTAL_2,
-			PIPE_TILES.BROKEN_HORIZONTAL_2,
-			PIPE_TILES.BROKEN_VERTICAL_1,
-			PIPE_TILES.BROKEN_VERTICAL_1,
-			PIPE_TILES.BROKEN_VERTICAL_2,
-			PIPE_TILES.BROKEN_VERTICAL_2
-		];
-		return brokenPipes[index];
-	}
-	if (broken && gas) {
-		const gasPipes = {
-			red: [
-				PIPE_TILES.GAS_HORIZONTAL_1,
-				PIPE_TILES.GAS_HORIZONTAL_2,
-				PIPE_TILES.GAS_VERTICAL_1,
-				PIPE_TILES.GAS_VERTICAL_2,
-				PIPE_TILES.GAS_CORNER_TOP_LEFT_1,
-				PIPE_TILES.GAS_CORNER_TOP_LEFT_2,
-				PIPE_TILES.GAS_CORNER_TOP_RIGHT_1,
-				PIPE_TILES.GAS_CORNER_TOP_RIGHT_2
-			]
-		};
-		return gasPipes[gas]?.[index];
-	}
-	return undefined;
-};
+
 
 const gas = (color, index) => {
 	const gasTiles = {
@@ -127,7 +81,7 @@ const cloud = (x, y) => [
 function pipeLine(x, y, length, direction = "horizontal") {
 	if (length <= 0) return [];
 
-	const value = pipe(false, false, direction === "horizontal" ? 0 : 1);
+	const value = direction === "horizontal" ? PIPE_TILES.STRAIGHT_HORIZONTAL : PIPE_TILES.STRAIGHT_VERTICAL;
 
 	let points;
 	points = Array.from({ length }, (_, i) => ({
@@ -147,9 +101,6 @@ function mazePattern(width, height, startX = 2, startY = 2) {
 	const visited = new Set();
 
 	const PIPE_TYPES = [
-		PIPE_TILES.CROSS,
-		PIPE_TILES.T_TOP,
-		PIPE_TILES.T_BOTTOM,
 		PIPE_TILES.STRAIGHT_HORIZONTAL,
 		PIPE_TILES.STRAIGHT_VERTICAL,
 		PIPE_TILES.CORNER_TOP_LEFT,
@@ -157,8 +108,8 @@ function mazePattern(width, height, startX = 2, startY = 2) {
 		PIPE_TILES.CORNER_BOTTOM_LEFT,
 	];
 
-	const HORIZONTAL_CONNECTORS = [PIPE_TILES.STRAIGHT_HORIZONTAL, PIPE_TILES.T_TOP, PIPE_TILES.T_BOTTOM];
-	const VERTICAL_CONNECTORS = [PIPE_TILES.STRAIGHT_VERTICAL, PIPE_TILES.T_TOP, PIPE_TILES.T_BOTTOM];
+	const HORIZONTAL_CONNECTORS = [PIPE_TILES.STRAIGHT_HORIZONTAL];
+	const VERTICAL_CONNECTORS = [PIPE_TILES.STRAIGHT_VERTICAL];
 
 	function isValid(x, y) {
 		return x >= startX && x < startX + width * cellSize &&
@@ -189,18 +140,14 @@ function mazePattern(width, height, startX = 2, startY = 2) {
 	}
 
 	function getRandomPipe(tiles) {
-		const tile = tiles[Math.floor(Math.random() * tiles.length)];
-		const index = PIPE_TYPES.indexOf(tile);
-		return pipe(false, false, index >= 0 ? index : 0);
+		return tiles[Math.floor(Math.random() * tiles.length)];
 	}
 
 	function dfs(x, y) {
 		visited.add(`${x},${y}`);
 
-		// Add pipe at current cell
-		const pipeType = Math.random() < 0.8 ?
-			getRandomPipe(PIPE_TYPES) :
-			pipe(false, "red", Math.floor(Math.random() * PIPE_TYPES.length));
+		const pipeType = PIPE_TILES.STRAIGHT_HORIZONTAL
+
 		maze.push({ x, y, value: pipeType });
 
 		const neighbors = getNeighbors(x, y);
@@ -232,9 +179,7 @@ function mazePattern(width, height, startX = 2, startY = 2) {
 		const ry = startY + Math.floor(Math.random() * height * cellSize);
 
 		if (isValid(rx, ry) && !isVisited(rx, ry)) {
-			const pipeType = Math.random() < 0.7 ?
-				getRandomPipe(PIPE_TYPES) :
-				pipe(true, false, Math.floor(Math.random() * PIPE_TYPES.length));
+			const pipeType = PIPE_TILES.STRAIGHT_HORIZONTAL
 			maze.push({ x: rx, y: ry, value: pipeType });
 		}
 	}
