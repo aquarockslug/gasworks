@@ -5,11 +5,39 @@ const BUTTONCLICKSOUND = new Sound([
 
 const MASKS = ["none", "red", "blue", "green", "yellow"];
 
+const PIPE_TILES = {
+	// Working pipe tiles
+	STRAIGHT_HORIZONTAL: 6,
+	STRAIGHT_VERTICAL: 7,
+	CORNER_TOP_LEFT: 8,
+	CORNER_TOP_RIGHT: 24,
+	CORNER_BOTTOM_LEFT: 26,
+	CROSS: 42,
+	T_TOP: 43,
+	T_BOTTOM: 44,
+	
+	// Broken pipe tiles
+	BROKEN_HORIZONTAL_1: 62,
+	BROKEN_HORIZONTAL_2: 25,
+	BROKEN_VERTICAL_1: 60,
+	BROKEN_VERTICAL_2: 61,
+	
+	// Gas pipe tiles
+	GAS_HORIZONTAL_1: 9,
+	GAS_HORIZONTAL_2: 45, // 9 + 36
+	GAS_VERTICAL_1: 10,
+	GAS_VERTICAL_2: 46, // 10 + 36
+	GAS_CORNER_TOP_LEFT_1: 27,
+	GAS_CORNER_TOP_LEFT_2: 63, // 27 + 36
+	GAS_CORNER_TOP_RIGHT_1: 28,
+	GAS_CORNER_TOP_RIGHT_2: 64, // 28 + 36
+};
+
 const TILE_INDICIES = {
 	pipes: {
-		working: [6, 7, 8, 24, 26, 42, 43, 44],
-		broken: [62, 62, 25, 25, 60, 60, 61, 61],
-		red: [9, 9 + 36, 10, 10 + 36, 27, 27 + 36, 28, 28 + 36],
+		working: [PIPE_TILES.STRAIGHT_HORIZONTAL, PIPE_TILES.STRAIGHT_VERTICAL, PIPE_TILES.CORNER_TOP_LEFT, PIPE_TILES.CORNER_TOP_RIGHT, PIPE_TILES.CORNER_BOTTOM_LEFT, PIPE_TILES.CROSS, PIPE_TILES.T_TOP, PIPE_TILES.T_BOTTOM],
+		broken: [PIPE_TILES.BROKEN_HORIZONTAL_1, PIPE_TILES.BROKEN_HORIZONTAL_1, PIPE_TILES.BROKEN_HORIZONTAL_2, PIPE_TILES.BROKEN_HORIZONTAL_2, PIPE_TILES.BROKEN_VERTICAL_1, PIPE_TILES.BROKEN_VERTICAL_1, PIPE_TILES.BROKEN_VERTICAL_2, PIPE_TILES.BROKEN_VERTICAL_2],
+		red: [PIPE_TILES.GAS_HORIZONTAL_1, PIPE_TILES.GAS_HORIZONTAL_2, PIPE_TILES.GAS_VERTICAL_1, PIPE_TILES.GAS_VERTICAL_2, PIPE_TILES.GAS_CORNER_TOP_LEFT_1, PIPE_TILES.GAS_CORNER_TOP_LEFT_2, PIPE_TILES.GAS_CORNER_TOP_RIGHT_1, PIPE_TILES.GAS_CORNER_TOP_RIGHT_2],
 	},
 	gas: {
 		red: [72, 73, 74, 90, 91, 92, 108, 109, 110],
@@ -73,10 +101,8 @@ const cloud = (x, y) => [
 
 function pipeLine(x, y, length, direction = "horizontal") {
 	if (length <= 0) return [];
-	value = pipe(false, false, direction === "horizontal" ? 6 : 4) 
-
-	// Use the provided value or default to pipe(false, false, 1)
-	const tileValue = value !== undefined ? value : pipe(false, false, 1);
+	
+	const value = pipe(false, false, direction === "horizontal" ? 1 : 3);
 
 	let points;
 	points = Array.from({ length }, (_, i) => ({
@@ -85,7 +111,6 @@ function pipeLine(x, y, length, direction = "horizontal") {
 		value,
 	}));
 
-	// points = points.map((p) => x === p.x && y === p.x ? { x: p.x, y: p.y, value: 1 } : p)
 	points = points.map((p) => ({ x: p.x, y: p.y, value: p.value }));
 
 	return points;
@@ -95,6 +120,20 @@ function mazePattern(width, height, startX = 2, startY = 2) {
 	const maze = [];
 	const cellSize = 3;
 	const visited = new Set();
+	
+	const PIPE_TYPES = [
+		PIPE_TILES.STRAIGHT_HORIZONTAL,
+		PIPE_TILES.STRAIGHT_VERTICAL,
+		PIPE_TILES.CORNER_TOP_LEFT,
+		PIPE_TILES.CORNER_TOP_RIGHT,
+		PIPE_TILES.CORNER_BOTTOM_LEFT,
+		PIPE_TILES.CROSS,
+		PIPE_TILES.T_TOP,
+		PIPE_TILES.T_BOTTOM
+	];
+	
+	const HORIZONTAL_CONNECTORS = [PIPE_TILES.STRAIGHT_HORIZONTAL, PIPE_TILES.T_TOP, PIPE_TILES.T_BOTTOM];
+	const VERTICAL_CONNECTORS = [PIPE_TILES.STRAIGHT_VERTICAL, PIPE_TILES.T_TOP, PIPE_TILES.T_BOTTOM];
 	
 	function isValid(x, y) {
 		return x >= startX && x < startX + width * cellSize && 
@@ -124,13 +163,19 @@ function mazePattern(width, height, startX = 2, startY = 2) {
 		return neighbors;
 	}
 	
+	function getRandomPipe(tiles) {
+		const tile = tiles[Math.floor(Math.random() * tiles.length)];
+		const index = PIPE_TYPES.indexOf(tile);
+		return pipe(false, false, index >= 0 ? index : 0);
+	}
+	
 	function dfs(x, y) {
 		visited.add(`${x},${y}`);
 		
 		// Add pipe at current cell
 		const pipeType = Math.random() < 0.8 ? 
-			pipe(false, false, Math.floor(Math.random() * 8)) : 
-			pipe(false, "red", Math.floor(Math.random() * 8));
+			getRandomPipe(PIPE_TYPES) : 
+			pipe(false, "red", Math.floor(Math.random() * PIPE_TYPES.length));
 		maze.push({ x, y, value: pipeType });
 		
 		const neighbors = getNeighbors(x, y);
@@ -142,9 +187,7 @@ function mazePattern(width, height, startX = 2, startY = 2) {
 			if (!isVisited(neighbor.x, neighbor.y)) {
 				// Add pipe connecting to neighbor
 				const isHorizontal = neighbor.wallX !== x;
-				const connectorPipe = isHorizontal ? 
-					pipe(false, false, Math.random() < 0.5 ? 1 : 2) : // horizontal connectors
-					pipe(false, false, Math.random() < 0.5 ? 3 : 4); // vertical connectors
+				const connectorPipe = getRandomPipe(isHorizontal ? HORIZONTAL_CONNECTORS : VERTICAL_CONNECTORS);
 				
 				maze.push({ x: neighbor.wallX, y: neighbor.wallY, value: connectorPipe });
 				
@@ -165,8 +208,8 @@ function mazePattern(width, height, startX = 2, startY = 2) {
 		
 		if (isValid(rx, ry) && !isVisited(rx, ry)) {
 			const pipeType = Math.random() < 0.7 ? 
-				pipe(false, false, Math.floor(Math.random() * 8)) : 
-				pipe(true, false, Math.floor(Math.random() * 8));
+				getRandomPipe(PIPE_TYPES) : 
+				pipe(true, false, Math.floor(Math.random() * PIPE_TYPES.length));
 			maze.push({ x: rx, y: ry, value: pipeType });
 		}
 	}
