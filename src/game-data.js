@@ -10,8 +10,8 @@ const PIPE_TILES = {
 	STRAIGHT_VERTICAL: 26,
 	CORNER_TOP_LEFT: 6,
 	CORNER_TOP_RIGHT: 8,
-	CORNER_BOTTOM_LEFT: 40,
-	CORNER_BOTTOM_RIGHT: 42,
+	CORNER_BOTTOM_LEFT: 42,
+	CORNER_BOTTOM_RIGHT: 44,
 
 	BROKEN_HORIZONTAL_1: 62,
 	BROKEN_HORIZONTAL_2: 25,
@@ -98,7 +98,7 @@ function pipe(x, y, length, direction = "horizontal") {
 function pipeLine(coordinates) {
 	if (coordinates.length < 2) return [];
 	
-	const pipelines = [];
+	const pipeline = [];
 	
 	for (let i = 0; i < coordinates.length - 1; i++) {
 		const start = coordinates[i];
@@ -107,15 +107,43 @@ function pipeLine(coordinates) {
 		if (start.x === end.x) {
 			const length = Math.abs(end.y - start.y);
 			const startY = Math.min(start.y, end.y);
-			pipelines.push(pipe(start.x, startY, length, "vertical"));
+			pipeline.push(pipe(start.x, startY, length, "vertical"));
 		} else if (start.y === end.y) {
 			const length = Math.abs(end.x - start.x);
 			const startX = Math.min(start.x, end.x);
-			pipelines.push(pipe(startX, start.y, length, "horizontal"));
+			pipeline.push(pipe(startX, start.y, length, "horizontal"));
 		}
 	}
 	
-	return pipelines.flat();
+	// Add corner pieces at coordinate junctions
+	for (let i = 1; i < coordinates.length - 1; i++) {
+		const prev = coordinates[i - 1];
+		const curr = coordinates[i];
+		const next = coordinates[i + 1];
+		
+		let cornerTile = null;
+		
+		// Horizontal to vertical turn
+		if (prev.y === curr.y && curr.x === next.x) {
+			if (prev.x < curr.x && next.y > curr.y) cornerTile = PIPE_TILES.CORNER_BOTTOM_RIGHT;
+			else if (prev.x < curr.x && next.y < curr.y) cornerTile = PIPE_TILES.CORNER_TOP_RIGHT;
+			else if (prev.x > curr.x && next.y > curr.y) cornerTile = PIPE_TILES.CORNER_BOTTOM_LEFT;
+			else if (prev.x > curr.x && next.y < curr.y) cornerTile = PIPE_TILES.CORNER_TOP_LEFT;
+		}
+		// Vertical to horizontal turn
+		else if (prev.x === curr.x && curr.y === next.y) {
+			if (prev.y < curr.y && next.x > curr.x) cornerTile = PIPE_TILES.CORNER_BOTTOM_LEFT;
+			else if (prev.y < curr.y && next.x < curr.x) cornerTile = PIPE_TILES.CORNER_TOP_RIGHT;
+			else if (prev.y > curr.y && next.x > curr.x) cornerTile = PIPE_TILES.CORNER_TOP_LEFT;
+			else if (prev.y > curr.y && next.x < curr.x) cornerTile = PIPE_TILES.CORNER_BOTTOM_RIGHT;
+		}
+		
+		if (cornerTile) {
+			pipeline.push({ x: curr.x, y: curr.y, value: cornerTile });
+		}
+	}
+	
+	return pipeline.flat();
 }
 
 function mazePattern(width, height, startX = 2, startY = 2) {
@@ -173,7 +201,7 @@ const level = {
 		...pipe(24, 16, 15),
 		{ x: 24, y: 16, value: PIPE_TILES.CORNER_TOP_LEFT },
 		...pipe(24, 10, 6, "vertical"),
-		...pipeLine([{x: 1, y: 5}, {x: 15, y: 5}, {x: 15, y: 12}]),
+		...pipeLine([{x: 1, y: 5}, {x: 15, y: 5}, {x: 15, y: 12}, {x: 5, y: 12}, {x: 5, y: 18}]),
 		// ...mazePattern(2, 2)
 
 	],

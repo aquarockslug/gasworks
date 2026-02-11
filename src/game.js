@@ -128,7 +128,7 @@ function gameInit() {
 
 	gasAnimTime = 0;
 
-	lever = new Lever(vec2(-2.5, 0), vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
+	lever = new Lever(vec2(-2.5, -5.5), vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
 	mask = new Mask(vec2(5, -5), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
 
 	pipeData = level.pipes.reduce(
