@@ -147,26 +147,24 @@ function pipeLine(coordinates) {
 }
 
 function mazePattern(width, height, startX = 2, startY = 2) {
-	const maze = [];
-	const cellSize = 8;
+	const path = [];
+	const cellSize = 12;
 	const visited = new Set();
-	const straightPipe = PIPE_TILES.STRAIGHT_HORIZONTAL;
 
 	const isValid = (x, y) => x >= startX && x < startX + width * cellSize && y >= startY && y < startY + height * cellSize;
 	const isVisited = (x, y) => visited.has(`${x},${y}`);
-	const getRandomPipe = (tiles) => tiles[Math.floor(Math.random() * tiles.length)];
 
 	const getNeighbors = (x, y) => {
-		const dirs = [{ dx: 2, dy: 0 }, { dx: -2, dy: 0 }, { dx: 0, dy: 2 }, { dx: 0, dy: -2 }];
+		const dirs = [{ dx: 4, dy: 0 }, { dx: -4, dy: 0 }, { dx: 0, dy: 4 }, { dx: 0, dy: -4 }];
 		return dirs.filter(({ dx, dy }) => {
 			const nx = x + dx, ny = y + dy;
 			return isValid(nx, ny) && !isVisited(nx, ny);
-		}).map(({ dx, dy }) => ({ x: x + dx, y: y + dy, wallX: x + dx/2, wallY: y + dy/2 }));
+		}).map(({ dx, dy }) => ({ x: x + dx, y: y + dy }));
 	};
 
 	const dfs = (x, y) => {
 		visited.add(`${x},${y}`);
-		maze.push({ x, y, value: straightPipe });
+		path.push({ x, y });
 
 		const neighbors = getNeighbors(x, y);
 		while (neighbors.length) {
@@ -174,9 +172,6 @@ function mazePattern(width, height, startX = 2, startY = 2) {
 			const neighbor = neighbors.splice(idx, 1)[0];
 
 			if (!isVisited(neighbor.x, neighbor.y)) {
-				const isHorizontal = neighbor.wallX !== x;
-				const connector = getRandomPipe(isHorizontal ? [straightPipe] : [PIPE_TILES.STRAIGHT_VERTICAL]);
-				maze.push({ x: neighbor.wallX, y: neighbor.wallY, value: connector });
 				dfs(neighbor.x, neighbor.y);
 			}
 		}
@@ -184,15 +179,29 @@ function mazePattern(width, height, startX = 2, startY = 2) {
 
 	dfs(startX, startY);
 
-	for (let i = 0; i < Math.floor(width * height * 0.3); i++) {
+	// Create additional random paths for complexity
+	for (let i = 0; i < Math.floor(width * height * 0.05); i++) {
 		const rx = startX + Math.floor(Math.random() * width * cellSize);
 		const ry = startY + Math.floor(Math.random() * height * cellSize);
 		if (isValid(rx, ry) && !isVisited(rx, ry)) {
-			maze.push({ x: rx, y: ry, value: straightPipe });
+			// Find nearest visited cell to connect to
+			let minDist = Infinity;
+			let nearestCell = null;
+			for (const cell of path) {
+				const dist = Math.abs(cell.x - rx) + Math.abs(cell.y - ry);
+				if (dist < minDist && dist <= 8) {
+					minDist = dist;
+					nearestCell = cell;
+				}
+			}
+			if (nearestCell) {
+				path.push({ x: rx, y: ry });
+				path.push(nearestCell);
+			}
 		}
 	}
 
-	return maze;
+	return pipeLine(path);
 }
 
 const level = {
@@ -202,7 +211,7 @@ const level = {
 		{ x: 24, y: 16, value: PIPE_TILES.CORNER_TOP_LEFT },
 		...pipe(24, 10, 6, "vertical"),
 		...pipeLine([{x: 1, y: 5}, {x: 15, y: 5}, {x: 15, y: 12}, {x: 5, y: 12}, {x: 5, y: 18}]),
-		// ...mazePattern(2, 2)
+		...mazePattern(1, 2)
 
 	],
 	gases: [...cloud(24, 17)],
