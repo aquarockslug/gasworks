@@ -15,8 +15,10 @@ build({
 	"./assets/pipes.png",
 	"./assets/gorm.png",
 	"./src/game.js",
+	"./src/player.js",
 	"./src/objects.js",
 	"./src/game-data.js",
-	"./lib/littlejs.js"
+	"./lib/littlejs.js",
+	"./lib/signals.js"
 })
 push("./index.zip", "aquarock/gas-game", "html5")
