@@ -1,10 +1,9 @@
 // Player state and reactive management
-const playerState = signal({ maskName: "none", position: vec2(0, 0), inGas: false, health: 100 });
+const playerState = signal({ maskName: "none", inGas: false, health: 100 });
 
 const updatePlayerState = (updates) => playerState.value = { ...playerState.value, ...updates };
 
 // State update functions
-const updatePlayerPosition = (newPosition) => updatePlayerState({ position: newPosition });
 const updatePlayerMask = (maskName) => updatePlayerState({ maskName: maskName });
 const setPlayerInGas = (inGas) => updatePlayerState({ inGas: inGas });
 const damagePlayer = (amount = 1) => updatePlayerState({ health: Math.max(0, playerState.value.health - amount) });
@@ -16,7 +15,7 @@ const isPlayerInDanger = () => playerState.value.inGas && !canSurviveGas();
 
 // Initialize player state
 const initializePlayerState = () => {
-  playerState.value = { maskName: "none", position: vec2(0, 0), inGas: false, health: 100 };
+  playerState.value = { maskName: "none", inGas: false, health: 100 };
   playerState.effect(() => console.log('Player state updated:', playerState.value));
 };
 
@@ -30,7 +29,6 @@ class Player extends GameObject {
 
 	update() {
 		super.update();
-		updatePlayerPosition(this.pos);
 		setPlayerInGas(gl.getData(this.pos.floor().add(vec2(16))).tile);
 		
 		if (lever.on && playerState.value.inGas && !canSurviveGas()) this.pos = vec2(0);
