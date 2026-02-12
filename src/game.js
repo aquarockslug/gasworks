@@ -46,7 +46,6 @@ function createTileLayer(
 
 	const dataArray = data || createEmptyGrid();
 
-
 	for (let y = 0; y < size.y; y++) {
 		for (let x = 0; x < size.x; x++) {
 			const value = dataArray[y][x];
@@ -55,9 +54,7 @@ function createTileLayer(
 					typeof value === "object" && value.tile ? value.tile : value;
 				const tileData = getTileData(tileIndex);
 				layer.setData(vec2(x, y), tileData);
-				if (isCollision) {
-					layer.setCollisionData(vec2(x, y));
-				}
+				if (isCollision) layer.setCollisionData(vec2(x, y));
 			}
 		}
 	}
@@ -207,11 +204,12 @@ function gameUpdate() {
 	}
 }
 
-function gameRender() {
-	// drawRect(vec2(), vec2(32), new Color().setHex("#bbc3ca"));
-}
+function gameRender() {}
 
-function postGameRender() {}
+function postGameRender() {
+	const intensity = 1 - (playerState.value.health / 100);
+	if (intensity > 0) drawRect(vec2(), vec2(100), new Color(0, 0, 0, intensity * 0.5));
+}
 
 engineInit(gameInit, gameUpdate, null, gameRender, postGameRender, [
 	"assets/pipes.png",
