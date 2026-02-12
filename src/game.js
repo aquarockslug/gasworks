@@ -154,6 +154,10 @@ function gameInit() {
 function gameUpdate() {
 	gasAnimTime += timeDelta;
 
+	// Update gas detection and damage
+	updateGasDetection();
+	updateGasDamage();
+
 	// Animate gas tiles
 	const frame = ((gasAnimTime * 6) | 0) % 4; // 4-frame loop
 	const actualFrame = frame === 3 ? 1 : frame; // Sequence: 0, 1, 2, 1 repeat

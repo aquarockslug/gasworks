@@ -31,3 +31,42 @@ class Mask extends GameObject {
 		this.tileInfo = tile(vec2(0, step < 4 ? 0 : step - 4), vec2(8, 10), 2);
 	}
 }
+
+class Player extends GameObject {
+	constructor(...args) {
+		super(...args);
+		this.lastEmitTime = 0;
+		this.emitInterval = 0.1;
+		this.setCollision();
+	}
+
+	update() {
+		super.update();
+
+		const moveInput = keyDirection().clampLength(1);
+		this.velocity = this.velocity.add(moveInput.scale(0.05));
+		this.mirror = this.velocity.x < 0;
+		cameraPos = this.pos.add(vec2(0, 2)).add(this.velocity.multiply(vec2(-1)));
+
+		this.state = moveInput.length() > 0 ? this.walk : this.idle;
+		this.state();
+	}
+
+	setAnimation(state) {
+		const animations = { idle: { rowOffset: 0, frames: 2, speed: 4 }, walk: { rowOffset: 1, frames: 4, speed: 6 } };
+		const anim = animations[state];
+		this.tileInfo = tile(
+			vec2(0, MASKS.indexOf(playerState.value.maskName) * 2 + anim.rowOffset),
+			vec2(19, 21), 1
+		).frame(((time * anim.speed) % anim.frames) | 0);
+	}
+
+	idle = () => this.setAnimation("idle");
+	walk = () => this.setAnimation("walk");
+
+	render() {
+		const offset = this.pos.subtract(cameraPos).multiply(vec2(0.15)).add(vec2(0, 0.45));
+		drawTile(this.pos.add(offset), vec2(1), tile(vec2(), vec2(19, 21), 1).frame(2));
+		super.render();
+	}
+}

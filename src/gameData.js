@@ -5,49 +5,6 @@ const BUTTONCLICKSOUND = new Sound([
 
 const MASKS = ["none", "red", "blue", "green", "yellow"];
 
-const PIPE_TILES = {
-	STRAIGHT_HORIZONTAL: 43,
-	STRAIGHT_HORIZONTAL_BAND: 7,
-	STRAIGHT_VERTICAL: 26,
-	STRAIGHT_VERTICAL_BAND: 24,
-	CORNER_TOP_LEFT: 6,
-	CORNER_TOP_RIGHT: 8,
-	CORNER_BOTTOM_LEFT: 42,
-	CORNER_BOTTOM_RIGHT: 44,
-
-	BROKEN_HORIZONTAL_1: 62,
-	BROKEN_HORIZONTAL_2: 25,
-	BROKEN_VERTICAL_1: 60,
-	BROKEN_VERTICAL_2: 61,
-
-	GAS_HORIZONTAL_1: 9,
-	GAS_HORIZONTAL_2: 45, // 9 + 36
-	GAS_VERTICAL_1: 10,
-	GAS_VERTICAL_2: 46, // 10 + 36
-	GAS_CORNER_TOP_LEFT_1: 27,
-	GAS_CORNER_TOP_LEFT_2: 63, // 27 + 36
-	GAS_CORNER_TOP_RIGHT_1: 28,
-	GAS_CORNER_TOP_RIGHT_2: 64, // 28 + 36
-};
-
-const gas = (color, index) => {
-	const gasTiles = {
-		red: [72, 73, 74, 90, 91, 92, 108, 109, 110],
-		blue: [74, 75, 92, 93]
-	};
-	return gasTiles[color]?.[index];
-};
-
-const ground = (index) => {
-	const groundTiles = [38, 39, 56, 57];
-	return groundTiles[index];
-};
-
-const wall = (index) => {
-	const wallTiles = [0, 1, 2, 3, 4, 5, 18, 19, 20, 21, 22, 23, 36, 37, 41];
-	return wallTiles[index];
-};
-
 const cloud = (x, y) => [
 	{ x: x, y: y, value: { tile: gas("red", 6), animSpeed: 4, frames: 4 } },
 	{ x: x + 1, y: y, value: { tile: gas("red", 7), animSpeed: 4, frames: 4 } },
@@ -76,7 +33,7 @@ const cloud = (x, y) => [
 	},
 ];
 
-function pipe(x, y, length, direction = "horizontal") {
+function pipeSection(x, y, length, direction = "horizontal") {
 	if (length <= 0) return [];
 
 	const straightValue = direction === "horizontal" ? PIPE_TILES.STRAIGHT_HORIZONTAL : PIPE_TILES.STRAIGHT_VERTICAL;
@@ -107,11 +64,11 @@ function pipeLine(coordinates) {
 		if (start.x === end.x) {
 			const length = Math.abs(end.y - start.y);
 			const startY = Math.min(start.y, end.y);
-			pipeline.push(pipe(start.x, startY, length, "vertical"));
+			pipeline.push(pipeSection(start.x, startY, length, "vertical"));
 		} else if (start.y === end.y) {
 			const length = Math.abs(end.x - start.x);
 			const startX = Math.min(start.x, end.x);
-			pipeline.push(pipe(startX, start.y, length, "horizontal"));
+			pipeline.push(pipeSection(startX, start.y, length, "horizontal"));
 		}
 	}
 
@@ -206,10 +163,11 @@ function mazePattern(width, height, startX = 2, startY = 2) {
 
 const level = {
 	pipes: [
-		...pipe(15, 20, 23),
-		...pipe(24, 16, 15),
+		...pipeSection(15, 20, 23),
+		...pipeSection(24, 16, 15),
 		{ x: 24, y: 16, value: PIPE_TILES.CORNER_TOP_LEFT },
-		...pipe(24, 10, 6, "vertical"),
+		{ x: 25, y: 20, value: PIPE_TILES.RED_GAS_HORIZONTAL_3 },
+		...pipeSection(24, 10, 6, "vertical"),
 		...pipeLine([{x: 1, y: 5}, {x: 15, y: 5}, {x: 15, y: 12}, {x: 5, y: 12}, {x: 5, y: 18}]),
 		...mazePattern(1, 2)
 
@@ -229,23 +187,14 @@ const getTileData = (tileIndex) => {
 
 // Pre-cache commonly used tile data
 const initTileDataCache = () => {
-	// Cache all pipe tiles
 	Object.values(PIPE_TILES).forEach((index) => {
 		index !== undefined && getTileData(index);
 	});
-
-	// Cache all gas tiles
-	const gasTiles = [72, 73, 74, 90, 91, 92, 108, 109, 110, 74, 75, 92, 93];
-	gasTiles.forEach((index) => {
+	Object.values(GAS_TILES).forEach((index) => {
 		index !== undefined && getTileData(index);
 	});
-
-	// Cache ground and wall tiles
-	const groundTiles = [38, 39, 56, 57];
-	const wallTiles = [0, 1, 2, 3, 4, 5, 18, 19, 20, 21, 22, 23, 36, 37, 41];
-
-	groundTiles.forEach(getTileData);
-	wallTiles.forEach(getTileData);
+	Object.values(GROUND_TILES).forEach(getTileData);
+	Object.values(WALL_TILES).forEach(getTileData);
 };
 
 const particles = {

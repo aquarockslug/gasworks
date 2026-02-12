@@ -15,9 +15,10 @@ build({
 	"./assets/pipes.png",
 	"./assets/gorm.png",
 	"./src/game.js",
-	"./src/player.js",
+	"./src/state.js",
 	"./src/objects.js",
-	"./src/game-data.js",
+	"./src/gameData.js",
+	"./src/tileData.js",
 	"./lib/littlejs.js",
 	"./lib/signals.js"
 })
