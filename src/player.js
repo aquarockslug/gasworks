@@ -1,19 +1,19 @@
-// Player state and reactive management
+// player state 
 const playerState = signal({ maskName: "none", inGas: false, health: 100 });
-
 const updatePlayerState = (updates) => playerState.value = { ...playerState.value, ...updates };
 
-// State update functions
+// setters
 const updatePlayerMask = (maskName) => updatePlayerState({ maskName: maskName });
-const setPlayerInGas = (inGas) => updatePlayerState({ inGas: inGas });
-const damagePlayer = (amount = 1) => updatePlayerState({ health: Math.max(0, playerState.value.health - amount) });
+const setPlayerInGas = (inGas) => updatePlayerState({ inGas: inGas }); // TODO get the color of the gas from the tile index
+const damagePlayer = (amount = 1) => {
+	updatePlayerState({ health: clamp(playerState.value.health - amount, 0, 100) })
+	if (playerState.value.health === 0) player.die()
+};
 
-// Getter functions
+// getters
 const canSurviveGas = () => playerState.value.maskName === "red";
-const isPlayerAlive = () => playerState.value.health > 0;
-const isPlayerInDanger = () => playerState.value.inGas && !canSurviveGas();
 
-// Initialize player state
+// initialize player state
 const initializePlayerState = () => {
   playerState.value = { maskName: "none", inGas: false, health: 100 };
   playerState.effect(() => console.log('Player state updated:', playerState.value));
@@ -24,14 +24,21 @@ class Player extends GameObject {
 		super(...args);
 		this.lastEmitTime = 0;
 		this.emitInterval = 0.1;
+		this.lastTilePos = null;
 		this.setCollision();
 	}
 
 	update() {
 		super.update();
-		setPlayerInGas(gl.getData(this.pos.floor().add(vec2(16))).tile);
 		
-		if (lever.on && playerState.value.inGas && !canSurviveGas()) this.pos = vec2(0);
+		const currentTilePos = this.pos.floor().add(vec2(16));
+		if (!this.lastTilePos || !currentTilePos.distance(this.lastTilePos) < 1) {
+			setPlayerInGas(gl.getData(currentTilePos).tile);
+			this.lastTilePos = currentTilePos;
+		}
+		
+		if (lever.on && playerState.value.inGas && !canSurviveGas()) damagePlayer(1);
+		else damagePlayer(-1)
 		
 		const moveInput = keyDirection().clampLength(1);
 		this.velocity = this.velocity.add(moveInput.scale(0.05));
@@ -40,6 +47,11 @@ class Player extends GameObject {
 		
 		this.state = moveInput.length() > 0 ? this.walk : this.idle;
 		this.state();
+	}
+
+	die() {
+		this.pos = vec2(0)
+		updatePlayerState({ health: 100 })
 	}
 
 	setAnimation(state) {
