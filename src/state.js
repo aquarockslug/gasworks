@@ -35,5 +35,5 @@ const updateGasDamage = () => {
 
 const initializePlayerState = () => {
   playerState.value = { maskName: "none", inGas: false, health: 100 };
-  playerState.effect(() => console.log('Player state updated:', playerState.value));
+  // playerState.effect(() => console.log('Player state updated:', playerState.value));
 };

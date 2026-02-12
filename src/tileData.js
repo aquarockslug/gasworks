@@ -13,10 +13,10 @@ const PIPE_TILES = {
 	BROKEN_VERTICAL_1: 60,
 	BROKEN_VERTICAL_2: 61,
 
-	RED_GAS_HORIZONTAL_1: 9,
-	RED_GAS_HORIZONTAL_2: 45, // 9 + 36
-	RED_GAS_HORIZONTAL_3: 10,
-	RED_GAS_HORIZONTAL_4: 46, 
+	RED_GAS_HORIZONTAL_DOWN_1: 10,
+	RED_GAS_HORIZONTAL_DOWN_2: 46,
+	RED_GAS_HORIZONTAL_UP_1: 9,
+	RED_GAS_HORIZONTAL_UP_2: 45, // 9 + 36
 	RED_GAS_VERTICAL_1: 10,
 	RED_GAS_VERTICAL_2: 46, // 10 + 36
 	RED_GAS_CORNER_TOP_LEFT_1: 27,
@@ -98,4 +98,58 @@ const wall = (index) => {
 		WALL_TILES.WALL_13, WALL_TILES.WALL_14, WALL_TILES.WALL_15
 	];
 	return wallTiles[index];
+};
+
+const pipe = (type, direction = null, hasGas = false, gasFrame = 1) => {
+	if (type === 'straight') {
+		if (hasGas) {
+			if (direction === 'horizontal') {
+				return gasFrame === 1 ? PIPE_TILES.RED_GAS_HORIZONTAL_DOWN_1 :
+				       gasFrame === 2 ? PIPE_TILES.RED_GAS_HORIZONTAL_DOWN_2 : 1
+			} else if (direction === 'vertical') {
+				return gasFrame === 1 ? PIPE_TILES.RED_GAS_VERTICAL_1 :
+				       PIPE_TILES.RED_GAS_VERTICAL_2;
+			}
+		} else {
+			return direction === 'horizontal' ? PIPE_TILES.STRAIGHT_HORIZONTAL :
+			       direction === 'vertical' ? PIPE_TILES.STRAIGHT_VERTICAL :
+			       PIPE_TILES.STRAIGHT_HORIZONTAL;
+		}
+	} else if (type === 'corner') {
+		if (hasGas) {
+			if (direction === 'top-left') {
+				return gasFrame === 1 ? PIPE_TILES.RED_GAS_CORNER_TOP_LEFT_1 :
+				       PIPE_TILES.RED_GAS_CORNER_TOP_LEFT_2;
+			} else if (direction === 'top-right') {
+				return gasFrame === 1 ? PIPE_TILES.RED_GAS_CORNER_TOP_RIGHT_1 :
+				       PIPE_TILES.RED_GAS_CORNER_TOP_RIGHT_2;
+			}
+		} else {
+			return direction === 'top-left' ? PIPE_TILES.CORNER_TOP_LEFT :
+			       direction === 'top-right' ? PIPE_TILES.CORNER_TOP_RIGHT :
+			       direction === 'bottom-left' ? PIPE_TILES.CORNER_BOTTOM_LEFT :
+			       direction === 'bottom-right' ? PIPE_TILES.CORNER_BOTTOM_RIGHT :
+			       PIPE_TILES.CORNER_TOP_LEFT;
+		}
+	} else if (type === 'broken') {
+		return direction === 'horizontal' ? (Math.random() < 0.5 ? PIPE_TILES.BROKEN_HORIZONTAL_1 : PIPE_TILES.BROKEN_HORIZONTAL_2) :
+		       direction === 'vertical' ? (Math.random() < 0.5 ? PIPE_TILES.BROKEN_VERTICAL_1 : PIPE_TILES.BROKEN_VERTICAL_2) :
+		       PIPE_TILES.BROKEN_HORIZONTAL_1;
+	} else if (typeof type === 'number') {
+		const pipeTiles = [
+			PIPE_TILES.STRAIGHT_HORIZONTAL, PIPE_TILES.STRAIGHT_HORIZONTAL_BAND,
+			PIPE_TILES.STRAIGHT_VERTICAL, PIPE_TILES.STRAIGHT_VERTICAL_BAND,
+			PIPE_TILES.CORNER_TOP_LEFT, PIPE_TILES.CORNER_TOP_RIGHT,
+			PIPE_TILES.CORNER_BOTTOM_LEFT, PIPE_TILES.CORNER_BOTTOM_RIGHT,
+			PIPE_TILES.BROKEN_HORIZONTAL_1, PIPE_TILES.BROKEN_HORIZONTAL_2,
+			PIPE_TILES.BROKEN_VERTICAL_1, PIPE_TILES.BROKEN_VERTICAL_2,
+			PIPE_TILES.RED_GAS_HORIZONTAL_1, PIPE_TILES.RED_GAS_HORIZONTAL_2,
+			PIPE_TILES.RED_GAS_HORIZONTAL_3, PIPE_TILES.RED_GAS_HORIZONTAL_4,
+			PIPE_TILES.RED_GAS_VERTICAL_1, PIPE_TILES.RED_GAS_VERTICAL_2,
+			PIPE_TILES.RED_GAS_CORNER_TOP_LEFT_1, PIPE_TILES.RED_GAS_CORNER_TOP_LEFT_2,
+			PIPE_TILES.RED_GAS_CORNER_TOP_RIGHT_1, PIPE_TILES.RED_GAS_CORNER_TOP_RIGHT_2
+		];
+		return pipeTiles[type];
+	}
+	return PIPE_TILES.STRAIGHT_HORIZONTAL;
 };

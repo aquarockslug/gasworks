@@ -161,20 +161,6 @@ function mazePattern(width, height, startX = 2, startY = 2) {
 	return pipeLine(path);
 }
 
-const level = {
-	pipes: [
-		...pipeSection(15, 20, 23),
-		...pipeSection(24, 16, 15),
-		{ x: 24, y: 16, value: PIPE_TILES.CORNER_TOP_LEFT },
-		{ x: 25, y: 20, value: PIPE_TILES.RED_GAS_HORIZONTAL_3 },
-		...pipeSection(24, 10, 6, "vertical"),
-		...pipeLine([{x: 1, y: 5}, {x: 15, y: 5}, {x: 15, y: 12}, {x: 5, y: 12}, {x: 5, y: 18}]),
-		...mazePattern(1, 2)
-
-	],
-	gases: [...cloud(24, 17)],
-};
-
 // Pre-create TileLayerData objects for performance
 const TILE_DATA_CACHE = {};
 
@@ -195,6 +181,20 @@ const initTileDataCache = () => {
 	});
 	Object.values(GROUND_TILES).forEach(getTileData);
 	Object.values(WALL_TILES).forEach(getTileData);
+};
+
+const level = {
+	pipes: [
+		...pipeSection(15, 20, 23),
+		...pipeSection(24, 16, 15),
+		{ x: 24, y: 16, value: PIPE_TILES.CORNER_TOP_LEFT },
+		{ x: 25, y: 20, value: pipe("straight", "horizontal", true ) },
+		...pipeSection(24, 10, 6, "vertical"),
+		...pipeLine([{x: 1, y: 5}, {x: 15, y: 5}, {x: 15, y: 12}, {x: 5, y: 12}, {x: 5, y: 18}]),
+		...mazePattern(1, 2)
+
+	],
+	gases: [...cloud(24, 17)],
 };
 
 const particles = {

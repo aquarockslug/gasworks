@@ -158,7 +158,7 @@ function gameUpdate() {
 	updateGasDetection();
 	updateGasDamage();
 
-	// Animate gas tiles
+	// Animate tiles
 	const frame = ((gasAnimTime * 6) | 0) % 4; // 4-frame loop
 	const actualFrame = frame === 3 ? 1 : frame; // Sequence: 0, 1, 2, 1 repeat
 
@@ -181,10 +181,12 @@ function gameUpdate() {
 			let tileIndex = typeof pipeTile === "object" ? pipeTile.tile : pipeTile;
 
 			if (
-				tileIndex == 25 ||
-				tileIndex == 60
+				tileIndex == pipe("straight", "horizontal", true, 1) ||
+				tileIndex == pipe("straight", "horizontal", true, 2)
 			)
-				tileIndex = time % 2 > 1 ? 25 : 60;
+				tileIndex = time % 2 > 1 ?
+					pipe("straight", "horizontal", true, 1) :
+					pipe("straight", "horizontal", true, 2);
 
 			const data = getTileData(tileIndex);
 			gl.setData(vec2(x, y), data);
