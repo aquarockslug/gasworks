@@ -65,7 +65,7 @@ class Player extends GameObject {
 	walk = () => this.setAnimation("walk");
 
 	render() {
-		const offset = this.pos.subtract(cameraPos).multiply(vec2(0.15)).add(vec2(0, 0.45));
+		const offset = this.pos.subtract(cameraPos).multiply(vec2(0.05)).add(vec2(0, 0.25));
 		drawTile(this.pos.add(offset), vec2(1), tile(vec2(), vec2(19, 21), 1).frame(2));
 		super.render();
 	}
