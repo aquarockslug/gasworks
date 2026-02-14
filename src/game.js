@@ -71,7 +71,7 @@ function groundLayer() {
 	for (let y = 1; y < 31; y++) {
 		for (let x = 0; x < 32; x++) {
 			let t =
-				(x % 4 || y % 5) || rand() < 0.5
+				x % 4 || y % 5 || rand() < 0.5
 					? [ground(0), ground(1), ground(3), ground(4)][randInt(0, 3)]
 					: ground(2);
 
@@ -102,7 +102,7 @@ function groundLayer() {
 	}
 
 	groundLayer.setData(vec2(31, 31), getTileData(wall(11))); // upper right
-	groundLayer.setData(vec2(0, 31), getTileData(wall(7)));// upper left
+	groundLayer.setData(vec2(0, 31), getTileData(wall(7))); // upper left
 	groundLayer.setData(vec2(31, 0), getTileData(wall(4))); // lower right
 	groundLayer.setData(vec2(0, 0), getTileData(wall(2))); // lower left
 
@@ -120,13 +120,13 @@ function gameInit() {
 	initializePlayerState();
 	playerState.value = {
 		...playerState.value,
-		maskName: MASKS[0]
+		maskName: MASKS[0],
 	};
 
 	gasAnimTime = 0;
 
-	lever = new Lever(vec2(2.5, 8), vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
-	mask = new Mask(vec2(5, -5), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
+	lever = new Lever(vec2(-5, 8), vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
+	mask = new Mask(vec2(10, 10), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
 
 	pipeData = level.pipes.reduce(
 		(acc, pipe) => addToGrid(acc, pipe.x, pipe.y, pipe.value, "pipe"),
@@ -143,7 +143,7 @@ function gameInit() {
 	grl = groundLayer();
 
 	setCanvasFixedSize(vec2(512, 512));
-	canvasClearColor = rgb().setHex("#a9b0ba")
+	canvasClearColor = rgb().setHex("#a9b0ba");
 	// squareGasCloud = emitGas(vec2(6), gases.square);
 	// circleGasCloud = emitGas(vec2(-6), gases.triangle);
 }
@@ -181,9 +181,10 @@ function gameUpdate() {
 				tileIndex == pipe("straight", "horizontal", true, 1) ||
 				tileIndex == pipe("straight", "horizontal", true, 2)
 			)
-				tileIndex = time % 2 > 1 ?
-					pipe("straight", "horizontal", true, 1) :
-					pipe("straight", "horizontal", true, 2);
+				tileIndex =
+					time % 2 > 1
+						? pipe("straight", "horizontal", true, 1)
+						: pipe("straight", "horizontal", true, 2);
 
 			const data = getTileData(tileIndex);
 			gl.setData(vec2(x, y), data);
@@ -207,8 +208,9 @@ function gameUpdate() {
 function gameRender() {}
 
 function postGameRender() {
-	const intensity = 1 - (playerState.value.health / 100);
-	if (intensity > 0) drawRect(vec2(), vec2(100), new Color(0, 0, 0, intensity * 0.5));
+	const intensity = 1 - playerState.value.health / 100;
+	if (intensity > 0)
+		drawRect(vec2(), vec2(100), new Color(0, 0, 0, intensity * 0.5));
 }
 
 engineInit(gameInit, gameUpdate, null, gameRender, postGameRender, [

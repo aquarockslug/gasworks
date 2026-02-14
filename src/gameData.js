@@ -36,8 +36,14 @@ const cloud = (x, y) => [
 function pipeSection(x, y, length, direction = "horizontal") {
 	if (length <= 0) return [];
 
-	const straightValue = direction === "horizontal" ? PIPE_TILES.STRAIGHT_HORIZONTAL : PIPE_TILES.STRAIGHT_VERTICAL;
-	const bandValue = direction === "horizontal" ? PIPE_TILES.STRAIGHT_HORIZONTAL_BAND : PIPE_TILES.STRAIGHT_VERTICAL_BAND;
+	const straightValue =
+		direction === "horizontal"
+			? PIPE_TILES.STRAIGHT_HORIZONTAL
+			: PIPE_TILES.STRAIGHT_VERTICAL;
+	const bandValue =
+		direction === "horizontal"
+			? PIPE_TILES.STRAIGHT_HORIZONTAL_BAND
+			: PIPE_TILES.STRAIGHT_VERTICAL_BAND;
 
 	let points = Array.from({ length }, (_, i) => {
 		const isBand = (i === 0 || i === length - 1) && length > 1;
@@ -82,17 +88,25 @@ function pipeLine(coordinates) {
 
 		// Horizontal to vertical turn
 		if (prev.y === curr.y && curr.x === next.x) {
-			if (prev.x < curr.x && next.y > curr.y) cornerTile = PIPE_TILES.CORNER_BOTTOM_RIGHT;
-			else if (prev.x < curr.x && next.y < curr.y) cornerTile = PIPE_TILES.CORNER_TOP_RIGHT;
-			else if (prev.x > curr.x && next.y > curr.y) cornerTile = PIPE_TILES.CORNER_BOTTOM_LEFT;
-			else if (prev.x > curr.x && next.y < curr.y) cornerTile = PIPE_TILES.CORNER_TOP_LEFT;
+			if (prev.x < curr.x && next.y > curr.y)
+				cornerTile = PIPE_TILES.CORNER_BOTTOM_RIGHT;
+			else if (prev.x < curr.x && next.y < curr.y)
+				cornerTile = PIPE_TILES.CORNER_TOP_RIGHT;
+			else if (prev.x > curr.x && next.y > curr.y)
+				cornerTile = PIPE_TILES.CORNER_BOTTOM_LEFT;
+			else if (prev.x > curr.x && next.y < curr.y)
+				cornerTile = PIPE_TILES.CORNER_TOP_LEFT;
 		}
 		// Vertical to horizontal turn
 		else if (prev.x === curr.x && curr.y === next.y) {
-			if (prev.y < curr.y && next.x > curr.x) cornerTile = PIPE_TILES.CORNER_BOTTOM_LEFT;
-			else if (prev.y < curr.y && next.x < curr.x) cornerTile = PIPE_TILES.CORNER_TOP_RIGHT;
-			else if (prev.y > curr.y && next.x > curr.x) cornerTile = PIPE_TILES.CORNER_TOP_LEFT;
-			else if (prev.y > curr.y && next.x < curr.x) cornerTile = PIPE_TILES.CORNER_BOTTOM_RIGHT;
+			if (prev.y < curr.y && next.x > curr.x)
+				cornerTile = PIPE_TILES.CORNER_BOTTOM_LEFT;
+			else if (prev.y < curr.y && next.x < curr.x)
+				cornerTile = PIPE_TILES.CORNER_TOP_RIGHT;
+			else if (prev.y > curr.y && next.x > curr.x)
+				cornerTile = PIPE_TILES.CORNER_TOP_LEFT;
+			else if (prev.y > curr.y && next.x < curr.x)
+				cornerTile = PIPE_TILES.CORNER_BOTTOM_RIGHT;
 		}
 
 		if (cornerTile) {
@@ -105,18 +119,30 @@ function pipeLine(coordinates) {
 
 function mazePattern(width, height, startX = 2, startY = 2) {
 	const path = [];
-	const cellSize = 12;
+	const cellSize = 4;
 	const visited = new Set();
 
-	const isValid = (x, y) => x >= startX && x < startX + width * cellSize && y >= startY && y < startY + height * cellSize;
+	const isValid = (x, y) =>
+		x >= startX &&
+		x < startX + width * cellSize &&
+		y >= startY &&
+		y < startY + height * cellSize;
 	const isVisited = (x, y) => visited.has(`${x},${y}`);
 
 	const getNeighbors = (x, y) => {
-		const dirs = [{ dx: 4, dy: 0 }, { dx: -4, dy: 0 }, { dx: 0, dy: 4 }, { dx: 0, dy: -4 }];
-		return dirs.filter(({ dx, dy }) => {
-			const nx = x + dx, ny = y + dy;
-			return isValid(nx, ny) && !isVisited(nx, ny);
-		}).map(({ dx, dy }) => ({ x: x + dx, y: y + dy }));
+		const dirs = [
+			{ dx: 4, dy: 0 },
+			{ dx: -4, dy: 0 },
+			{ dx: 0, dy: 4 },
+			{ dx: 0, dy: -4 },
+		];
+		return dirs
+			.filter(({ dx, dy }) => {
+				const nx = x + dx,
+					ny = y + dy;
+				return isValid(nx, ny) && !isVisited(nx, ny);
+			})
+			.map(({ dx, dy }) => ({ x: x + dx, y: y + dy }));
 	};
 
 	const dfs = (x, y) => {
@@ -185,14 +211,21 @@ const initTileDataCache = () => {
 
 const level = {
 	pipes: [
-		...pipeSection(15, 20, 23),
+		...pipeSection(18, 20, 23),
 		...pipeSection(24, 16, 15),
 		{ x: 24, y: 16, value: PIPE_TILES.CORNER_TOP_LEFT },
-		{ x: 25, y: 20, value: pipe("straight", "horizontal", true ) },
+		{ x: 25, y: 20, value: pipe("straight", "horizontal", true) },
 		...pipeSection(24, 10, 6, "vertical"),
-		...pipeLine([{x: 1, y: 5}, {x: 15, y: 5}, {x: 15, y: 12}, {x: 5, y: 12}, {x: 5, y: 18}]),
-		...mazePattern(1, 2)
-
+		...pipeLine([
+			{ x: 1, y: 18 },
+			{ x: 15, y: 18 },
+			{ x: 15, y: 25 },
+			{ x: 5, y: 25 },
+			{ x: 5, y: 28 },
+			{ x: 3, y: 28 },
+			{ x: 3, y: 23 },
+		]),
+		...mazePattern(7, 4),
 	],
 	gases: [...cloud(24, 17)],
 };
