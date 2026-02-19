@@ -128,12 +128,12 @@ function gameInit() {
 	lever = new Lever(vec2(-5, 8), vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
 	mask = new Mask(vec2(10, 10), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
 
-	pipeData = level.pipes.reduce(
+	pipeData = levels[0].pipes.reduce(
 		(acc, pipe) => addToGrid(acc, pipe.x, pipe.y, pipe.value, "pipe"),
 		createEmptyGrid(),
 	);
 
-	gasData = level.gases.reduce(
+	gasData = levels[0].gases.reduce(
 		(acc, gas) => addToGrid(acc, gas.x, gas.y, gas.value, "gas"),
 		createEmptyGrid(),
 	);

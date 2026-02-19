@@ -18,6 +18,7 @@ build({
 	"./src/state.js",
 	"./src/objects.js",
 	"./src/gameData.js",
+	"./src/levels.js",
 	"./src/tileData.js",
 	"./lib/littlejs.js",
 	"./lib/signals.js"

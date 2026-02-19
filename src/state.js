@@ -1,13 +1,17 @@
-// player state 
+// player state
 const playerState = signal({ maskName: "none", inGas: false, health: 100 });
-const updatePlayerState = (updates) => playerState.value = { ...playerState.value, ...updates };
+const updatePlayerState = (updates) =>
+	(playerState.value = { ...playerState.value, ...updates });
 
 // setters
-const updatePlayerMask = (maskName) => updatePlayerState({ maskName: maskName });
+const updatePlayerMask = (maskName) =>
+	updatePlayerState({ maskName: maskName });
 const setPlayerInGas = (inGas) => updatePlayerState({ inGas: inGas }); // TODO get the color of the gas from the tile index
 const damagePlayer = (amount = 1) => {
-	updatePlayerState({ health: clamp(playerState.value.health - amount, 0, 100) })
-	if (playerState.value.health === 0) resetPlayer()
+	updatePlayerState({
+		health: clamp(playerState.value.health - amount, 0, 100),
+	});
+	if (playerState.value.health === 0) resetPlayer();
 };
 
 const resetPlayer = () => {
@@ -34,6 +38,6 @@ const updateGasDamage = () => {
 };
 
 const initializePlayerState = () => {
-  playerState.value = { maskName: "none", inGas: false, health: 100 };
-  // playerState.effect(() => console.log('Player state updated:', playerState.value));
+	playerState.value = { maskName: "none", inGas: false, health: 100 };
+	// playerState.effect(() => console.log('Player state updated:', playerState.value));
 };
