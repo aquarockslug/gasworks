@@ -1,6 +1,3 @@
-// Global game variables
-let player, lever, mask, gasAnimTime, pipeData, gasData, pl, gl, grl;
-
 function createEmptyGrid(width = 32, height = 32) {
 	return Array(height)
 		.fill(null)
@@ -118,8 +115,8 @@ function gameInit() {
 
 	// Initialize reactive player state
 	initializePlayerState();
-	playerState.value = {
-		...playerState.value,
+	state.value = {
+		...state.value,
 		maskName: MASKS[0],
 	};
 
@@ -157,7 +154,7 @@ function gameUpdate() {
 
 	// Animate tiles
 	const frame = ((gasAnimTime * 6) | 0) % 4; // 4-frame loop
-	const actualFrame = frame === 3 ? 1 : frame; // Sequence: 0, 1, 2, 1 repeat
+	const gasFrame = frame === 3 ? 1 : frame; // Sequence: 0, 1, 2, 1 repeat
 
 	for (let y = 0; y < 32; y++) {
 		for (let x = 0; x < 32; x++) {
@@ -165,7 +162,7 @@ function gameUpdate() {
 			if (!gas) continue;
 
 			const tileIndex = typeof gas === "object" ? gas.tile : gas;
-			const data = getTileData(tileIndex + actualFrame * 3);
+			const data = getTileData(tileIndex + gasFrame * 3);
 			gl.setData(vec2(x, y), data);
 		}
 	}
@@ -200,7 +197,7 @@ function gameUpdate() {
 	gl.pos = vec2(-16).add(vec2(lever.on ? 0 : 1000));
 
 	if (keyWasPressed("Space") && player.pos.distance(mask.pos) < 1) {
-		const currentMask = playerState.value.maskName;
+		const currentMask = state.value.maskName;
 		updatePlayerMask(currentMask === "red" ? "none" : "red");
 	}
 }
@@ -208,7 +205,7 @@ function gameUpdate() {
 function gameRender() {}
 
 function postGameRender() {
-	const intensity = 1 - playerState.value.health / 100;
+	const intensity = 1 - state.value.health / 100;
 	if (intensity > 0)
 		drawRect(vec2(), vec2(100), new Color(0, 0, 0, intensity * 0.5));
 }

@@ -52,12 +52,16 @@ class Player extends GameObject {
 		this.state();
 	}
 
-	setAnimation(state) {
-		const animations = { idle: { rowOffset: 0, frames: 2, speed: 4 }, walk: { rowOffset: 1, frames: 4, speed: 6 } };
-		const anim = animations[state];
+	setAnimation(animState) {
+		const animations = {
+			idle: { rowOffset: 0, frames: 2, speed: 4 },
+			walk: { rowOffset: 1, frames: 4, speed: 6 },
+		};
+		const anim = animations[animState];
 		this.tileInfo = tile(
-			vec2(0, MASKS.indexOf(playerState.value.maskName) * 2 + anim.rowOffset),
-			vec2(19, 21), 1
+			vec2(0, MASKS.indexOf(state.value.maskName) * 2 + anim.rowOffset),
+			vec2(19, 21),
+			1,
 		).frame(((time * anim.speed) % anim.frames) | 0);
 	}
 
@@ -65,8 +69,15 @@ class Player extends GameObject {
 	walk = () => this.setAnimation("walk");
 
 	render() {
-		const offset = this.pos.subtract(cameraPos).multiply(vec2(0.05)).add(vec2(0, 0.25));
-		drawTile(this.pos.add(offset), vec2(1), tile(vec2(), vec2(19, 21), 1).frame(2));
+		const offset = this.pos
+			.subtract(cameraPos)
+			.multiply(vec2(0.05))
+			.add(vec2(0, 0.25));
+		drawTile(
+			this.pos.add(offset),
+			vec2(1),
+			tile(vec2(), vec2(19, 21), 1).frame(2),
+		);
 		super.render();
 	}
 }
