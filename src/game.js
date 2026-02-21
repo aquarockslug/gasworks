@@ -110,7 +110,11 @@ function groundLayer() {
 function gameInit() {
 	initTileDataCache();
 	objectDefaultDamping = 0.7;
-	player = new Player(vec2(), vec2(0.5, 0.25), tile(vec2(), vec2(19, 21), 1));
+	player = new Player(
+		vec2(0, -14),
+		vec2(0.5, 0.25),
+		tile(vec2(), vec2(19, 21), 1),
+	);
 	player.drawSize = vec2(1);
 
 	// Initialize reactive player state
@@ -122,8 +126,9 @@ function gameInit() {
 
 	gasAnimTime = 0;
 
-	lever = new Lever(vec2(-5, 8), vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
-	mask = new Mask(vec2(10, 10), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
+	lever = new Lever(vec2(13, -10), vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
+	mask = new Mask(vec2(-9, -9), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
+	//triangle mask = new Mask(vec2(9, -2), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
 
 	pipeData = levels[0].pipes.reduce(
 		(acc, pipe) => addToGrid(acc, pipe.x, pipe.y, pipe.value, "pipe"),

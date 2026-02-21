@@ -100,11 +100,11 @@ function pipeLine(coordinates) {
 		// Vertical to horizontal turn
 		else if (prev.x === curr.x && curr.y === next.y) {
 			if (prev.y < curr.y && next.x > curr.x)
-				cornerTile = PIPE_TILES.CORNER_BOTTOM_LEFT;
+				cornerTile = PIPE_TILES.CORNER_TOP_LEFT;
 			else if (prev.y < curr.y && next.x < curr.x)
 				cornerTile = PIPE_TILES.CORNER_TOP_RIGHT;
 			else if (prev.y > curr.y && next.x > curr.x)
-				cornerTile = PIPE_TILES.CORNER_TOP_LEFT;
+				cornerTile = PIPE_TILES.CORNER_BOTTOM_LEFT;
 			else if (prev.y > curr.y && next.x < curr.x)
 				cornerTile = PIPE_TILES.CORNER_BOTTOM_RIGHT;
 		}
