@@ -5,33 +5,39 @@ const BUTTONCLICKSOUND = new Sound([
 
 const MASKS = ["none", "red", "blue", "green", "yellow"];
 
-const cloud = (x, y) => [
-	{ x: x, y: y, value: { tile: gas("red", 6), animSpeed: 4, frames: 4 } },
-	{ x: x + 1, y: y, value: { tile: gas("red", 7), animSpeed: 4, frames: 4 } },
-	{ x: x + 2, y: y, value: { tile: gas("red", 8), animSpeed: 4, frames: 4 } },
-	{ x: x, y: y + 1, value: { tile: gas("red", 3), animSpeed: 4, frames: 4 } },
-	{
-		x: x + 1,
-		y: y + 1,
-		value: { tile: gas("red", 4), animSpeed: 4, frames: 4 },
-	},
-	{
-		x: x + 2,
-		y: y + 1,
-		value: { tile: gas("red", 5), animSpeed: 4, frames: 4 },
-	},
-	{ x: x, y: y + 2, value: { tile: gas("red", 0), animSpeed: 4, frames: 4 } },
-	{
-		x: x + 1,
-		y: y + 2,
-		value: { tile: gas("red", 1), animSpeed: 4, frames: 4 },
-	},
-	{
-		x: x + 2,
-		y: y + 2,
-		value: { tile: gas("red", 2), animSpeed: 4, frames: 4 },
-	},
-];
+const cloud = (color, corner1, corner2) => {
+	const g = (x, y, index) => ({
+		x: x,
+		y: y,
+		value: { tile: gas(color, index), animSpeed: 4, frames: 4 },
+	});
+	const corners = [
+		g(corner1.x, corner1.y, 0), // upper left
+		g(corner2.x, corner2.y, 8), // lower right
+		g(corner1.x, corner2.y, 6), // lower left
+		g(corner2.x, corner1.y, 2), // upper right
+	];
+	// top is index 1, left side is index 3, right side is index 5, bottom is index 7
+	const top = Array.from({ length: corner2.x - corner1.x - 1 }, (_, i) =>
+		g(corner1.x + 1 + i, corner1.y, 1),
+	);
+	const bottom = Array.from({ length: corner2.x - corner1.x - 1 }, (_, i) =>
+		g(corner1.x + 1 + i, corner2.y, 7),
+	);
+	const left = Array.from({ length: corner1.y - corner2.y - 1 }, (_, i) =>
+		g(corner1.x, corner2.y + 1 + i, 3),
+	);
+	const right = Array.from({ length: corner1.y - corner2.y - 1 }, (_, i) =>
+		g(corner2.x, corner2.y + 1 + i, 5),
+	);
+	const sides = [...top, ...left, ...right, ...bottom];
+	const center = Array.from({ length: corner1.y - corner2.y - 1 }, (_, y) =>
+		Array.from({ length: corner2.x - corner1.x - 1 }, (_, x) =>
+			g(corner1.x + 1 + x, corner2.y + 1 + y, 4),
+		),
+	).flat();
+	return [...corners, ...sides, ...center];
+};
 
 function pipeSection(x, y, length, direction = "horizontal") {
 	if (length <= 0) return [];

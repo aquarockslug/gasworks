@@ -115,14 +115,16 @@ function gameInit() {
 		vec2(0.5, 0.25),
 		tile(vec2(), vec2(19, 21), 1),
 	);
+	this.startPos = this.pos;
 	player.drawSize = vec2(1);
 
 	// Initialize reactive player state
-	initializePlayerState();
-	state.value = {
-		...state.value,
+	initializePlayerState({
 		maskName: MASKS[0],
-	};
+		currLevel: levels[0],
+		inGas: false,
+		health: 100,
+	});
 
 	gasAnimTime = 0;
 
@@ -130,12 +132,12 @@ function gameInit() {
 	mask = new Mask(vec2(-9, -9), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
 	//triangle mask = new Mask(vec2(9, -2), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
 
-	pipeData = levels[0].pipes.reduce(
+	pipeData = state.value.currLevel.pipes.reduce(
 		(acc, pipe) => addToGrid(acc, pipe.x, pipe.y, pipe.value, "pipe"),
 		createEmptyGrid(),
 	);
 
-	gasData = levels[0].gases.reduce(
+	gasData = state.value.currLevel.gases.reduce(
 		(acc, gas) => addToGrid(acc, gas.x, gas.y, gas.value, "gas"),
 		createEmptyGrid(),
 	);

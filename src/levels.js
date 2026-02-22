@@ -29,7 +29,7 @@ const levels = [
 			]),
 			...pipeLine([vec2(27, 0), vec2(27, 11), vec2(18, 11)]),
 		],
-		gases: [...cloud(15, 12), ...cloud(28, 7)],
+		gases: [...cloud("red", vec2(15, 15), vec2(23, 10)), ...cloud("red", vec2(28, 17), vec2(30, 7))],
 		valves: [],
 	},
 	{
@@ -57,7 +57,7 @@ const levels = [
 		],
 		gases: [
 			// a cloud of gas at the given position
-			...cloud(24, 17),
+			// ...cloudSimple(24, 17),
 		],
 		valves: [],
 	},
