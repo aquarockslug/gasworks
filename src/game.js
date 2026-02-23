@@ -118,19 +118,20 @@ function gameInit() {
 	this.startPos = this.pos;
 	player.drawSize = vec2(1);
 
+	lever = new Lever(vec2(13, -10), vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
+	mask = new Mask(vec2(-9, -9), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
+	//triangle mask = new Mask(vec2(9, -2), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
+
 	// Initialize reactive player state
-	initializePlayerState({
+	initializeState({
 		maskName: MASKS[0],
 		currLevel: levels[0],
 		inGas: "none",
 		health: 100,
+		redLever: lever,
 	});
 
 	gasAnimTime = 0;
-
-	lever = new Lever(vec2(13, -10), vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
-	mask = new Mask(vec2(-9, -9), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
-	//triangle mask = new Mask(vec2(9, -2), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
 
 	pipeData = state.value.currLevel.pipes.reduce(
 		(acc, pipe) => addToGrid(acc, pipe.x, pipe.y, pipe.value, "pipe"),
@@ -201,7 +202,8 @@ function gameUpdate() {
 	if (keyWasPressed("Space") && player.pos.distance(lever.pos) < 1)
 		lever.toggle();
 
-	gl.pos = vec2(-16).add(vec2(lever.on ? 0 : 1000));
+	// TODO make this an effect so that it is only called on state changes
+	gl.pos = vec2(-16).add(vec2(state.value.redLever.on ? 0 : 1000));
 
 	if (keyWasPressed("Space") && player.pos.distance(mask.pos) < 1) {
 		const currentMask = state.value.maskName;

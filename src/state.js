@@ -1,13 +1,14 @@
 // Global game variables
-let player, lever, mask, gasAnimTime, pipeData, gasData, pl, gl, grl;
-const state = signal({ maskName: "none", inGas: false, health: 100 });
+let player, mask, gasAnimTime, pipeData, gasData, pl, gl, grl;
+const state = signal({ redLever: undefined });
 
 // player state
-const initializePlayerState = (v) => {
+const initializeState = (v) => {
 	state.value = v;
 };
 const updateState = (updates) => {
 	state.value = { ...state.value, ...updates };
+	console.log(state.value.inGas);
 };
 
 // effects are called when the state is changed
@@ -16,7 +17,6 @@ state.effect(() => {
 		player.pos = vec2(0, -14);
 		updateState({ health: 100 });
 	}
-	console.log(state.value.inGas);
 });
 
 const updatePlayerMask = (maskName) => updateState({ maskName: maskName });
@@ -32,6 +32,7 @@ const updateGasDetection = () => {
 			[0, 3, 6].map((o) => gas("red", i) + o),
 		);
 		const inGas = t && gasTiles.includes(t) ? "red" : "none";
+		// TODO check redLever
 
 		if (state.value.inGas !== inGas) updateState({ inGas });
 		lastPlayerTilePos = currentTilePos;
@@ -41,6 +42,6 @@ const updateGasDetection = () => {
 const updateGasDamage = () => {
 	const { health, maskName } = state.value;
 	const inGas = lever.on && state.value.inGas != "none" && maskName !== "red";
-	const newHealth = clamp(health + (inGas ? -1 : 2), 0, 100);
+	const newHealth = clamp(health + (inGas ? -2 : 4), 0, 100);
 	if (newHealth !== health) updateState({ health: newHealth });
 };

@@ -69,7 +69,7 @@ class Player extends GameObject {
 	walk = () => this.setAnimation("walk");
 
 	render() {
-		if (!state.value.inGas) {
+		if (state.value.inGas === "none") {
 			const offset = this.pos
 				.subtract(cameraPos)
 				.multiply(vec2(0.05))
