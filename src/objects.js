@@ -18,6 +18,7 @@ class Lever extends GameObject {
 	toggle() {
 		this.on = !this.on;
 		this.tileInfo = tile(vec2(9, 10), vec2(16)).frame(this.on ? 1 : 0);
+		sfx.lever.play(this.pos, 0.66);
 	}
 }
 
@@ -66,20 +67,22 @@ class Player extends GameObject {
 	}
 
 	idle = () => this.setAnimation("idle");
-	walk = () => this.setAnimation("walk");
+	walk = () => {
+		if ((time * 6) % 2 == 0) sfx.walk.play(this.pos, 0.2);
+
+		this.setAnimation("walk");
+	};
 
 	render() {
-		if (state.value.inGas === "none") {
-			const offset = this.pos
-				.subtract(cameraPos)
-				.multiply(vec2(0.05))
-				.add(vec2(0, 0.25));
-			drawTile(
-				this.pos.add(offset),
-				vec2(1),
-				tile(vec2(), vec2(19, 21), 1).frame(2),
-			);
-		}
+		const offset = this.pos
+			.subtract(cameraPos)
+			.multiply(vec2(0.05))
+			.add(vec2(0, 0.25));
+		drawTile(
+			this.pos.add(offset),
+			vec2(1),
+			tile(vec2(), vec2(19, 21), 1).frame(2),
+		);
 		super.render();
 	}
 }

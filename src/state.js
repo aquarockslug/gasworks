@@ -1,6 +1,6 @@
 // Global game variables
 let player, mask, gasAnimTime, pipeData, gasData, pl, gl, grl;
-const state = signal({ redLever: undefined });
+const state = signal({});
 
 // player state
 const initializeState = (v) => {
@@ -8,7 +8,6 @@ const initializeState = (v) => {
 };
 const updateState = (updates) => {
 	state.value = { ...state.value, ...updates };
-	console.log(state.value.inGas);
 };
 
 // effects are called when the state is changed

@@ -3,6 +3,12 @@ const BUTTONCLICKSOUND = new Sound([
 	0.04, 0.05, 350,
 ]);
 
+// biome-ignore format: sfx
+const sfx = {
+	walk:  new Sound([2,,459,.01,.01,.002,3,2,,,,,,,15,.1,.22,.83,.01]),
+	lever: new Sound([,,191,.02,.01,.07,3,3.5,,,,,,.5,,.4,,.86,.01])
+}
+
 const MASKS = ["none", "red", "blue", "green", "yellow"];
 
 const cloud = (color, corner1, corner2) => {
