@@ -16,6 +16,7 @@ state.effect(() => {
 		player.pos = vec2(0, -14);
 		updateState({ health: 100 });
 	}
+	console.log(state.value.inGas);
 });
 
 const updatePlayerMask = (maskName) => updateState({ maskName: maskName });
@@ -25,50 +26,21 @@ let lastPlayerTilePos = null;
 const updateGasDetection = () => {
 	const currentTilePos = player.pos.floor().add(vec2(16));
 	if (!lastPlayerTilePos || currentTilePos.distance(lastPlayerTilePos) >= 0.5) {
-		// TODO get the color of the gas from the tile index
-		let t = gl.getData(currentTilePos).tile;
-		console.log("🪚 t:", t);
-		if (!t) updateState({ inGas: "none" });
-		// the animations change the tile index
-		if (t == gas("red", 8)) updateState({ inGas: "red" });
-		if (t == gas("red", 8) + 3) updateState({ inGas: "red" });
-		if (t == gas("red", 8) + 6) updateState({ inGas: "red" });
-		if (t == gas("red", 7)) updateState({ inGas: "red" });
-		if (t == gas("red", 7) + 3) updateState({ inGas: "red" });
-		if (t == gas("red", 7) + 6) updateState({ inGas: "red" });
-		if (t == gas("red", 6)) updateState({ inGas: "red" });
-		if (t == gas("red", 6) + 3) updateState({ inGas: "red" });
-		if (t == gas("red", 6) + 6) updateState({ inGas: "red" });
-		if (t == gas("red", 5)) updateState({ inGas: "red" });
-		if (t == gas("red", 5) + 3) updateState({ inGas: "red" });
-		if (t == gas("red", 5) + 6) updateState({ inGas: "red" });
-		if (t == gas("red", 4)) updateState({ inGas: "red" });
-		if (t == gas("red", 4) + 3) updateState({ inGas: "red" });
-		if (t == gas("red", 4) + 6) updateState({ inGas: "red" });
-		if (t == gas("red", 3)) updateState({ inGas: "red" });
-		if (t == gas("red", 3) + 3) updateState({ inGas: "red" });
-		if (t == gas("red", 3) + 6) updateState({ inGas: "red" });
-		if (t == gas("red", 2)) updateState({ inGas: "red" });
-		if (t == gas("red", 2) + 3) updateState({ inGas: "red" });
-		if (t == gas("red", 2) + 6) updateState({ inGas: "red" });
-		if (t == gas("red", 1)) updateState({ inGas: "red" });
-		if (t == gas("red", 1) + 3) updateState({ inGas: "red" });
-		if (t == gas("red", 1) + 6) updateState({ inGas: "red" });
-		if (t == gas("red", 0)) updateState({ inGas: "red" });
-		if (t == gas("red", 0) + 3) updateState({ inGas: "red" });
-		if (t == gas("red", 0) + 6) updateState({ inGas: "red" });
+		const t = gl.getData(currentTilePos).tile;
 
+		const gasTiles = [8, 7, 6, 5, 4, 3, 2, 1, 0].flatMap((i) =>
+			[0, 3, 6].map((o) => gas("red", i) + o),
+		);
+		const inGas = t && gasTiles.includes(t) ? "red" : "none";
+
+		if (state.value.inGas !== inGas) updateState({ inGas });
 		lastPlayerTilePos = currentTilePos;
 	}
 };
 
 const updateGasDamage = () => {
-	const damagePlayer = (amount = 1) =>
-		updateState({
-			health: clamp(state.value.health - amount, 0, 100),
-		});
-	const canSurviveGas = () => state.value.maskName === "red";
-	if (lever.on && state.value.inGas != "none" && !canSurviveGas())
-		damagePlayer(1);
-	else damagePlayer(-2);
+	const { health, maskName } = state.value;
+	const inGas = lever.on && state.value.inGas != "none" && maskName !== "red";
+	const newHealth = clamp(health + (inGas ? -1 : 2), 0, 100);
+	if (newHealth !== health) updateState({ health: newHealth });
 };
