@@ -35,10 +35,6 @@ const GAS_TILES = {
 	RED_GAS_7: 108,
 	RED_GAS_8: 109,
 	RED_GAS_9: 110,
-	BLUE_GAS_1: 74,
-	BLUE_GAS_2: 75,
-	BLUE_GAS_3: 92,
-	BLUE_GAS_4: 93,
 };
 
 const GROUND_TILES = {

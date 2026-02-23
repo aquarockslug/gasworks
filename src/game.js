@@ -122,7 +122,7 @@ function gameInit() {
 	initializePlayerState({
 		maskName: MASKS[0],
 		currLevel: levels[0],
-		inGas: false,
+		inGas: "none",
 		health: 100,
 	});
 
