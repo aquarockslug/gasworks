@@ -60,7 +60,7 @@ class Player extends GameObject {
 		};
 		const anim = animations[animState];
 		this.tileInfo = tile(
-			vec2(0, MASKS.indexOf(state.value.maskName) * 2 + anim.rowOffset),
+			vec2(0, MASKS.indexOf(maskName) * 2 + anim.rowOffset),
 			vec2(19, 21),
 			1,
 		).frame(((time * anim.speed) % anim.frames) | 0);
