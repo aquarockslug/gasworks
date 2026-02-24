@@ -16,6 +16,7 @@ const PIPE_TILES = {
 	RED_GAS_HORIZONTAL_DOWN: 10,
 	RED_GAS_HORIZONTAL_UP: 9,
 	RED_GAS_VERTICAL_RIGHT: 28,
+	RED_GAS_VERTICAL_LEFT: 29, // WARN
 };
 
 const GAS_TILES = {
@@ -153,15 +154,15 @@ const pipe = (type, direction = null, hasGas = false, gasFrame = 1) => {
 							: PIPE_TILES.CORNER_TOP_LEFT;
 		}
 	} else if (type === "broken") {
-		return direction === "horizontal"
-			? Math.random() < 0.5
-				? PIPE_TILES.BROKEN_HORIZONTAL_1
-				: PIPE_TILES.BROKEN_HORIZONTAL_2
-			: direction === "vertical"
-				? Math.random() < 0.5
-					? PIPE_TILES.BROKEN_VERTICAL_1
-					: PIPE_TILES.BROKEN_VERTICAL_2
-				: PIPE_TILES.BROKEN_HORIZONTAL_1;
+		return direction === "up"
+			? PIPE_TILES.RED_GAS_HORIZONTAL_UP
+			: direction === "down"
+				? PIPE_TILES.RED_GAS_HORIZONTAL_DOWN
+				: direction === "left"
+					? PIPE_TILES.RED_GAS_VERTICAL_LEFT
+					: direction === "right"
+						? PIPE_TILES.RED_GAS_VERTICAL_RIGHT
+						: PIPE_TILES.CORNER_VERTICAL_LEFT;
 	} else if (type === "leaking") {
 		return direction === "up"
 			? PIPE_TILES.RED_GAS_HORIZONTAL_UP

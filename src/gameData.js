@@ -209,6 +209,20 @@ const getTileData = (tileIndex) => {
 	return TILE_DATA_CACHE[tileIndex];
 };
 
+function emitGas(position, gas) {
+	if (!gas || !gas.emitterData) {
+		console.error("Invalid gas object provided");
+		return null;
+	}
+
+	const emitterConfig = [...gas.emitterData];
+	emitterConfig[0] = position;
+
+	gas.emitter = new ParticleEmitter(...emitterConfig);
+	gas.emitter.renderOrder = -500;
+	return gas;
+}
+
 const initTileDataCache = () => {
 	Object.values(PIPE_TILES).forEach((index) => {
 		index !== undefined && getTileData(index);
