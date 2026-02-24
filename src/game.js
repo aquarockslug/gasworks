@@ -1,17 +1,4 @@
-let player, pipeData, gasData, pl, gl, grl;
-let maskName, level, inGas, health, redLever, mask;
-let lastPlayerTilePos = null;
-
-const initializeState = (v) => {
-	({ maskName, level, inGas, health, redLever, mask } = v);
-};
-
-const updateState = (updates) => {
-	if (updates.maskName !== undefined) maskName = updates.maskName;
-	if (updates.level !== undefined) level = updates.level;
-	if (updates.inGas !== undefined) inGas = updates.inGas;
-	if (updates.health !== undefined) health = updates.health;
-};
+let player, pipeData, gasData, pl, gl, grl, level;
 
 const updateGasDetection = () => {
 	const currentTilePos = player.pos.floor().add(vec2(16));
@@ -22,30 +9,19 @@ const updateGasDetection = () => {
 	);
 	const newInGas = t && gasTiles.includes(t) ? "red" : "none";
 
-	if (inGas !== newInGas) inGas = newInGas;
-	lastPlayerTilePos = currentTilePos;
+	if (player.inGas !== newInGas) player.inGas = newInGas;
 };
 
 const updateGasDamage = () => {
-	const takeDamage = inGas !== "none" && inGas !== maskName;
-	const newHealth = clamp(health + (takeDamage ? -2 : 4), 0, 100);
-	if (newHealth !== health) {
-		health = newHealth;
+	const takeDamage =
+		player.inGas !== "none" && player.inGas !== player.maskName;
+	const newHealth = clamp(player.health + (takeDamage ? -2 : 4), 0, 100);
+	if (newHealth !== player.health) {
+		player.health = newHealth;
 		if (newHealth === 0) {
 			player.pos = level.startPos;
-			health = 100;
+			player.health = 100;
 		}
-	}
-};
-
-const updateLeverInteraction = () => {
-	if (keyWasPressed("Space") && player.pos.distance(redLever.pos) < 1)
-		redLever.toggle();
-};
-
-const updateMaskInteraction = () => {
-	if (keyWasPressed("Space") && player.pos.distance(mask.pos) < 1) {
-		maskName = maskName === "red" ? "none" : "red";
 	}
 };
 
@@ -57,20 +33,12 @@ function gameInit() {
 		vec2(0.5, 0.25),
 		tile(vec2(), vec2(19, 21), 1),
 	);
-	player.drawSize = vec2(1);
-
-	initializeState({
-		maskName: MASKS[0],
-		level: levels[0],
-		inGas: "none",
-		health: 100,
-		redLever: new Lever(
-			vec2(13, -10),
-			vec2(0.5),
-			tile(vec2(10, 10), vec2(16), 0),
-		),
-		mask: new Mask(vec2(-9, -9), vec2(0.5), tile(vec2(0, 0), vec2(8), 2)),
-	});
+	level = levels[0];
+	level.redLever = new Lever(
+		level.levers.find((l) => l.name === "red").pos,
+		vec2(0.5),
+		tile(vec2(10, 10), vec2(16), 0),
+	);
 
 	pipeData = level.pipes.reduce(
 		(acc, pipe) => addToGrid(acc, pipe.x, pipe.y, pipe.value, "pipe"),
@@ -93,8 +61,6 @@ function gameInit() {
 function gameUpdate() {
 	updateGasDetection();
 	updateGasDamage();
-	updateLeverInteraction();
-	updateMaskInteraction();
 
 	gasTileAnimation();
 	pipeTileAnimation();
@@ -102,7 +68,7 @@ function gameUpdate() {
 	gl.redraw();
 	pl.redraw();
 
-	gl.pos = vec2(-16).add(vec2(redLever.on ? 0 : 1000));
+	gl.pos = vec2(-16).add(vec2(level.redLever.on ? 0 : 1000));
 }
 
 function gasTileAnimation() {
@@ -149,7 +115,7 @@ function pipeTileAnimation() {
 function gameRender() {}
 
 function postGameRender() {
-	const intensity = 1 - health / 100;
+	const intensity = 1 - player.health / 100;
 	if (intensity > 0)
 		drawRect(vec2(), vec2(100), new Color(0, 0, 0, intensity * 0.5));
 }

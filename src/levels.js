@@ -36,7 +36,7 @@ const levels = [
 			...cloud("red", vec2(28, 17), vec2(30, 7)),
 			...cloud("red", vec2(8, 24), vec2(12, 17)),
 		],
-		valves: [],
+		levers: [{ name: "red", pos: vec2(13, -10) }],
 		startPos: vec2(0, -14),
 	},
 ];

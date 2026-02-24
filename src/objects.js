@@ -14,6 +14,7 @@ class Lever extends GameObject {
 	constructor(...args) {
 		super(...args);
 		this.on = true;
+		this.name = "red";
 	}
 	toggle() {
 		this.on = !this.on;
@@ -38,6 +39,11 @@ class Player extends GameObject {
 		super(...args);
 		this.lastEmitTime = 0;
 		this.emitInterval = 0.1;
+		this.drawSize = vec2(1);
+		this.maskName = MASKS[0];
+		this.inGas = "none";
+		this.health = 100;
+		this.mask = new Mask(vec2(-9, -9), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
 		this.setCollision();
 	}
 
@@ -51,6 +57,11 @@ class Player extends GameObject {
 
 		this.state = moveInput.length() > 0 ? this.walk : this.idle;
 		this.state();
+
+		if (keyWasPressed("Space") && this.pos.distance(level.redLever.pos) < 1)
+			level.redLever.toggle();
+		if (keyWasPressed("Space") && this.pos.distance(this.mask.pos) < 1)
+			this.maskName = this.maskName === "red" ? "none" : "red";
 	}
 
 	setAnimation(animState) {
@@ -60,7 +71,7 @@ class Player extends GameObject {
 		};
 		const anim = animations[animState];
 		this.tileInfo = tile(
-			vec2(0, MASKS.indexOf(maskName) * 2 + anim.rowOffset),
+			vec2(0, MASKS.indexOf(this.maskName) * 2 + anim.rowOffset),
 			vec2(19, 21),
 			1,
 		).frame(((time * anim.speed) % anim.frames) | 0);
@@ -69,7 +80,6 @@ class Player extends GameObject {
 	idle = () => this.setAnimation("idle");
 	walk = () => {
 		if ((time * 6) % 2 == 0) sfx.walk.play(this.pos, 0.2);
-
 		this.setAnimation("walk");
 	};
 
