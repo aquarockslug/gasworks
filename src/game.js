@@ -1,4 +1,5 @@
 let player, pipeData, gasData, pl, gl, grl, level;
+let debugMode = false;
 
 const updateGasDetection = () => {
 	const currentTilePos = player.pos.floor().add(vec2(16));
@@ -13,9 +14,9 @@ const updateGasDetection = () => {
 };
 
 const updateGasDamage = () => {
-	const takeDamage =
-		player.inGas !== "none" && player.inGas !== player.maskName;
-	const newHealth = clamp(player.health + (takeDamage ? -2 : 4), 0, 100);
+	const shouldTakeDamage =
+		player.inGas !== "none" && player.inGas !== player.maskColor;
+	const newHealth = clamp(player.health + (shouldTakeDamage ? -2 : 4), 0, 100);
 	if (newHealth !== player.health) {
 		player.health = newHealth;
 		if (newHealth === 0) {
@@ -28,25 +29,30 @@ const updateGasDamage = () => {
 function gameInit() {
 	initTileDataCache();
 	objectDefaultDamping = 0.7;
+
+	level = levels[0];
 	player = new Player(
-		vec2(0, -14),
+		level.startPos,
 		vec2(0.5, 0.25),
 		tile(vec2(), vec2(19, 21), 1),
 	);
-	level = levels[0];
-	level.redLever = new Lever(
-		level.levers.find((l) => l.name === "red").pos,
-		vec2(0.5),
-		tile(vec2(10, 10), vec2(16), 0),
-	);
+
+	level.redLeverData = level.levers.find((l) => l.color === "red");
+	if (level.redLeverData) level.redLever = new Lever(level.redLeverData.pos, level.redLeverData.color);
+
+	level.redMaskData = level.masks.find((m) => m.color === "red");
+	if (level.redMaskData) level.redMask = new Mask(level.redMaskData.pos, level.redMaskData.color);
+
+	level.blueMaskData = level.masks.find((m) => m.color === "blue");
+	if (level.blueMaskData) level.blueMask = new Mask(level.blueMaskData.pos, level.blueMaskData.color);
 
 	pipeData = level.pipes.reduce(
-		(acc, pipe) => addToGrid(acc, pipe.x, pipe.y, pipe.value, "pipe"),
+		(acc, pipe) => addToGrid(acc, pipe.x + 16, pipe.y + 16, pipe.value, "pipe"),
 		createEmptyGrid(),
 	);
 
 	gasData = level.gases.reduce(
-		(acc, gas) => addToGrid(acc, gas.x, gas.y, gas.value, "gas"),
+		(acc, gas) => addToGrid(acc, gas.x + 16, gas.y + 16, gas.value, "gas"),
 		createEmptyGrid(),
 	);
 
@@ -58,7 +64,11 @@ function gameInit() {
 	canvasClearColor = rgb().setHex("#a9b0ba");
 }
 
+function loadLevel() {}
+
 function gameUpdate() {
+	if (keyWasPressed("F1")) debugMode = !debugMode;
+
 	updateGasDetection();
 	updateGasDamage();
 
@@ -118,6 +128,19 @@ function postGameRender() {
 	const intensity = 1 - player.health / 100;
 	if (intensity > 0)
 		drawRect(vec2(), vec2(100), new Color(0, 0, 0, intensity * 0.5));
+
+	if (debugMode) {
+		const currentTilePos = player.pos.floor().add(vec2(16));
+		const tileData = gl.getData(currentTilePos);
+		const tileNum = tileData?.tile ?? -1;
+		drawTextScreen(`Tile: ${tileNum}`, vec2(80, 30), 20, new Color(0, 0, 0, 1));
+		drawTextScreen(
+			`Pos: ${player.pos.x.toFixed(1)}, ${player.pos.y.toFixed(1)}`,
+			vec2(80, 55),
+			16,
+			new Color(0, 0, 0, 1),
+		);
+	}
 }
 
 engineInit(gameInit, gameUpdate, null, gameRender, postGameRender, [

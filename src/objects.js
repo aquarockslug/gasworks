@@ -11,10 +11,10 @@ class GameObject extends EngineObject {
 }
 
 class Lever extends GameObject {
-	constructor(...args) {
-		super(...args);
+	constructor(pos, name) {
+		super(pos, vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
 		this.on = true;
-		this.name = "red";
+		this.name = name;
 	}
 	toggle() {
 		this.on = !this.on;
@@ -24,13 +24,19 @@ class Lever extends GameObject {
 }
 
 class Mask extends GameObject {
-	constructor(...args) {
-		super(...args);
+	constructor(pos, name) {
+		super(pos, vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
+		this.name = name;
+		this.color = ["red", "blue", "green", "yellow"].indexOf(name);
 	}
 	update() {
 		super.update();
 		let step = ((time * 6) % 8) | 0;
-		this.tileInfo = tile(vec2(0, step < 4 ? 0 : step - 4), vec2(8, 10), 2);
+		this.tileInfo = tile(
+			vec2(this.color, step < 4 ? 0 : step - 4),
+			vec2(8, 10),
+			2,
+		);
 	}
 }
 
@@ -40,10 +46,9 @@ class Player extends GameObject {
 		this.lastEmitTime = 0;
 		this.emitInterval = 0.1;
 		this.drawSize = vec2(1);
-		this.maskName = MASKS[0];
+		this.maskColor = MASKS[0];
 		this.inGas = "none";
 		this.health = 100;
-		this.mask = new Mask(vec2(-9, -9), vec2(0.5), tile(vec2(0, 0), vec2(8), 2));
 		this.setCollision();
 	}
 
@@ -60,8 +65,15 @@ class Player extends GameObject {
 
 		if (keyWasPressed("Space") && this.pos.distance(level.redLever.pos) < 1)
 			level.redLever.toggle();
-		if (keyWasPressed("Space") && this.pos.distance(this.mask.pos) < 1)
-			this.maskName = this.maskName === "red" ? "none" : "red";
+		if (
+			level.redMask &&
+			keyWasPressed("Space") &&
+			this.pos.distance(level.redMask.pos) < 1
+		) {
+			level.redMask.destroy();
+			level.redMask = null;
+			this.maskColor = this.maskColor === "red" ? "none" : "red";
+		}
 	}
 
 	setAnimation(animState) {
@@ -71,7 +83,7 @@ class Player extends GameObject {
 		};
 		const anim = animations[animState];
 		this.tileInfo = tile(
-			vec2(0, MASKS.indexOf(this.maskName) * 2 + anim.rowOffset),
+			vec2(0, MASKS.indexOf(this.maskColor) * 2 + anim.rowOffset),
 			vec2(19, 21),
 			1,
 		).frame(((time * anim.speed) % anim.frames) | 0);
