@@ -37,10 +37,10 @@ const levels = [
 			...cloud("red", vec2(12, 1), vec2(14, -9)),
 			...cloud("red", vec2(-8, 8), vec2(-4, 1)),
 		],
-		levers: [{ color: "red", pos: vec2(-3, -26) }],
-		masks: [
-			{ color: "red", pos: vec2(-9, -9) },
-			{ color: "blue", pos: vec2(10, 0.5) },
+		leversData: [{ value: "red", pos: vec2(13.5, -10) }],
+		masksData: [
+			{ value: "red", pos: vec2(-9, -9) },
+			{ value: "blue", pos: vec2(10, 0.5) },
 		],
 		startPos: vec2(0, -14),
 	},

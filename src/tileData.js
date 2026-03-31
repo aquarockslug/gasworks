@@ -29,6 +29,24 @@ const GAS_TILES = {
 	RED_GAS_7: 108,
 	RED_GAS_8: 109,
 	RED_GAS_9: 110,
+	GREEN_GAS_1: 72,
+	GREEN_GAS_2: 73,
+	GREEN_GAS_3: 74,
+	GREEN_GAS_4: 90,
+	GREEN_GAS_5: 91,
+	GREEN_GAS_6: 92,
+	GREEN_GAS_7: 108,
+	GREEN_GAS_8: 109,
+	GREEN_GAS_9: 110,
+	YELLOW_GAS_1: 72,
+	YELLOW_GAS_2: 73,
+	YELLOW_GAS_3: 74,
+	YELLOW_GAS_4: 90,
+	YELLOW_GAS_5: 91,
+	YELLOW_GAS_6: 92,
+	YELLOW_GAS_7: 108,
+	YELLOW_GAS_8: 109,
+	YELLOW_GAS_9: 110,
 };
 
 const GROUND_TILES = {
@@ -74,8 +92,35 @@ const gas = (color, index) => {
 		GAS_TILES.BLUE_GAS_3,
 		GAS_TILES.BLUE_GAS_4,
 	];
+	const greenGasTiles = [
+		GAS_TILES.GREEN_GAS_1,
+		GAS_TILES.GREEN_GAS_2,
+		GAS_TILES.GREEN_GAS_3,
+		GAS_TILES.GREEN_GAS_4,
+		GAS_TILES.GREEN_GAS_5,
+		GAS_TILES.GREEN_GAS_6,
+		GAS_TILES.GREEN_GAS_7,
+		GAS_TILES.GREEN_GAS_8,
+		GAS_TILES.GREEN_GAS_9,
+	];
+	const yellowGasTiles = [
+		GAS_TILES.YELLOW_GAS_1,
+		GAS_TILES.YELLOW_GAS_2,
+		GAS_TILES.YELLOW_GAS_3,
+		GAS_TILES.YELLOW_GAS_4,
+		GAS_TILES.YELLOW_GAS_5,
+		GAS_TILES.YELLOW_GAS_6,
+		GAS_TILES.YELLOW_GAS_7,
+		GAS_TILES.YELLOW_GAS_8,
+		GAS_TILES.YELLOW_GAS_9,
+	];
 
-	const gasTiles = { red: redGasTiles, blue: blueGasTiles };
+	const gasTiles = {
+		red: redGasTiles,
+		blue: blueGasTiles,
+		green: greenGasTiles,
+		yellow: yellowGasTiles,
+	};
 	return gasTiles[color]?.[index];
 };
 

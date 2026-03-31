@@ -5,17 +5,23 @@ const updateGasDetection = () => {
 	const currentTilePos = player.pos.floor().add(vec2(16));
 	const t = gl.getData(currentTilePos).tile;
 
-	const gasTiles = [8, 7, 6, 5, 4, 3, 2, 1, 0].flatMap((i) =>
-		[0, 3, 6].map((o) => gas("red", i) + o),
-	);
-	const newInGas = t && gasTiles.includes(t) ? "red" : "none";
+	const gasColor = t
+		? Object.keys(level.gasTilesByColor).find((color) =>
+				level.gasTilesByColor[color].includes(t),
+			)
+		: null;
+
+	const newInGas = gasColor || "none";
 
 	if (player.inGas !== newInGas) player.inGas = newInGas;
 };
 
 const updateGasDamage = () => {
+	const currentLever = level.levers.find((l) => l.name === player.inGas);
 	const shouldTakeDamage =
-		player.inGas !== "none" && player.inGas !== player.maskColor;
+		player.inGas !== "none" &&
+		player.inGas !== player.maskColor &&
+		currentLever?.on;
 	const newHealth = clamp(player.health + (shouldTakeDamage ? -2 : 4), 0, 100);
 	if (newHealth !== player.health) {
 		player.health = newHealth;
@@ -37,14 +43,20 @@ function gameInit() {
 		tile(vec2(), vec2(19, 21), 1),
 	);
 
-	level.redLeverData = level.levers.find((l) => l.color === "red");
-	if (level.redLeverData) level.redLever = new Lever(level.redLeverData.pos, level.redLeverData.color);
+	level.levers = (level.leversData || level.levers).map(
+		(d) => new Lever(d.pos, d.value),
+	);
+	level.masks = (level.masksData || level.masks).map(
+		(d) => new Mask(d.pos, d.value),
+	);
 
-	level.redMaskData = level.masks.find((m) => m.color === "red");
-	if (level.redMaskData) level.redMask = new Mask(level.redMaskData.pos, level.redMaskData.color);
-
-	level.blueMaskData = level.masks.find((m) => m.color === "blue");
-	if (level.blueMaskData) level.blueMask = new Mask(level.blueMaskData.pos, level.blueMaskData.color);
+	level.gasTilesByColor = {};
+	for (const color of MASKS.slice(1)) {
+		const tiles = [8, 7, 6, 5, 4, 3, 2, 1, 0]
+			.flatMap((i) => [0, 3, 6].map((o) => gas(color, i) + o))
+			.filter((t) => !isNaN(t));
+		if (tiles.length > 0) level.gasTilesByColor[color] = tiles;
+	}
 
 	pipeData = level.pipes.reduce(
 		(acc, pipe) => addToGrid(acc, pipe.x + 16, pipe.y + 16, pipe.value, "pipe"),
@@ -64,8 +76,6 @@ function gameInit() {
 	canvasClearColor = rgb().setHex("#a9b0ba");
 }
 
-function loadLevel() {}
-
 function gameUpdate() {
 	if (keyWasPressed("F1")) debugMode = !debugMode;
 
@@ -78,7 +88,10 @@ function gameUpdate() {
 	gl.redraw();
 	pl.redraw();
 
-	gl.pos = vec2(-16).add(vec2(level.redLever.on ? 0 : 1000));
+	// TODO create a different layer for each color of gas
+	gl.pos = vec2(-16).add(
+		vec2(level.levers.find((l) => l.name === "red")?.on ? 0 : 1000),
+	);
 }
 
 function gasTileAnimation() {
@@ -137,6 +150,25 @@ function postGameRender() {
 		drawTextScreen(
 			`Pos: ${player.pos.x.toFixed(1)}, ${player.pos.y.toFixed(1)}`,
 			vec2(80, 55),
+			16,
+			new Color(0, 0, 0, 1),
+		);
+		drawTextScreen(
+			`In Gas: ${player.inGas}`,
+			vec2(80, 80),
+			16,
+			new Color(0, 0, 0, 1),
+		);
+		drawTextScreen(
+			`Mask: ${player.maskColor}`,
+			vec2(80, 105),
+			16,
+			new Color(0, 0, 0, 1),
+		);
+		const lever = level.levers.find((l) => l.color === player.inGas);
+		drawTextScreen(
+			`Lever: ${lever?.on ?? "none"}`,
+			vec2(80, 130),
 			16,
 			new Color(0, 0, 0, 1),
 		);

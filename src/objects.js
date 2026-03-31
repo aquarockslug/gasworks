@@ -63,16 +63,17 @@ class Player extends GameObject {
 		this.state = moveInput.length() > 0 ? this.walk : this.idle;
 		this.state();
 
-		if (keyWasPressed("Space") && this.pos.distance(level.redLever.pos) < 1)
-			level.redLever.toggle();
-		if (
-			level.redMask &&
-			keyWasPressed("Space") &&
-			this.pos.distance(level.redMask.pos) < 1
-		) {
-			level.redMask.destroy();
-			level.redMask = null;
-			this.maskColor = this.maskColor === "red" ? "none" : "red";
+		for (const lever of level.levers) {
+			if (keyWasPressed("Space") && this.pos.distance(lever.pos) < 1)
+				lever.toggle();
+		}
+
+		for (const mask of level.masks) {
+			if (keyWasPressed("Space") && this.pos.distance(mask.pos) < 1) {
+				mask.destroy();
+				level.masks = level.masks.filter((m) => m !== mask);
+				this.maskColor = this.maskColor === mask.name ? "none" : mask.name;
+			}
 		}
 	}
 
