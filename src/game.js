@@ -1,39 +1,7 @@
 let player, pipeData, gasData, pl, gl, grl, level;
 let debugMode = false;
 
-const updateGasDetection = () => {
-	const currentTilePos = player.pos.floor().add(vec2(16));
-	const t = gl.getData(currentTilePos).tile;
-
-	const gasColor = t
-		? Object.keys(level.gasTilesByColor).find((color) =>
-				level.gasTilesByColor[color].includes(t),
-			)
-		: null;
-
-	const newInGas = gasColor || "none";
-
-	if (player.inGas !== newInGas) player.inGas = newInGas;
-};
-
-const updateGasDamage = () => {
-	const currentLever = level.levers.find((l) => l.name === player.inGas);
-	const leverOn = currentLever?.on ?? false;
-	const shouldTakeDamage =
-		player.inGas !== "none" &&
-		player.inGas !== player.maskColor &&
-		leverOn;
-
-	const newHealth = clamp(player.health + (shouldTakeDamage ? -2 : 4), 0, 100);
-	if (newHealth !== player.health) {
-		player.health = newHealth;
-		if (newHealth === 0) player.die()
-
-	}
-};
-
-const initTileDataCache = () => {
-	const createTileData = (index) => new TileLayerData(index);
+function gameInit() {
 	[
 		...Object.values(PIPE_TILES),
 		...Object.values(GAS_TILES),
@@ -41,11 +9,8 @@ const initTileDataCache = () => {
 		...Object.values(WALL_TILES),
 	]
 		.filter((i) => i != null)
-		.forEach(createTileData);
-};
+		.forEach((i) => new TileLayerData(i));
 
-function gameInit() {
-	initTileDataCache();
 	objectDefaultDamping = 0.7;
 
 	level = levels[0];
@@ -93,16 +58,15 @@ function gameInit() {
 function gameUpdate() {
 	if (keyWasPressed("F1")) debugMode = !debugMode;
 
-	updateGasDetection();
-	updateGasDamage();
-
 	gasTileAnimation();
 	pipeTileAnimation();
 
 	gl.redraw();
 	pl.redraw();
 
-	// TODO create a different layer for each color of gas
+	// TODO hide gas when its corresponding lever is turned off
+	// use gl.setData to update the tiles
+	// create a different tile layer for each color of gas and move them away
 	gl.pos = vec2(-16).add(
 		vec2(level.levers.find((l) => l.name === "red")?.on ? 0 : 1000),
 	);
@@ -190,7 +154,7 @@ function postGameRender() {
 }
 
 engineInit(gameInit, gameUpdate, null, gameRender, postGameRender, [
-	"assets/pipes.png",
+	"assets/tiles.png",
 	"assets/gorm.png",
 	"assets/masks.png",
 ]);

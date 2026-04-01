@@ -33,9 +33,9 @@ const levels = [
 			{ x: 6, y: -4, value: pipe("leaking", "down") },
 		],
 		gases: [
-			...cloud("red", vec2(-1, -1), vec2(7, -6)),
+			...cloud("red", vec2(-1, 1), vec2(7, -6)),
 			...cloud("red", vec2(12, 1), vec2(14, -9)),
-			...cloud("red", vec2(-8, 8), vec2(-4, 1)),
+			...cloud("blue", vec2(-8, 8), vec2(-4, 1)),
 		],
 		leversData: [{ value: "red", pos: vec2(13.5, -10) }],
 		masksData: [

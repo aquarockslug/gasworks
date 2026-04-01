@@ -52,6 +52,7 @@ class Player extends GameObject {
 
 	update() {
 		super.update();
+		this.updateGas();
 
 		const moveInput = keyDirection().clampLength(1);
 		this.velocity = this.velocity.add(moveInput.scale(0.05));
@@ -66,18 +67,57 @@ class Player extends GameObject {
 				lever.toggle();
 		}
 
-		for (const mask of level.masks) {
-			if (keyWasPressed("Space") && this.pos.distance(mask.pos) < 1) {
+		if (keyWasPressed("Space")) {
+			const maskIndex = level.masks.findIndex(
+				(m) => this.pos.distance(m.pos) < 1,
+			);
+			if (maskIndex !== -1) {
+				const mask = level.masks[maskIndex];
+				if (this.maskColor !== "none" && this.maskColor !== mask.name) {
+					level.masks.push(new Mask(this.pos.copy(), this.maskColor));
+				}
 				mask.destroy();
-				level.masks = level.masks.filter((m) => m !== mask);
+				level.masks.splice(maskIndex, 1);
 				this.maskColor = this.maskColor === mask.name ? "none" : mask.name;
 			}
 		}
 	}
 
 	die() {
-		this.pos = vec2(0, -14)// TODO level.startPos get changed to the current position somehow;
+		this.pos = level.startPos.copy();
 		this.health = 100;
+		this.maskColor = "none";
+
+		// reset masks
+		level.masks.map((m) => m.destroy());
+		level.masks = level.masksData.map((d) => new Mask(d.pos, d.value));
+	}
+
+	updateGas() {
+		// detect gas
+		const currentTilePos = this.pos.floor().add(vec2(16));
+		const t = gl.getData(currentTilePos).tile;
+		const gasColor = t
+			? Object.keys(level.gasTilesByColor).find((color) =>
+					level.gasTilesByColor[color].includes(t),
+				)
+			: null;
+		const newInGas = gasColor || "none";
+		if (this.inGas !== newInGas) this.inGas = newInGas;
+
+		// take damage
+		const leverOn = this.currentLever()?.on ?? false;
+		const wrongMask = this.inGas !== this.maskColor;
+		const shouldTakeDamage = wrongMask && leverOn;
+		const newHealth = clamp(this.health + (shouldTakeDamage ? -2 : 4), 0, 100);
+		if (newHealth !== this.health) {
+			this.health = newHealth;
+			if (newHealth === 0) this.die();
+		}
+	}
+
+	currentLever() {
+		return level.levers.find((l) => l.name === this.inGas);
 	}
 
 	setAnimation(animState) {
@@ -104,7 +144,7 @@ class Player extends GameObject {
 			.subtract(cameraPos)
 			.multiply(vec2(0.05))
 			.add(vec2(0, 0.25));
-		if (this.pos.y > -14.8 && this.inGas == "none")
+		if (this.pos.y > -14.8 && !this.currentLever()?.on)
 			drawTile(
 				this.pos.add(offset),
 				vec2(1),
