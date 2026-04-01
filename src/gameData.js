@@ -55,7 +55,7 @@ const cloud = (color, corner1, corner2) => {
 	const g = (x, y, index) => ({
 		x: x,
 		y: y,
-		value: { tile: gas(color, index), animSpeed: 4, frames: 4 },
+		value: { color, tile: gas(color, index), animSpeed: 4, frames: 4 },
 	});
 	const corners = [
 		g(corner1.x, corner1.y, 0), // upper left

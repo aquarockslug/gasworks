@@ -42,10 +42,13 @@ function gameInit() {
 		createEmptyGrid(),
 	);
 
+	// TODO seperate gasData into a seperate set of data for each color
 	gasData = level.gases.reduce(
 		(acc, gas) => addToGrid(acc, gas.x + 16, gas.y + 16, gas.value, "gas"),
 		createEmptyGrid(),
 	);
+
+	// const tilesWithColor = (color) => gasData.flat().filter((g) => g?.color == color)
 
 	pl = createTileLayer(pipeData, true, -10000);
 	gl = createTileLayer(gasData, false, -9999);
@@ -65,7 +68,6 @@ function gameUpdate() {
 	pl.redraw();
 
 	// TODO hide gas when its corresponding lever is turned off
-	// use gl.setData to update the tiles
 	// create a different tile layer for each color of gas and move them away
 	gl.pos = vec2(-16).add(
 		vec2(level.levers.find((l) => l.name === "red")?.on ? 0 : 1000),
