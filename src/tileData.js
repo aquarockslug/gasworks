@@ -16,7 +16,7 @@ const PIPE_TILES = {
 	RED_GAS_HORIZONTAL_DOWN: 10,
 	RED_GAS_HORIZONTAL_UP: 9,
 	RED_GAS_VERTICAL_RIGHT: 28,
-	RED_GAS_VERTICAL_LEFT: 29, // WARN
+	RED_GAS_VERTICAL_LEFT: 29,
 };
 
 const GAS_TILES = {
@@ -47,6 +47,10 @@ const GAS_TILES = {
 	YELLOW_GAS_7: 108,
 	YELLOW_GAS_8: 109,
 	YELLOW_GAS_9: 110,
+	BLUE_GAS_1: 72,
+	BLUE_GAS_2: 73,
+	BLUE_GAS_3: 74,
+	BLUE_GAS_4: 90,
 };
 
 const GROUND_TILES = {
@@ -75,67 +79,60 @@ const WALL_TILES = {
 };
 
 const gas = (color, index) => {
-	const redGasTiles = [
-		GAS_TILES.RED_GAS_1,
-		GAS_TILES.RED_GAS_2,
-		GAS_TILES.RED_GAS_3,
-		GAS_TILES.RED_GAS_4,
-		GAS_TILES.RED_GAS_5,
-		GAS_TILES.RED_GAS_6,
-		GAS_TILES.RED_GAS_7,
-		GAS_TILES.RED_GAS_8,
-		GAS_TILES.RED_GAS_9,
-	];
-	const blueGasTiles = [
-		GAS_TILES.BLUE_GAS_1,
-		GAS_TILES.BLUE_GAS_2,
-		GAS_TILES.BLUE_GAS_3,
-		GAS_TILES.BLUE_GAS_4,
-	];
-	const greenGasTiles = [
-		GAS_TILES.GREEN_GAS_1,
-		GAS_TILES.GREEN_GAS_2,
-		GAS_TILES.GREEN_GAS_3,
-		GAS_TILES.GREEN_GAS_4,
-		GAS_TILES.GREEN_GAS_5,
-		GAS_TILES.GREEN_GAS_6,
-		GAS_TILES.GREEN_GAS_7,
-		GAS_TILES.GREEN_GAS_8,
-		GAS_TILES.GREEN_GAS_9,
-	];
-	const yellowGasTiles = [
-		GAS_TILES.YELLOW_GAS_1,
-		GAS_TILES.YELLOW_GAS_2,
-		GAS_TILES.YELLOW_GAS_3,
-		GAS_TILES.YELLOW_GAS_4,
-		GAS_TILES.YELLOW_GAS_5,
-		GAS_TILES.YELLOW_GAS_6,
-		GAS_TILES.YELLOW_GAS_7,
-		GAS_TILES.YELLOW_GAS_8,
-		GAS_TILES.YELLOW_GAS_9,
-	];
-
 	const gasTiles = {
-		red: redGasTiles,
-		blue: blueGasTiles,
-		green: greenGasTiles,
-		yellow: yellowGasTiles,
+		red: [
+			GAS_TILES.RED_GAS_1,
+			GAS_TILES.RED_GAS_2,
+			GAS_TILES.RED_GAS_3,
+			GAS_TILES.RED_GAS_4,
+			GAS_TILES.RED_GAS_5,
+			GAS_TILES.RED_GAS_6,
+			GAS_TILES.RED_GAS_7,
+			GAS_TILES.RED_GAS_8,
+			GAS_TILES.RED_GAS_9,
+		],
+		blue: [
+			GAS_TILES.BLUE_GAS_1,
+			GAS_TILES.BLUE_GAS_2,
+			GAS_TILES.BLUE_GAS_3,
+			GAS_TILES.BLUE_GAS_4,
+		],
+		green: [
+			GAS_TILES.GREEN_GAS_1,
+			GAS_TILES.GREEN_GAS_2,
+			GAS_TILES.GREEN_GAS_3,
+			GAS_TILES.GREEN_GAS_4,
+			GAS_TILES.GREEN_GAS_5,
+			GAS_TILES.GREEN_GAS_6,
+			GAS_TILES.GREEN_GAS_7,
+			GAS_TILES.GREEN_GAS_8,
+			GAS_TILES.GREEN_GAS_9,
+		],
+		yellow: [
+			GAS_TILES.YELLOW_GAS_1,
+			GAS_TILES.YELLOW_GAS_2,
+			GAS_TILES.YELLOW_GAS_3,
+			GAS_TILES.YELLOW_GAS_4,
+			GAS_TILES.YELLOW_GAS_5,
+			GAS_TILES.YELLOW_GAS_6,
+			GAS_TILES.YELLOW_GAS_7,
+			GAS_TILES.YELLOW_GAS_8,
+			GAS_TILES.YELLOW_GAS_9,
+		],
 	};
 	return gasTiles[color]?.[index];
 };
 
-const ground = (index) => {
-	const groundTiles = [
+const ground = (index) =>
+	[
 		GROUND_TILES.GROUND_1,
 		GROUND_TILES.GROUND_2,
 		GROUND_TILES.GROUND_3,
 		GROUND_TILES.GROUND_4,
-	];
-	return groundTiles[index];
-};
+	][index];
 
-const wall = (index) => {
-	const wallTiles = [
+const wall = (index) =>
+	[
 		WALL_TILES.WALL_1,
 		WALL_TILES.WALL_2,
 		WALL_TILES.WALL_3,
@@ -151,73 +148,37 @@ const wall = (index) => {
 		WALL_TILES.WALL_13,
 		WALL_TILES.WALL_14,
 		WALL_TILES.WALL_15,
-	];
-	return wallTiles[index];
-};
+	][index];
 
 const pipe = (type, direction = null, hasGas = false, gasFrame = 1) => {
 	if (type === "straight") {
-		if (hasGas) {
-			if (direction === "horizontal") {
-				return gasFrame === 1
-					? PIPE_TILES.RED_GAS_HORIZONTAL_DOWN_1
-					: gasFrame === 2
-						? PIPE_TILES.RED_GAS_HORIZONTAL_DOWN_2
-						: 1;
-			} else if (direction === "vertical") {
-				return gasFrame === 1
-					? PIPE_TILES.RED_GAS_VERTICAL_1
-					: PIPE_TILES.RED_GAS_VERTICAL_2;
-			}
-		} else {
-			return direction === "horizontal"
+		return hasGas
+			? direction === "horizontal"
+				? PIPE_TILES.RED_GAS_HORIZONTAL_DOWN
+				: PIPE_TILES.RED_GAS_VERTICAL_RIGHT
+			: direction === "horizontal"
 				? PIPE_TILES.STRAIGHT_HORIZONTAL
 				: direction === "vertical"
 					? PIPE_TILES.STRAIGHT_VERTICAL
 					: PIPE_TILES.STRAIGHT_HORIZONTAL;
-		}
-	} else if (type === "corner") {
-		if (hasGas) {
-			if (direction === "top-left") {
-				return gasFrame === 1
-					? PIPE_TILES.RED_GAS_CORNER_TOP_LEFT_1
-					: PIPE_TILES.RED_GAS_CORNER_TOP_LEFT_2;
-			} else if (direction === "top-right") {
-				return gasFrame === 1
-					? PIPE_TILES.RED_GAS_CORNER_TOP_RIGHT_1
-					: PIPE_TILES.RED_GAS_CORNER_TOP_RIGHT_2;
-			}
-		} else {
-			return direction === "top-left"
-				? PIPE_TILES.CORNER_TOP_LEFT
-				: direction === "top-right"
-					? PIPE_TILES.CORNER_TOP_RIGHT
-					: direction === "bottom-left"
-						? PIPE_TILES.CORNER_BOTTOM_LEFT
-						: direction === "bottom-right"
-							? PIPE_TILES.CORNER_BOTTOM_RIGHT
-							: PIPE_TILES.CORNER_TOP_LEFT;
-		}
-	} else if (type === "broken") {
-		return direction === "up"
-			? PIPE_TILES.RED_GAS_HORIZONTAL_UP
-			: direction === "down"
-				? PIPE_TILES.RED_GAS_HORIZONTAL_DOWN
-				: direction === "left"
-					? PIPE_TILES.RED_GAS_VERTICAL_LEFT
-					: direction === "right"
-						? PIPE_TILES.RED_GAS_VERTICAL_RIGHT
-						: PIPE_TILES.CORNER_VERTICAL_LEFT;
-	} else if (type === "leaking") {
-		return direction === "up"
-			? PIPE_TILES.RED_GAS_HORIZONTAL_UP
-			: direction === "down"
-				? PIPE_TILES.RED_GAS_HORIZONTAL_DOWN
-				: direction === "left"
-					? PIPE_TILES.RED_GAS_VERTICAL_LEFT
-					: direction === "right"
-						? PIPE_TILES.RED_GAS_VERTICAL_RIGHT
-						: PIPE_TILES.RED_GAS_VERTICAL_RIGHT;
+	}
+	if (type === "corner") {
+		const corners = {
+			"top-left": PIPE_TILES.CORNER_TOP_LEFT,
+			"top-right": PIPE_TILES.CORNER_TOP_RIGHT,
+			"bottom-left": PIPE_TILES.CORNER_BOTTOM_LEFT,
+			"bottom-right": PIPE_TILES.CORNER_BOTTOM_RIGHT,
+		};
+		return corners[direction] ?? PIPE_TILES.CORNER_TOP_LEFT;
+	}
+	if (type === "broken" || type === "leaking") {
+		const brokenPipes = {
+			up: PIPE_TILES.RED_GAS_HORIZONTAL_UP,
+			down: PIPE_TILES.RED_GAS_HORIZONTAL_DOWN,
+			left: PIPE_TILES.RED_GAS_VERTICAL_LEFT,
+			right: PIPE_TILES.RED_GAS_VERTICAL_RIGHT,
+		};
+		return brokenPipes[direction] ?? PIPE_TILES.RED_GAS_VERTICAL_RIGHT;
 	}
 	return PIPE_TILES.STRAIGHT_HORIZONTAL;
 };

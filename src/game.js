@@ -18,18 +18,30 @@ const updateGasDetection = () => {
 
 const updateGasDamage = () => {
 	const currentLever = level.levers.find((l) => l.name === player.inGas);
+	const leverOn = currentLever?.on ?? false;
 	const shouldTakeDamage =
 		player.inGas !== "none" &&
 		player.inGas !== player.maskColor &&
-		currentLever?.on;
+		leverOn;
+
 	const newHealth = clamp(player.health + (shouldTakeDamage ? -2 : 4), 0, 100);
 	if (newHealth !== player.health) {
 		player.health = newHealth;
-		if (newHealth === 0) {
-			player.pos = level.startPos;
-			player.health = 100;
-		}
+		if (newHealth === 0) player.die()
+
 	}
+};
+
+const initTileDataCache = () => {
+	const createTileData = (index) => new TileLayerData(index);
+	[
+		...Object.values(PIPE_TILES),
+		...Object.values(GAS_TILES),
+		...Object.values(GROUND_TILES),
+		...Object.values(WALL_TILES),
+	]
+		.filter((i) => i != null)
+		.forEach(createTileData);
 };
 
 function gameInit() {
@@ -51,8 +63,10 @@ function gameInit() {
 	);
 
 	level.gasTilesByColor = {};
-	for (const color of MASKS.slice(1)) {
-		const tiles = [8, 7, 6, 5, 4, 3, 2, 1, 0]
+	const gasTypeCounts = { blue: 4, red: 9, green: 9, yellow: 9 };
+	for (const color of ["red", "blue", "green", "yellow"]) {
+		const count = gasTypeCounts[color];
+		const tiles = Array.from({ length: count }, (_, i) => count - 1 - i)
 			.flatMap((i) => [0, 3, 6].map((o) => gas(color, i) + o))
 			.filter((t) => !isNaN(t));
 		if (tiles.length > 0) level.gasTilesByColor[color] = tiles;
@@ -165,7 +179,7 @@ function postGameRender() {
 			16,
 			new Color(0, 0, 0, 1),
 		);
-		const lever = level.levers.find((l) => l.color === player.inGas);
+		const lever = level.levers.find((l) => l.name === player.inGas);
 		drawTextScreen(
 			`Lever: ${lever?.on ?? "none"}`,
 			vec2(80, 130),

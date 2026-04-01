@@ -1,15 +1,55 @@
-const BUTTONCLICKSOUND = new Sound([
-	0.08, 0, 250, 0.01, 0.01, 0.02, 1, 0.8, 0, 0, 0, 0, 0, 0.3, 0, 0, 0, 0.3,
-	0.04, 0.05, 350,
-]);
-
-// biome-ignore format: sfx
 const sfx = {
-	walk:  new Sound([2,,459,.01,.01,.002,3,2,,,,,,,15,.1,.22,.83,.01]),
-	lever: new Sound([,,191,.02,.01,.07,3,3.5,,,,,,.5,,.4,,.86,.01])
-}
+	walk: new Sound([
+		2,
+		,
+		459,
+		0.01,
+		0.01,
+		0.002,
+		3,
+		2,
+		,
+		,
+		,
+		,
+		,
+		,
+		15,
+		0.1,
+		0.22,
+		0.83,
+		0.01,
+	]),
+	lever: new Sound([
+		,
+		,
+		191,
+		0.02,
+		0.01,
+		0.07,
+		3,
+		3.5,
+		,
+		,
+		,
+		,
+		0.5,
+		,
+		0.4,
+		,
+		0.86,
+		0.01,
+	]),
+};
 
 const MASKS = ["none", "red", "blue", "green", "yellow"];
+const TILE_DATA_CACHE = {};
+
+const getTileData = (tileIndex) => {
+	if (!TILE_DATA_CACHE[tileIndex])
+		TILE_DATA_CACHE[tileIndex] = new TileLayerData(tileIndex);
+	return TILE_DATA_CACHE[tileIndex];
+};
 
 const cloud = (color, corner1, corner2) => {
 	const g = (x, y, index) => ({
@@ -128,201 +168,3 @@ function pipeLine(coordinates) {
 
 	return pipeline.flat();
 }
-
-function mazePattern(width, height, startX = 2, startY = 2) {
-	const path = [];
-	const cellSize = 4;
-	const visited = new Set();
-
-	const isValid = (x, y) =>
-		x >= startX &&
-		x < startX + width * cellSize &&
-		y >= startY &&
-		y < startY + height * cellSize;
-	const isVisited = (x, y) => visited.has(`${x},${y}`);
-
-	const getNeighbors = (x, y) => {
-		const dirs = [
-			{ dx: 4, dy: 0 },
-			{ dx: -4, dy: 0 },
-			{ dx: 0, dy: 4 },
-			{ dx: 0, dy: -4 },
-		];
-		return dirs
-			.filter(({ dx, dy }) => {
-				const nx = x + dx,
-					ny = y + dy;
-				return isValid(nx, ny) && !isVisited(nx, ny);
-			})
-			.map(({ dx, dy }) => ({ x: x + dx, y: y + dy }));
-	};
-
-	const dfs = (x, y) => {
-		visited.add(`${x},${y}`);
-		path.push({ x, y });
-
-		const neighbors = getNeighbors(x, y);
-		while (neighbors.length) {
-			const idx = Math.floor(Math.random() * neighbors.length);
-			const neighbor = neighbors.splice(idx, 1)[0];
-
-			if (!isVisited(neighbor.x, neighbor.y)) {
-				dfs(neighbor.x, neighbor.y);
-			}
-		}
-	};
-
-	dfs(startX, startY);
-
-	// Create additional random paths for complexity
-	for (let i = 0; i < Math.floor(width * height * 0.05); i++) {
-		const rx = startX + Math.floor(Math.random() * width * cellSize);
-		const ry = startY + Math.floor(Math.random() * height * cellSize);
-		if (isValid(rx, ry) && !isVisited(rx, ry)) {
-			// Find nearest visited cell to connect to
-			let minDist = Infinity;
-			let nearestCell = null;
-			for (const cell of path) {
-				const dist = Math.abs(cell.x - rx) + Math.abs(cell.y - ry);
-				if (dist < minDist && dist <= 8) {
-					minDist = dist;
-					nearestCell = cell;
-				}
-			}
-			if (nearestCell) {
-				path.push({ x: rx, y: ry });
-				path.push(nearestCell);
-			}
-		}
-	}
-
-	return pipeLine(path);
-}
-
-// Pre-create TileLayerData objects for performance
-const TILE_DATA_CACHE = {};
-
-const getTileData = (tileIndex) => {
-	if (!TILE_DATA_CACHE[tileIndex]) {
-		TILE_DATA_CACHE[tileIndex] = new TileLayerData(tileIndex);
-	}
-	return TILE_DATA_CACHE[tileIndex];
-};
-
-function emitGas(position, gas) {
-	if (!gas || !gas.emitterData) {
-		console.error("Invalid gas object provided");
-		return null;
-	}
-
-	const emitterConfig = [...gas.emitterData];
-	emitterConfig[0] = position;
-
-	gas.emitter = new ParticleEmitter(...emitterConfig);
-	gas.emitter.renderOrder = -500;
-	return gas;
-}
-
-const initTileDataCache = () => {
-	Object.values(PIPE_TILES).forEach((index) => {
-		index !== undefined && getTileData(index);
-	});
-	Object.values(GAS_TILES).forEach((index) => {
-		index !== undefined && getTileData(index);
-	});
-	Object.values(GROUND_TILES).forEach(getTileData);
-	Object.values(WALL_TILES).forEach(getTileData);
-};
-
-const particles = {
-	square: {
-		emitterData: [
-			vec2(0, 0),
-			0, // pos, angle
-			1,
-			undefined,
-			100,
-			PI, // emitSize, emitTime, rate, cone
-			0, // tileInfo
-			rgb(0, 0, 1, 0.5),
-			hsl(0, 0, 1, 0.5), // colorStartA, colorStartB
-			hsl(1, 0, 0, 0),
-			hsl(0, 0, 1, 0), // colorEndA, colorEndB
-			1,
-			1,
-			5,
-			0.2,
-			0.01, // time, sizeStart, sizeEnd, speed, angleSpeed
-			0.85,
-			1,
-			-1,
-			PI,
-			0.3, // damp, angleDamp, gravity, particleCone, fade
-			0.5,
-			0,
-			0,
-			1, // randomness, collide, additive, colorLinear
-		],
-		effects: (player) => ({}),
-	},
-	triangle: {
-		emitterData: [
-			vec2(0, 0),
-			0, // pos, angle
-			1,
-			undefined,
-			100,
-			PI, // emitSize, emitTime, rate, cone
-			0, // tileInfo
-			rgb(1, 0, 0, 0.5),
-			hsl(0, 0, 1, 0.5), // colorStartA, colorStartB
-			hsl(1, 0, 0, 0),
-			hsl(0, 0, 1, 0), // colorEndA, colorEndB
-			1,
-			1,
-			5,
-			0.2,
-			0.01, // time, sizeStart, sizeEnd, speed, angleSpeed
-			0.85,
-			1,
-			-1,
-			PI,
-			0.3, // damp, angleDamp, gravity, particleCone, fade
-			0.5,
-			0,
-			0,
-			1, // randomness, collide, additive, colorLinear
-		],
-		effects: (player) => ({}),
-	},
-	dust: {
-		emitterData: [
-			vec2(0, 0),
-			0, // pos, angle
-			0.3,
-			0.2,
-			30,
-			PI / 3, // emitSize, emitTime, rate, cone
-			0, // tileInfo
-			rgb(0.6, 0.4, 0.2, 0.7),
-			rgb(0.7, 0.5, 0.3, 0.7), // colorStartA, colorStartB
-			hsl(0.1, 0.3, 0.3, 0),
-			hsl(0.1, 0.2, 0.2, 0), // colorEndA, colorEndB
-			0.4,
-			0.05,
-			0.08,
-			0.03,
-			0.01, // time, sizeStart, sizeEnd, speed, angleSpeed
-			0.95,
-			0.9,
-			0.05,
-			PI / 4,
-			0.9, // damp, angleDamp, gravity, particleCone, fade
-			0.2,
-			1,
-			0,
-			1, // randomness, collide, additive, colorLinear
-		],
-		effects: (player) => ({}),
-	},
-};

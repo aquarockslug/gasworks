@@ -43,8 +43,6 @@ class Mask extends GameObject {
 class Player extends GameObject {
 	constructor(...args) {
 		super(...args);
-		this.lastEmitTime = 0;
-		this.emitInterval = 0.1;
 		this.drawSize = vec2(1);
 		this.maskColor = MASKS[0];
 		this.inGas = "none";
@@ -77,6 +75,11 @@ class Player extends GameObject {
 		}
 	}
 
+	die() {
+		this.pos = vec2(0, -14)// TODO level.startPos get changed to the current position somehow;
+		this.health = 100;
+	}
+
 	setAnimation(animState) {
 		const animations = {
 			idle: { rowOffset: 0, frames: 2, speed: 4 },
@@ -92,7 +95,7 @@ class Player extends GameObject {
 
 	idle = () => this.setAnimation("idle");
 	walk = () => {
-		if ((time * 6) % 2 == 0) sfx.walk.play(this.pos, 0.2);
+		if ((time * 6) % 2 === 0) sfx.walk.play(this.pos, 0.2);
 		this.setAnimation("walk");
 	};
 
@@ -101,11 +104,12 @@ class Player extends GameObject {
 			.subtract(cameraPos)
 			.multiply(vec2(0.05))
 			.add(vec2(0, 0.25));
-		drawTile(
-			this.pos.add(offset),
-			vec2(1),
-			tile(vec2(), vec2(19, 21), 1).frame(2),
-		);
+		if (this.pos.y > -14.8 && this.inGas == "none")
+			drawTile(
+				this.pos.add(offset),
+				vec2(1),
+				tile(vec2(), vec2(19, 21), 1).frame(2),
+			);
 		super.render();
 	}
 }
