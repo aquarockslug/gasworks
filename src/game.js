@@ -2,15 +2,6 @@ let player, pipeData, gasData, pl, gl, grl, level;
 let debugMode = false;
 
 function gameInit() {
-	[
-		...Object.values(PIPE_TILES),
-		...Object.values(GAS_TILES),
-		...Object.values(GROUND_TILES),
-		...Object.values(WALL_TILES),
-	]
-		.filter((i) => i != null)
-		.forEach((i) => new TileLayerData(i));
-
 	objectDefaultDamping = 0.7;
 
 	level = levels[0];
@@ -28,7 +19,7 @@ function gameInit() {
 	);
 
 	level.gasTilesByColor = {};
-	const gasTypeCounts = { blue: 4, red: 9, green: 9, yellow: 9 };
+	const gasTypeCounts = { blue: 9, red: 9, green: 9, yellow: 9 };
 	for (const color of ["red", "blue", "green", "yellow"]) {
 		const count = gasTypeCounts[color];
 		const tiles = Array.from({ length: count }, (_, i) => count - 1 - i)

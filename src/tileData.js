@@ -17,6 +17,18 @@ const PIPE_TILES = {
 	RED_GAS_HORIZONTAL_UP: 9,
 	RED_GAS_VERTICAL_RIGHT: 28,
 	RED_GAS_VERTICAL_LEFT: 29,
+	BLUE_GAS_HORIZONTAL_DOWN: 14,
+	BLUE_GAS_HORIZONTAL_UP: 13,
+	BLUE_GAS_VERTICAL_RIGHT: 32,
+	BLUE_GAS_VERTICAL_LEFT: 33,
+	GREEN_GAS_HORIZONTAL_DOWN: 18,
+	GREEN_GAS_HORIZONTAL_UP: 17,
+	GREEN_GAS_VERTICAL_RIGHT: 36,
+	GREEN_GAS_VERTICAL_LEFT: 37,
+	YELLOW_GAS_HORIZONTAL_DOWN: 22,
+	YELLOW_GAS_HORIZONTAL_UP: 21,
+	YELLOW_GAS_VERTICAL_RIGHT: 40,
+	YELLOW_GAS_VERTICAL_LEFT: 41,
 };
 
 const GAS_TILES = {
@@ -29,15 +41,15 @@ const GAS_TILES = {
 	RED_GAS_7: 108,
 	RED_GAS_8: 109,
 	RED_GAS_9: 110,
-	GREEN_GAS_1: 72,
-	GREEN_GAS_2: 73,
-	GREEN_GAS_3: 74,
-	GREEN_GAS_4: 90,
-	GREEN_GAS_5: 91,
-	GREEN_GAS_6: 92,
-	GREEN_GAS_7: 108,
-	GREEN_GAS_8: 109,
-	GREEN_GAS_9: 110,
+	GREEN_GAS_1: 81,
+	GREEN_GAS_2: 82,
+	GREEN_GAS_3: 83,
+	GREEN_GAS_4: 103,
+	GREEN_GAS_5: 104,
+	GREEN_GAS_6: 105,
+	GREEN_GAS_7: 125,
+	GREEN_GAS_8: 126,
+	GREEN_GAS_9: 127,
 	YELLOW_GAS_1: 72,
 	YELLOW_GAS_2: 73,
 	YELLOW_GAS_3: 74,
@@ -50,12 +62,12 @@ const GAS_TILES = {
 	BLUE_GAS_1: 126,
 	BLUE_GAS_2: 127,
 	BLUE_GAS_3: 128,
-	BLUE_GAS_4: 90,
-	BLUE_GAS_5: 91,
-	BLUE_GAS_6: 92,
-	BLUE_GAS_7: 108,
-	BLUE_GAS_8: 109,
-	BLUE_GAS_9: 110,
+	BLUE_GAS_4: 144,
+	BLUE_GAS_5: 145,
+	BLUE_GAS_6: 146,
+	BLUE_GAS_7: 162,
+	BLUE_GAS_8: 163,
+	BLUE_GAS_9: 164,
 };
 
 const GROUND_TILES = {
@@ -160,12 +172,18 @@ const wall = (index) =>
 		WALL_TILES.WALL_15,
 	][index];
 
-const pipe = (type, direction = null, hasGas = false, gasFrame = 1) => {
+const pipe = (
+	type,
+	direction = null,
+	hasGas = false,
+	gasFrame = 1,
+	gasColor = "red",
+) => {
 	if (type === "straight") {
 		return hasGas
 			? direction === "horizontal"
-				? PIPE_TILES.RED_GAS_HORIZONTAL_DOWN
-				: PIPE_TILES.RED_GAS_VERTICAL_RIGHT
+				? PIPE_TILES[`${gasColor.toUpperCase()}_GAS_HORIZONTAL_DOWN`]
+				: PIPE_TILES[`${gasColor.toUpperCase()}_GAS_VERTICAL_RIGHT`]
 			: direction === "horizontal"
 				? PIPE_TILES.STRAIGHT_HORIZONTAL
 				: direction === "vertical"
@@ -182,13 +200,16 @@ const pipe = (type, direction = null, hasGas = false, gasFrame = 1) => {
 		return corners[direction] ?? PIPE_TILES.CORNER_TOP_LEFT;
 	}
 	if (type === "broken" || type === "leaking") {
+		const colorKey = gasColor.toUpperCase();
 		const brokenPipes = {
-			up: PIPE_TILES.RED_GAS_HORIZONTAL_UP,
-			down: PIPE_TILES.RED_GAS_HORIZONTAL_DOWN,
-			left: PIPE_TILES.RED_GAS_VERTICAL_LEFT,
-			right: PIPE_TILES.RED_GAS_VERTICAL_RIGHT,
+			up: PIPE_TILES[`${colorKey}_GAS_HORIZONTAL_UP`],
+			down: PIPE_TILES[`${colorKey}_GAS_HORIZONTAL_DOWN`],
+			left: PIPE_TILES[`${colorKey}_GAS_VERTICAL_LEFT`],
+			right: PIPE_TILES[`${colorKey}_GAS_VERTICAL_RIGHT`],
 		};
-		return brokenPipes[direction] ?? PIPE_TILES.RED_GAS_VERTICAL_RIGHT;
+		return (
+			brokenPipes[direction] ?? PIPE_TILES[`${colorKey}_GAS_VERTICAL_RIGHT`]
+		);
 	}
 	return PIPE_TILES.STRAIGHT_HORIZONTAL;
 };

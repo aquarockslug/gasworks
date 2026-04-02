@@ -28,7 +28,7 @@ const levels = [
 			]),
 			...pipeLine([vec2(16, 2), vec2(0, 2), vec2(0, 4), vec2(16, 4)]),
 			...pipeLine([vec2(11, -16), vec2(11, -4), vec2(2, -4)]),
-			{ x: -6, y: 0, value: pipe("leaking", "up") },
+			{ x: -6, y: 0, value: pipe("leaking", "up", true, 1, "blue") },
 			{ x: 11, y: -8, value: pipe("leaking", "right") },
 			{ x: 6, y: -4, value: pipe("leaking", "down") },
 		],
