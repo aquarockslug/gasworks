@@ -98,18 +98,14 @@ class Player extends GameObject {
 	updateGas() {
 		const currentTilePos = this.pos.floor().add(vec2(16));
 		let t = null;
+		let gasColor = "none"
 		for (const color of ["red", "blue", "green", "yellow"]) {
-			const data = gls[color].getData(currentTilePos);
-			if (data) {
-				t = data.tile;
+			const gasTile = gls[color].getData(currentTilePos).tile;
+			if (gasTile) {
+				gasColor = color
 				break;
 			}
 		}
-		const gasColor = t
-			? Object.keys(level.gasTilesByColor).find((color) =>
-					level.gasTilesByColor[color].includes(t),
-				)
-			: null;
 
 		const newInGas = gasColor || "none";
 		if (this.inGas !== newInGas) this.inGas = newInGas;
