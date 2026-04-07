@@ -86,7 +86,7 @@ class Player extends GameObject {
 	}
 
 	die() {
-		this.pos = level.startPos.copy();
+		this.pos = level.start.copy();
 		this.health = 100;
 		this.maskColor = "none";
 

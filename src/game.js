@@ -6,7 +6,7 @@ function gameInit() {
 
 	level = levels[0];
 	player = new Player(
-		level.startPos,
+		level.start,
 		vec2(0.5, 0.25),
 		tile(vec2(), vec2(19, 21), 1),
 	);
@@ -112,8 +112,7 @@ function pipeTileAnimation() {
 						: pipe("broken", brokenDirections[brokenIndex]) + 36;
 			}
 
-			const data = getTileData(tileIndex);
-			pl.setData(vec2(x, y), data);
+			pl.setData(vec2(x, y), getTileData(tileIndex));
 		}
 	}
 }
