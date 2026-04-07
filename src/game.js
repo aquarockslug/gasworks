@@ -1,4 +1,4 @@
-let player, pipeData, pl, gls, grl, level;
+let player, pl, gls, grl, level;
 let debugMode = false;
 
 function gameInit() {
@@ -28,35 +28,25 @@ function gameInit() {
 		if (tiles.length > 0) level.gasTilesByColor[color] = tiles;
 	}
 
-	pipeData = level.pipes.reduce(
+	level.pipeData = level.pipes.reduce(
 		(acc, pipe) => addToGrid(acc, pipe.x + 16, pipe.y + 16, pipe.value, "pipe"),
 		createEmptyGrid(),
 	);
 
-	level.gasDataByColor = {};
-	for (const color of ["red", "blue", "green", "yellow"]) {
-		level.gasDataByColor[color] = createEmptyGrid();
-	}
-
-	level.gases.reduce(
-		(acc, gas) =>
-			addToGrid(
-				level.gasDataByColor[gas.value.color] || acc,
-				gas.x + 16,
-				gas.y + 16,
-				gas.value,
-				"gas",
-			),
-		null,
-	);
-
+	const colors = ["red", "blue", "green", "yellow"];
 	const gasLayers = {};
-	for (const color of ["red", "blue", "green", "yellow"]) {
-		const data = level.gasDataByColor[color];
+	for (const color of colors) {
+		const data = level.gases
+			.filter((g) => g.value.color === color)
+			.reduce(
+				(grid, gas) =>
+					addToGrid(grid, gas.x + 16, gas.y + 16, gas.value, "gas"),
+				createEmptyGrid(),
+			);
 		gasLayers[color] = createTileLayer(data, false, -9999);
 	}
 
-	pl = createTileLayer(pipeData, true, -10000);
+	pl = createTileLayer(level.pipeData, true, -10000);
 	gls = gasLayers;
 	grl = groundLayer();
 
@@ -82,7 +72,13 @@ function gasTileAnimation() {
 	const gasFrame = frame === 3 ? 1 : frame;
 
 	for (const color of ["red", "blue", "green", "yellow"]) {
-		const data = level.gasDataByColor[color];
+		const data = level.gases
+			.filter((g) => g.value.color === color)
+			.reduce(
+				(grid, gas) =>
+					addToGrid(grid, gas.x + 16, gas.y + 16, gas.value, "gas"),
+				createEmptyGrid(),
+			);
 		const layer = gls[color];
 		for (let y = 0; y < 32; y++) {
 			for (let x = 0; x < 32; x++) {
@@ -101,7 +97,7 @@ function pipeTileAnimation() {
 	const brokenDirections = ["up", "down", "right", "left"];
 	for (let y = 0; y < 32; y++) {
 		for (let x = 0; x < 32; x++) {
-			const pipeTile = pipeData[y][x];
+			const pipeTile = level.pipeData[y][x];
 			if (!pipeTile) continue;
 
 			let tileIndex = typeof pipeTile === "object" ? pipeTile.tile : pipeTile;
@@ -125,45 +121,50 @@ function pipeTileAnimation() {
 function gameRender() {}
 
 function postGameRender() {
-	const intensity = 1 - player.health / 100;
-	if (intensity > 0)
-		drawRect(vec2(), vec2(100), new Color(0, 0, 0, intensity * 0.5));
+	const deathFade = 1 - player.health / 100;
+	if (deathFade > 0)
+		drawRect(vec2(), vec2(100), new Color(0, 0, 0, deathFade * 0.5));
 
-	if (debugMode) {
-		const currentTilePos = player.pos.floor().add(vec2(16));
-		let tileData = null;
-		for (const color of ["red", "blue", "green", "yellow"]) {
-			tileData = gls[color].getData(currentTilePos);
-			if (tileData) break;
+	if (!debugMode) return;
+	const currentTilePos = player.pos.floor().add(vec2(16));
+	for (const color of ["red", "blue", "green", "yellow"]) {
+		const tileData = gls[color].getData(currentTilePos);
+		if (tileData?.tile) {
+			const tileNum = tileData.tile;
+			drawTextScreen(
+				`Tile: ${tileNum}`,
+				vec2(80, 30),
+				20,
+				new Color(0, 0, 0, 1),
+			);
+			break;
 		}
-		const tileNum = tileData?.tile ?? -1;
-		drawTextScreen(`Tile: ${tileNum}`, vec2(80, 30), 20, new Color(0, 0, 0, 1));
-		drawTextScreen(
-			`Pos: ${player.pos.x.toFixed(1)}, ${player.pos.y.toFixed(1)}`,
-			vec2(80, 55),
-			16,
-			new Color(0, 0, 0, 1),
-		);
-		drawTextScreen(
-			`In Gas: ${player.inGas}`,
-			vec2(80, 80),
-			16,
-			new Color(0, 0, 0, 1),
-		);
-		drawTextScreen(
-			`Mask: ${player.maskColor}`,
-			vec2(80, 105),
-			16,
-			new Color(0, 0, 0, 1),
-		);
-		const lever = level.levers.find((l) => l.name === player.inGas);
-		drawTextScreen(
-			`Lever: ${lever?.on ?? "none"}`,
-			vec2(80, 130),
-			16,
-			new Color(0, 0, 0, 1),
-		);
 	}
+	drawTextScreen(
+		`Pos: ${Math.floor(player.pos.x)}, ${Math.floor(player.pos.y)}`,
+		vec2(80, 55),
+		16,
+		new Color(0, 0, 0, 1),
+	);
+	drawTextScreen(
+		`In Gas: ${player.inGas}`,
+		vec2(80, 80),
+		16,
+		new Color(0, 0, 0, 1),
+	);
+	drawTextScreen(
+		`Mask: ${player.maskColor}`,
+		vec2(80, 105),
+		16,
+		new Color(0, 0, 0, 1),
+	);
+	const lever = level.levers.find((l) => l.name === player.inGas);
+	drawTextScreen(
+		`Lever: ${lever?.on ?? "none"}`,
+		vec2(80, 130),
+		16,
+		new Color(0, 0, 0, 1),
+	);
 }
 
 engineInit(gameInit, gameUpdate, null, gameRender, postGameRender, [
