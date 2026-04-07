@@ -25,6 +25,12 @@ class Lever extends GameObject {
 	}
 }
 
+class Exit extends GameObject {
+	constructor(pos) {
+		super(pos, vec2(0.5), tile(vec2(8, 10), vec2(16), 0));
+	}
+}
+
 class Mask extends GameObject {
 	constructor(pos, name) {
 		super(pos, vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
@@ -98,11 +104,11 @@ class Player extends GameObject {
 	updateGas() {
 		const currentTilePos = this.pos.floor().add(vec2(16));
 		let t = null;
-		let gasColor = "none"
+		let gasColor = "none";
 		for (const color of ["red", "blue", "green", "yellow"]) {
 			const gasTile = gls[color].getData(currentTilePos).tile;
 			if (gasTile) {
-				gasColor = color
+				gasColor = color;
 				break;
 			}
 		}

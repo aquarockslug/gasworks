@@ -18,6 +18,8 @@ function gameInit() {
 		(d) => new Mask(d.pos, d.value),
 	);
 
+	new Exit(level.exit);
+
 	level.gasTilesByColor = {};
 	const gasTypeCounts = { blue: 9, red: 9, green: 9, yellow: 9 };
 	for (const color of ["red", "blue", "green", "yellow"]) {
