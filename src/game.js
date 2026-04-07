@@ -1,4 +1,4 @@
-let player, pipeData, gasData, pl, gl, grl, level;
+let player, pipeData, pl, gls, grl, level;
 let debugMode = false;
 
 function gameInit() {
@@ -33,16 +33,31 @@ function gameInit() {
 		createEmptyGrid(),
 	);
 
-	// TODO seperate gasData into a seperate set of data for each color
-	gasData = level.gases.reduce(
-		(acc, gas) => addToGrid(acc, gas.x + 16, gas.y + 16, gas.value, "gas"),
-		createEmptyGrid(),
+	level.gasDataByColor = {};
+	for (const color of ["red", "blue", "green", "yellow"]) {
+		level.gasDataByColor[color] = createEmptyGrid();
+	}
+
+	level.gases.reduce(
+		(acc, gas) =>
+			addToGrid(
+				level.gasDataByColor[gas.value.color] || acc,
+				gas.x + 16,
+				gas.y + 16,
+				gas.value,
+				"gas",
+			),
+		null,
 	);
 
-	// const tilesWithColor = (color) => gasData.flat().filter((g) => g?.color == color)
+	const gasLayers = {};
+	for (const color of ["red", "blue", "green", "yellow"]) {
+		const data = level.gasDataByColor[color];
+		gasLayers[color] = createTileLayer(data, false, -9999);
+	}
 
 	pl = createTileLayer(pipeData, true, -10000);
-	gl = createTileLayer(gasData, false, -9999);
+	gls = gasLayers;
 	grl = groundLayer();
 
 	setCanvasFixedSize(vec2(512, 512));
@@ -55,28 +70,29 @@ function gameUpdate() {
 	gasTileAnimation();
 	pipeTileAnimation();
 
-	gl.redraw();
-	pl.redraw();
-
-	// TODO hide gas when its corresponding lever is turned off
-	// create a different tile layer for each color of gas and move them away
-	gl.pos = vec2(-16).add(
-		vec2(level.levers.find((l) => l.name === "red")?.on ? 0 : 1000),
-	);
+	for (const color of ["red", "blue", "green", "yellow"]) {
+		const isOn = level.levers.find((l) => l.name === color)?.on ?? false;
+		gls[color].pos = vec2(-16).add(isOn ? vec2(0) : vec2(1000));
+		gls[color].redraw();
+	}
 }
 
 function gasTileAnimation() {
 	const frame = ((time * 6) | 0) % 4;
 	const gasFrame = frame === 3 ? 1 : frame;
 
-	for (let y = 0; y < 32; y++) {
-		for (let x = 0; x < 32; x++) {
-			const gas = gasData[y][x];
-			if (!gas) continue;
+	for (const color of ["red", "blue", "green", "yellow"]) {
+		const data = level.gasDataByColor[color];
+		const layer = gls[color];
+		for (let y = 0; y < 32; y++) {
+			for (let x = 0; x < 32; x++) {
+				const gas = data[y][x];
+				if (!gas) continue;
 
-			const tileIndex = typeof gas === "object" ? gas.tile : gas;
-			const data = getTileData(tileIndex + gasFrame * 3);
-			gl.setData(vec2(x, y), data);
+				const tileIndex = typeof gas === "object" ? gas.tile : gas;
+				const tileData = getTileData(tileIndex + gasFrame * 3);
+				layer.setData(vec2(x, y), tileData);
+			}
 		}
 	}
 }
@@ -115,7 +131,11 @@ function postGameRender() {
 
 	if (debugMode) {
 		const currentTilePos = player.pos.floor().add(vec2(16));
-		const tileData = gl.getData(currentTilePos);
+		let tileData = null;
+		for (const color of ["red", "blue", "green", "yellow"]) {
+			tileData = gls[color].getData(currentTilePos);
+			if (tileData) break;
+		}
 		const tileNum = tileData?.tile ?? -1;
 		drawTextScreen(`Tile: ${tileNum}`, vec2(80, 30), 20, new Color(0, 0, 0, 1));
 		drawTextScreen(
