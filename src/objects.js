@@ -22,6 +22,7 @@ class Lever extends GameObject {
 		this.on = !this.on;
 		this.tileInfo = tile(vec2(9, 10), vec2(16)).frame(this.on ? this.color : 0);
 		sfx.lever.play(this.pos, 0.66);
+		setTimeout(() => sfx.gas.play(this.pos, this.on ? 0.33 : 0.1), 100);
 	}
 }
 
@@ -105,7 +106,7 @@ class Player extends GameObject {
 		const currentTilePos = this.pos.floor().add(vec2(16));
 		let t = null;
 		let gasColor = "none";
-		for (const color of ["red", "blue", "green", "yellow"]) {
+		for (const color of MASKS.slice(1)) {
 			const gasTile = gls[color].getData(currentTilePos).tile;
 			if (gasTile) {
 				gasColor = color;

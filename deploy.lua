@@ -12,7 +12,7 @@ end
 build({
 	"./index.html",
 	"./assets/masks.png",
-	"./assets/pipes.png",
+	"./assets/tiles.png",
 	"./assets/gorm.png",
 	"./src/game.js",
 	"./src/grid.js",
@@ -21,6 +21,5 @@ build({
 	"./src/levels.js",
 	"./src/tileData.js",
 	"./lib/littlejs.js",
-	"./lib/signals.js"
 })
 push("./index.zip", "aquarock/gas-game", "html5")
