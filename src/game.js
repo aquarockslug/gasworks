@@ -4,27 +4,22 @@ let debugMode = false;
 function gameInit() {
 	objectDefaultDamping = 0.7;
 
-	level = levels[0];
+	level = levels.find((level) => level.name === "level one")
+	if (!level) throw new Error("No level was loaded")
+
 	player = new Player(
 		level.start,
 		vec2(0.5, 0.25),
 		tile(vec2(), vec2(19, 21), 1),
 	);
 
-	level.levers = (level.leversData || level.levers).map(
-		(d) => new Lever(d.pos, d.value),
-	);
-	level.masks = (level.masksData || level.masks).map(
-		(d) => new Mask(d.pos, d.value),
-	);
-
+	level.levers = level.leversData.map((d) => new Lever(d.pos, d.value),);
+	level.masks = level.masksData.map((d) => new Mask(d.pos, d.value));
 	level.exitObj = new Exit(level.exit);
 
 	level.gasTilesByColor = {};
-	const gasTypeCounts = { blue: 9, red: 9, green: 9, yellow: 9 };
-	for (const color of ["red", "blue", "green", "yellow"]) {
-		const count = gasTypeCounts[color];
-		const tiles = Array.from({ length: count }, (_, i) => count - 1 - i)
+	for (const color of MASKS.slice(1)) {
+		const tiles = Array.from({ length: 9 }, (_, i) => 8 - i)
 			.flatMap((i) => [0, 3, 6].map((o) => gas(color, i) + o))
 			.filter((t) => !isNaN(t));
 		if (tiles.length > 0) level.gasTilesByColor[color] = tiles;
@@ -35,9 +30,8 @@ function gameInit() {
 		createEmptyGrid(),
 	);
 
-	const colors = ["red", "blue", "green", "yellow"];
 	const gasLayers = {};
-	for (const color of colors) {
+	for (const color of MASKS.slice(1)) {
 		const data = level.gases
 			.filter((g) => g.value.color === color)
 			.reduce(
@@ -62,7 +56,7 @@ function gameUpdate() {
 	gasTileAnimation();
 	pipeTileAnimation();
 
-	for (const color of ["red", "blue", "green", "yellow"]) {
+	for (const color of MASKS.slice(1)) {
 		const isOn = level.levers.find((l) => l.name === color)?.on ?? false;
 		gls[color].pos = vec2(-16).add(isOn ? vec2(0) : vec2(1000));
 		gls[color].redraw();
@@ -73,7 +67,7 @@ function gasTileAnimation() {
 	const frame = ((time * 6) | 0) % 4;
 	const gasFrame = frame === 3 ? 1 : frame;
 
-	for (const color of ["red", "blue", "green", "yellow"]) {
+	for (const color of MASKS.slice(1)) {
 		const data = level.gases
 			.filter((g) => g.value.color === color)
 			.reduce(
@@ -128,7 +122,7 @@ function postGameRender() {
 
 	if (!debugMode) return;
 	const currentTilePos = player.pos.floor().add(vec2(16));
-	for (const color of ["red", "blue", "green", "yellow"]) {
+	for (const color of MASKS.slice(1)) {
 		const tileData = gls[color].getData(currentTilePos);
 		if (tileData?.tile) {
 			const tileNum = tileData.tile;
