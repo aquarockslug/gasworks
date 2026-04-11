@@ -76,6 +76,9 @@ class Player extends GameObject {
 				lever.toggle();
 		}
 
+		if (keyWasPressed("Space") && this.pos.distance(level.exit) < 1)
+			sfx.victory.play();
+
 		if (keyWasPressed("Space")) {
 			const maskIndex = level.masks.findIndex(
 				(m) => this.pos.distance(m.pos) < 1,
@@ -85,6 +88,7 @@ class Player extends GameObject {
 				if (this.maskColor !== "none" && this.maskColor !== mask.name) {
 					level.masks.push(new Mask(this.pos.copy(), this.maskColor));
 				}
+				sfx.mask.play(this.pos, 0.33);
 				mask.destroy();
 				level.masks.splice(maskIndex, 1);
 				this.maskColor = this.maskColor === mask.name ? "none" : mask.name;
@@ -147,7 +151,7 @@ class Player extends GameObject {
 
 	idle = () => this.setAnimation("idle");
 	walk = () => {
-		if ((time * 6) % 2 === 0) sfx.walk.play(this.pos, 0.2);
+		if ((time * 6) % 2 === 0) sfx.walk.play(this.pos, 0.1);
 		this.setAnimation("walk");
 	};
 
