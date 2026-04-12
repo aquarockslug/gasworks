@@ -172,15 +172,9 @@ const wall = (index) =>
 		WALL_TILES.WALL_15,
 	][index];
 
-const pipe = (
-	type,
-	direction = null,
-	hasGas = false,
-	gasFrame = 1,
-	gasColor = "red",
-) => {
+const pipe = (type, direction = null, gasColor = "red") => {
 	if (type === "straight") {
-		return hasGas
+		return gasColor !== "none"
 			? direction === "horizontal"
 				? PIPE_TILES[`${gasColor.toUpperCase()}_GAS_HORIZONTAL_DOWN`]
 				: PIPE_TILES[`${gasColor.toUpperCase()}_GAS_VERTICAL_RIGHT`]

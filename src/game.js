@@ -3,9 +3,11 @@ let debugMode = false;
 
 function gameInit() {
 	objectDefaultDamping = 0.7;
+	setCanvasFixedSize(vec2(512, 512));
+	canvasClearColor = rgb().setHex("#a9b0ba");
 
-	level = levels.find((level) => level.name === "level one")
-	if (!level) throw new Error("No level was loaded")
+	level = levels.find((level) => level.name === "level one");
+	if (!level) throw new Error("No level was loaded");
 
 	player = new Player(
 		level.start,
@@ -13,7 +15,7 @@ function gameInit() {
 		tile(vec2(), vec2(19, 21), 1),
 	);
 
-	level.levers = level.leversData.map((d) => new Lever(d.pos, d.value),);
+	level.levers = level.leversData.map((d) => new Lever(d.pos, d.value));
 	level.masks = level.masksData.map((d) => new Mask(d.pos, d.value));
 	level.exitObj = new Exit(level.exit);
 
@@ -45,9 +47,6 @@ function gameInit() {
 	pl = createTileLayer(level.pipeData, true, -10000);
 	gls = gasLayers;
 	grl = groundLayer();
-
-	setCanvasFixedSize(vec2(512, 512));
-	canvasClearColor = rgb().setHex("#a9b0ba");
 }
 
 function gameUpdate() {
@@ -91,25 +90,27 @@ function gasTileAnimation() {
 
 function pipeTileAnimation() {
 	const brokenDirections = ["up", "down", "right", "left"];
+	const colors = MASKS.slice(1);
 	for (let y = 0; y < 32; y++) {
 		for (let x = 0; x < 32; x++) {
-			const pipeTile = level.pipeData[y][x];
+			let pipeTile = level.pipeData[y][x];
 			if (!pipeTile) continue;
 
-			let tileIndex = typeof pipeTile === "object" ? pipeTile.tile : pipeTile;
 			const brokenIndex = brokenDirections.findIndex(
-				(dir) => tileIndex === pipe("broken", dir),
+				(dir) => pipeTile === pipe("broken", dir, "red"),
 			);
 
+			const colorOffset = 0;
 			if (brokenIndex !== -1) {
-				tileIndex =
+				pipeTile =
 					time % 2 > 1
-						? pipe("broken", brokenDirections[brokenIndex])
-						: pipe("broken", brokenDirections[brokenIndex]) + 36;
+						? pipe("broken", brokenDirections[brokenIndex], "red")
+						: pipe("broken", brokenDirections[brokenIndex], "red") + 36;
 			}
 
-			pl.setData(vec2(x, y), getTileData(tileIndex));
+			pl.setData(vec2(x, y), getTileData(pipeTile));
 		}
+		pl.redraw();
 	}
 }
 

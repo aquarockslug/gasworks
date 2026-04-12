@@ -12,7 +12,7 @@ class GameObject extends EngineObject {
 
 class Lever extends GameObject {
 	constructor(pos, name, on = true) {
-		var color = ["none", "red", "blue", "green", "yellow"].indexOf(name);
+		var color = MASKS.indexOf(name);
 		super(pos, vec2(0.5), tile(vec2(9, 10), vec2(16)).frame(on ? color : 0), 0);
 		this.on = on;
 		this.name = name;
@@ -36,7 +36,7 @@ class Mask extends GameObject {
 	constructor(pos, name) {
 		super(pos, vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
 		this.name = name;
-		this.color = ["none", "red", "blue", "green", "yellow"].indexOf(name);
+		this.color = MASKS.indexOf(name);
 	}
 	update() {
 		super.update();
