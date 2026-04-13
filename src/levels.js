@@ -33,9 +33,9 @@ const levels = [
 			...pipeLine([vec2(-8, 16), vec2(-8, 12), vec2(0, 12), vec2(0, 16)]),
 			...pipeLine([vec2(4, 6), vec2(13, 6), vec2(13, 10), vec2(-8, 10)]),
 			{ x: -5, y: 0, value: pipe("leaking", "up", "blue") },
-			// { x: -9, y: -4, value: pipe("leaking", "right", "yellow") },
+			{ x: -9, y: -4, value: pipe("leaking", "right", "yellow") },
 			{ x: 11, y: -8, value: pipe("leaking", "right", "red") },
-			// { x: 6, y: -4, value: pipe("leaking", "down", "blue") },
+			{ x: 6, y: -4, value: pipe("leaking", "down", "red") },
 		],
 		gases: [
 			...cloud("red", vec2(-1, 1), vec2(7, -6)),

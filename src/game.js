@@ -18,6 +18,7 @@ function gameInit() {
 	level.levers = level.leversData.map((d) => new Lever(d.pos, d.value));
 	level.masks = level.masksData.map((d) => new Mask(d.pos, d.value));
 	level.exitObj = new Exit(level.exit);
+	level.leverByColor = Object.fromEntries(level.levers.map((l) => [l.name, l]));
 
 	level.gasTilesByColor = {};
 	for (const color of MASKS.slice(1)) {
@@ -47,6 +48,18 @@ function gameInit() {
 	pl = createTileLayer(level.pipeData, true, -10000);
 	gls = gasLayers;
 	grl = groundLayer();
+
+	level.gasDataByColor = Object.fromEntries(
+		MASKS.slice(1).map((color) => [
+			color,
+			level.gases
+				.filter((g) => g.value.color === color)
+				.map((g) => ({
+					pos: vec2(g.x + 16, g.y + 16),
+					gas: g.value,
+				})),
+		]),
+	);
 }
 
 function gameUpdate() {
@@ -56,7 +69,8 @@ function gameUpdate() {
 	pipeTileAnimation();
 
 	for (const color of MASKS.slice(1)) {
-		const isOn = level.levers.find((l) => l.name === color)?.on ?? false;
+		const lever = level.leverByColor[color];
+		const isOn = lever?.on ?? false;
 		gls[color].pos = vec2(-16).add(isOn ? vec2(0) : vec2(1000));
 		gls[color].redraw();
 	}
@@ -66,76 +80,37 @@ function gasTileAnimation() {
 	const frame = ((time * 6) | 0) % 4;
 	const gasFrame = frame === 3 ? 1 : frame;
 
-	for (const color of MASKS.slice(1)) {
-		const data = level.gases
-			.filter((g) => g.value.color === color)
-			.reduce(
-				(grid, gas) =>
-					addToGrid(grid, gas.x + 16, gas.y + 16, gas.value, "gas"),
-				createEmptyGrid(),
-			);
+	MASKS.slice(1).forEach((color) => {
 		const layer = gls[color];
-		for (let y = 0; y < 32; y++) {
-			for (let x = 0; x < 32; x++) {
-				const gas = data[y][x];
-				if (!gas) continue;
+		const gasData = level.gasDataByColor[color] ?? [];
 
-				const tileIndex = typeof gas === "object" ? gas.tile : gas;
-				const tileData = getTileData(tileIndex + gasFrame * 3);
-				layer.setData(vec2(x, y), tileData);
-			}
-		}
-	}
+		gasData.forEach(({ pos, gas }) => {
+			const tileIndex = typeof gas === "object" ? gas.tile : gas;
+			layer.setData(pos, getTileData(tileIndex + gasFrame * 3));
+		});
+	});
 }
 
 function pipeTileAnimation() {
-	const gasPipeTiles = {
-		red: {
-			horizontal: { up: 9, down: 10 },
-			vertical: { right: 28, left: 29 },
-		},
-		blue: {
-			horizontal: { up: 13, down: 14 },
-			vertical: { right: 32, left: 33 },
-		},
-		green: {
-			horizontal: { up: 17, down: 18 },
-			vertical: { right: 36, left: 37 },
-		},
-		yellow: {
-			horizontal: { up: 21, down: 22 },
-			vertical: { right: 34, left: 35 },
-		},
-	};
+	const animationOffset = (time | 0) % 2 === 0 ? 36 : 0;
 
-	const getPipe = (tile) => {
-		for (const [color, dirs] of Object.entries(gasPipeTiles)) {
-			for (const [dir, dirData] of Object.entries(dirs)) {
-				for (const [leakDir, tileNum] of Object.entries(dirData)) {
-					if (tileNum === tile) {
-						return { color, dir: leakDir };
-					}
-				}
-			}
-		}
-		return null;
-	};
+	Array.from({ length: 32 }, (_, y) =>
+		Array.from({ length: 32 }, (_, x) => [x, y]),
+	)
+		.flat()
+		.map(([x, y]) => ({
+			pos: vec2(x, y),
+			p: PIPE_BROKEN_LOOKUP[level.pipeData[y]?.[x]],
+		}))
+		.filter(({ p }) => p)
+		.forEach(({ pos, p }) => {
+			pl.setData(
+				pos,
+				getTileData(pipe("broken", p.dir, p.color) + animationOffset),
+			);
+		});
 
-	for (let y = 0; y < 32; y++) {
-		for (let x = 0; x < 32; x++) {
-			const pipeTile = level.pipeData[y][x];
-			const p = getPipe(pipeTile);
-			if (p) {
-				newPipeTile =
-					time % 2 > 1
-						? pipe("broken", p.dir, p.color)
-						: pipe("broken", p.dir, p.color) + 36;
-
-				pl.setData(vec2(x, y), getTileData(newPipeTile));
-			}
-		}
-		pl.redraw();
-	}
+	pl.redraw();
 }
 
 function gameRender() {}
@@ -178,7 +153,7 @@ function postGameRender() {
 		16,
 		new Color(0, 0, 0, 1),
 	);
-	const lever = level.levers.find((l) => l.name === player.inGas);
+	const lever = level.leverByColor[player.inGas];
 	drawTextScreen(
 		`Lever: ${lever?.on ?? "none"}`,
 		vec2(80, 130),

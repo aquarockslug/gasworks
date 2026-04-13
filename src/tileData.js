@@ -31,6 +31,19 @@ const PIPE_TILES = {
 	YELLOW_GAS_VERTICAL_LEFT: 33,
 };
 
+const PIPE_BROKEN_TILES = {
+	red: { up: 9, down: 10, right: 28, left: 29 },
+	blue: { up: 13, down: 14, right: 32, left: 33 },
+	green: { up: 17, down: 18, right: 36, left: 37 },
+	yellow: { up: 21, down: 22, right: 34, left: 35 },
+};
+
+const PIPE_BROKEN_LOOKUP = Object.fromEntries(
+	Object.entries(PIPE_BROKEN_TILES).flatMap(([color, dirs]) =>
+		Object.entries(dirs).map(([dir, tileNum]) => [tileNum, { color, dir }]),
+	),
+);
+
 const GAS_TILES = {
 	RED_GAS_1: 72,
 	RED_GAS_2: 73,
@@ -95,55 +108,54 @@ const WALL_TILES = {
 	WALL_15: 41,
 };
 
-const gas = (color, index) => {
-	const gasTiles = {
-		red: [
-			GAS_TILES.RED_GAS_1,
-			GAS_TILES.RED_GAS_2,
-			GAS_TILES.RED_GAS_3,
-			GAS_TILES.RED_GAS_4,
-			GAS_TILES.RED_GAS_5,
-			GAS_TILES.RED_GAS_6,
-			GAS_TILES.RED_GAS_7,
-			GAS_TILES.RED_GAS_8,
-			GAS_TILES.RED_GAS_9,
-		],
-		blue: [
-			GAS_TILES.BLUE_GAS_1,
-			GAS_TILES.BLUE_GAS_2,
-			GAS_TILES.BLUE_GAS_3,
-			GAS_TILES.BLUE_GAS_4,
-			GAS_TILES.BLUE_GAS_5,
-			GAS_TILES.BLUE_GAS_6,
-			GAS_TILES.BLUE_GAS_7,
-			GAS_TILES.BLUE_GAS_8,
-			GAS_TILES.BLUE_GAS_9,
-		],
-		green: [
-			GAS_TILES.GREEN_GAS_1,
-			GAS_TILES.GREEN_GAS_2,
-			GAS_TILES.GREEN_GAS_3,
-			GAS_TILES.GREEN_GAS_4,
-			GAS_TILES.GREEN_GAS_5,
-			GAS_TILES.GREEN_GAS_6,
-			GAS_TILES.GREEN_GAS_7,
-			GAS_TILES.GREEN_GAS_8,
-			GAS_TILES.GREEN_GAS_9,
-		],
-		yellow: [
-			GAS_TILES.YELLOW_GAS_1,
-			GAS_TILES.YELLOW_GAS_2,
-			GAS_TILES.YELLOW_GAS_3,
-			GAS_TILES.YELLOW_GAS_4,
-			GAS_TILES.YELLOW_GAS_5,
-			GAS_TILES.YELLOW_GAS_6,
-			GAS_TILES.YELLOW_GAS_7,
-			GAS_TILES.YELLOW_GAS_8,
-			GAS_TILES.YELLOW_GAS_9,
-		],
-	};
-	return gasTiles[color]?.[index];
+const GAS_TILE_ARRAYS = {
+	red: [
+		GAS_TILES.RED_GAS_1,
+		GAS_TILES.RED_GAS_2,
+		GAS_TILES.RED_GAS_3,
+		GAS_TILES.RED_GAS_4,
+		GAS_TILES.RED_GAS_5,
+		GAS_TILES.RED_GAS_6,
+		GAS_TILES.RED_GAS_7,
+		GAS_TILES.RED_GAS_8,
+		GAS_TILES.RED_GAS_9,
+	],
+	blue: [
+		GAS_TILES.BLUE_GAS_1,
+		GAS_TILES.BLUE_GAS_2,
+		GAS_TILES.BLUE_GAS_3,
+		GAS_TILES.BLUE_GAS_4,
+		GAS_TILES.BLUE_GAS_5,
+		GAS_TILES.BLUE_GAS_6,
+		GAS_TILES.BLUE_GAS_7,
+		GAS_TILES.BLUE_GAS_8,
+		GAS_TILES.BLUE_GAS_9,
+	],
+	green: [
+		GAS_TILES.GREEN_GAS_1,
+		GAS_TILES.GREEN_GAS_2,
+		GAS_TILES.GREEN_GAS_3,
+		GAS_TILES.GREEN_GAS_4,
+		GAS_TILES.GREEN_GAS_5,
+		GAS_TILES.GREEN_GAS_6,
+		GAS_TILES.GREEN_GAS_7,
+		GAS_TILES.GREEN_GAS_8,
+		GAS_TILES.GREEN_GAS_9,
+	],
+	yellow: [
+		GAS_TILES.YELLOW_GAS_1,
+		GAS_TILES.YELLOW_GAS_2,
+		GAS_TILES.YELLOW_GAS_3,
+		GAS_TILES.YELLOW_GAS_4,
+		GAS_TILES.YELLOW_GAS_5,
+		GAS_TILES.YELLOW_GAS_6,
+		GAS_TILES.YELLOW_GAS_7,
+		GAS_TILES.YELLOW_GAS_8,
+		GAS_TILES.YELLOW_GAS_9,
+	],
 };
+
+const gas = (color, index) => GAS_TILE_ARRAYS[color]?.[index];
 
 const ground = (index) =>
 	[
