@@ -18,8 +18,8 @@ function gameInit() {
 	level.exit = new Exit(level.exitPos);
 	level.levers = level.leversData.map((d) => new Lever(d.pos, d.value));
 	level.masks = level.masksData.map((d) => new Mask(d.pos, d.value));
-
-	for (const color of MASKS.slice(1)) {
+	gasLayers = MASKS.slice(1);
+	for (const color of gasLayers) {
 		const data = level.gases
 			.filter((g) => g.value.color === color)
 			.reduce(
