@@ -7,6 +7,7 @@ function gameInit() {
 	canvasClearColor = rgb().setHex("#a9b0ba");
 	touchGamepadEnable = true;
 	touchGamepadAnalog = false;
+	touchGamepadButtonCount = 1;
 
 	level = levels.find((level) => level.name === "level one");
 	if (!level) throw new Error("No level was loaded");

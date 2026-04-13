@@ -1,3 +1,5 @@
+const interactPressed = () => keyWasPressed("Space") || gamepadWasPressed(0);
+
 class GameObject extends EngineObject {
 	update() {
 		this.renderOrder = -this.pos.y; // sort by y position
@@ -74,7 +76,7 @@ class Player extends GameObject {
 		const interactDistance = 1;
 		for (const lever of level.levers) {
 			if (
-				keyWasPressed("Space") &&
+				interactPressed() &&
 				this.pos.distance(lever.pos) < interactDistance
 			) {
 				lever.toggle();
@@ -82,13 +84,13 @@ class Player extends GameObject {
 		}
 
 		if (
-			keyWasPressed("Space") &&
+			interactPressed() &&
 			this.pos.distance(level.exitPos) < interactDistance
 		) {
 			sfx.victory.play();
 		}
 
-		if (keyWasPressed("Space")) {
+		if (interactPressed()) {
 			const maskIndex = level.masks.findIndex(
 				(m) => this.pos.distance(m.pos) < interactDistance,
 			);
