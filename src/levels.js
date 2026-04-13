@@ -1,7 +1,7 @@
 const levels = [
 	{
 		name: "level one",
-		pipes: [
+		pipeData: [
 			...pipeLine([
 				vec2(-3, -16),
 				vec2(-3, -13),
@@ -55,32 +55,7 @@ const levels = [
 			{ value: "blue", pos: vec2(10, 0.5) },
 			{ value: "yellow", pos: vec2(2, 7) },
 		],
-		start: vec2(3, -14),
-		exit: vec2(5, 14),
-	},
-	{
-		name: "level two",
-		pipes: [
-			...pipeLine([
-				vec2(15, -11),
-				vec2(10, -11),
-				vec2(10, -2),
-				vec2(2, -2),
-				vec2(2, 0),
-			]),
-		],
-		gases: [],
-		leversData: [
-			{ value: "red", pos: vec2(13.5, -10) },
-			{ value: "blue", pos: vec2(13, 13) },
-			{ value: "yellow", pos: vec2(-13, -8) },
-		],
-		masksData: [
-			{ value: "red", pos: vec2(-9, -9) },
-			{ value: "blue", pos: vec2(10, 0.5) },
-			{ value: "yellow", pos: vec2(2, 7) },
-		],
-		start: vec2(3, -14),
-		exit: vec2(5, 14),
+		startPos: vec2(3, -14),
+		exitPos: vec2(5, 14),
 	},
 ];

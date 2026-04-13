@@ -76,7 +76,7 @@ class Player extends GameObject {
 				lever.toggle();
 		}
 
-		if (keyWasPressed("Space") && this.pos.distance(level.exit) < 1)
+		if (keyWasPressed("Space") && this.pos.distance(level.exitPos) < 1)
 			sfx.victory.play();
 
 		if (keyWasPressed("Space")) {
@@ -97,13 +97,15 @@ class Player extends GameObject {
 	}
 
 	die() {
-		this.pos = level.start.copy();
+		this.pos = level.startPos.copy();
 		this.health = 100;
 		this.maskColor = "none";
 
 		// reset masks
 		level.masks.map((m) => m.destroy());
 		level.masks = level.masksData.map((d) => new Mask(d.pos, d.value));
+
+		// TODO reset switches
 	}
 
 	updateGas() {
