@@ -75,6 +75,8 @@ const pipeTileAnimation = () => {
 		}))
 		.filter(({ p }) => p)
 		.forEach(({ pos, p }) => {
+			// TODO find the level.levers lever with the same color as p.
+			// if the lever is not on, set color to "none"
 			pl.setData(pos, getTileData(pipe("broken", p.dir, p.color) + frame));
 		});
 
