@@ -89,26 +89,50 @@ function gasTileAnimation() {
 }
 
 function pipeTileAnimation() {
-	const brokenDirections = ["up", "down", "right", "left"];
-	const colors = MASKS.slice(1);
+	const gasPipeTiles = {
+		red: {
+			horizontal: { up: 9, down: 10 },
+			vertical: { right: 28, left: 29 },
+		},
+		blue: {
+			horizontal: { up: 13, down: 14 },
+			vertical: { right: 32, left: 33 },
+		},
+		green: {
+			horizontal: { up: 17, down: 18 },
+			vertical: { right: 36, left: 37 },
+		},
+		yellow: {
+			horizontal: { up: 21, down: 22 },
+			vertical: { right: 34, left: 35 },
+		},
+	};
+
+	const getPipe = (tile) => {
+		for (const [color, dirs] of Object.entries(gasPipeTiles)) {
+			for (const [dir, dirData] of Object.entries(dirs)) {
+				for (const [leakDir, tileNum] of Object.entries(dirData)) {
+					if (tileNum === tile) {
+						return { color, dir: leakDir };
+					}
+				}
+			}
+		}
+		return null;
+	};
+
 	for (let y = 0; y < 32; y++) {
 		for (let x = 0; x < 32; x++) {
-			let pipeTile = level.pipeData[y][x];
-			if (!pipeTile) continue;
-
-			const brokenIndex = brokenDirections.findIndex(
-				(dir) => pipeTile === pipe("broken", dir, "red"),
-			);
-
-			const colorOffset = 0;
-			if (brokenIndex !== -1) {
-				pipeTile =
+			const pipeTile = level.pipeData[y][x];
+			const p = getPipe(pipeTile);
+			if (p) {
+				newPipeTile =
 					time % 2 > 1
-						? pipe("broken", brokenDirections[brokenIndex], "red")
-						: pipe("broken", brokenDirections[brokenIndex], "red") + 36;
-			}
+						? pipe("broken", p.dir, p.color)
+						: pipe("broken", p.dir, p.color) + 36;
 
-			pl.setData(vec2(x, y), getTileData(pipeTile));
+				pl.setData(vec2(x, y), getTileData(newPipeTile));
+			}
 		}
 		pl.redraw();
 	}
