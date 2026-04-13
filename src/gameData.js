@@ -1,11 +1,11 @@
 // biome-ignore format: sfx
 const sfx = {
-	walk: new Sound([2, , 459, 0.01, 0.01, 0.002, 3, 2, , , , , , , 15, 0.1, 0.22, 0.83, 0.01, ]),
-	lever: new Sound([ , , 191, 0.02, 0.01, 0.07, 3, 3.5, , , , , 0.5, , 0.4, , 0.86, 0.01, ]),
-	gas: new Sound([1.3,,98,.03,.15,.23,4,1.1,1.9,-4,,.01,-0.02,1.4,1,.4,.25,.41,.11,,1367]), // Explosion 61 - Mutation 5
-	victory: new Sound([,,595,.09,.11,.32,,2.7,,,-151,.12,,,,,,.53,.27]), // Powerup 67
-	mask: new Sound([1.1,,796,.02,.01,.04,2,1.6,27,-25,,,,,,.1,,.67]) // Blip 79
-}
+	walk: new Sound([2, , 459, 0.01, 0.01, 0.002, 3, 2, , , , , , , 15, 0.1, 0.22, 0.83, 0.01,]),
+	lever: new Sound([, , 191, 0.02, 0.01, 0.07, 3, 3.5, , , , , 0.5, , 0.4, , 0.86, 0.01, ]),
+	gas: new Sound([ 1.3, , 98, 0.03, 0.15, 0.23, 4, 1.1, 1.9, -4, , 0.01, -0.02, 1.4, 1, 0.4, 0.25, 0.41, 0.11, , 1367, ]), // Explosion 61 - Mutation 5
+	victory: new Sound([ , , 595, 0.09, 0.11, 0.32, , 2.7, , , -151, 0.12, , , , , , 0.53, 0.27, ]), // Powerup 67
+	mask: new Sound([ 1.1, , 796, 0.02, 0.01, 0.04, 2, 1.6, 27, -25, , , , , , 0.1, , 0.67,]), // Blip 79
+};
 
 const MASKS = ["none", "red", "blue", "green", "yellow"];
 const TILE_DATA_CACHE = {};
@@ -18,36 +18,40 @@ const getTileData = (tileIndex) => {
 
 const cloud = (color, corner1, corner2) => {
 	const g = (x, y, index) => ({
-		x: x,
-		y: y,
+		x,
+		y,
 		value: { color, tile: gas(color, index), animSpeed: 4, frames: 4 },
 	});
+
 	const corners = [
-		g(corner1.x, corner1.y, 0), // upper left
-		g(corner2.x, corner2.y, 8), // lower right
-		g(corner1.x, corner2.y, 6), // lower left
-		g(corner2.x, corner1.y, 2), // upper right
+		g(corner1.x, corner1.y, 0),
+		g(corner2.x, corner2.y, 8),
+		g(corner1.x, corner2.y, 6),
+		g(corner2.x, corner1.y, 2),
 	];
-	// top is index 1, left side is index 3, right side is index 5, bottom is index 7
-	const top = Array.from({ length: corner2.x - corner1.x - 1 }, (_, i) =>
+
+	const width = corner2.x - corner1.x - 1;
+	const height = corner1.y - corner2.y - 1;
+
+	const top = Array.from({ length: width }, (_, i) =>
 		g(corner1.x + 1 + i, corner1.y, 1),
 	);
-	const bottom = Array.from({ length: corner2.x - corner1.x - 1 }, (_, i) =>
+	const bottom = Array.from({ length: width }, (_, i) =>
 		g(corner1.x + 1 + i, corner2.y, 7),
 	);
-	const left = Array.from({ length: corner1.y - corner2.y - 1 }, (_, i) =>
+	const left = Array.from({ length: height }, (_, i) =>
 		g(corner1.x, corner2.y + 1 + i, 3),
 	);
-	const right = Array.from({ length: corner1.y - corner2.y - 1 }, (_, i) =>
+	const right = Array.from({ length: height }, (_, i) =>
 		g(corner2.x, corner2.y + 1 + i, 5),
 	);
-	const sides = [...top, ...left, ...right, ...bottom];
-	const center = Array.from({ length: corner1.y - corner2.y - 1 }, (_, y) =>
-		Array.from({ length: corner2.x - corner1.x - 1 }, (_, x) =>
+	const center = Array.from({ length: height }, (_, y) =>
+		Array.from({ length: width }, (_, x) =>
 			g(corner1.x + 1 + x, corner2.y + 1 + y, 4),
 		),
 	).flat();
-	return [...corners, ...sides, ...center];
+
+	return [...corners, ...top, ...left, ...right, ...bottom, ...center];
 };
 
 function pipeSection(x, y, length, direction = "horizontal") {
@@ -62,7 +66,7 @@ function pipeSection(x, y, length, direction = "horizontal") {
 			? PIPE_TILES.STRAIGHT_HORIZONTAL_BAND
 			: PIPE_TILES.STRAIGHT_VERTICAL_BAND;
 
-	let points = Array.from({ length }, (_, i) => {
+	return Array.from({ length }, (_, i) => {
 		const isBand = (i === 0 || i === length - 1) && length > 1;
 		const value = isBand ? bandValue : straightValue;
 		return {
@@ -71,9 +75,18 @@ function pipeSection(x, y, length, direction = "horizontal") {
 			value,
 		};
 	});
-
-	return points.map((p) => ({ x: p.x, y: p.y, value: p.value }));
 }
+
+const CORNER_LOOKUP = {
+	"h-right-down": PIPE_TILES.CORNER_BOTTOM_RIGHT,
+	"h-right-up": PIPE_TILES.CORNER_TOP_RIGHT,
+	"h-left-down": PIPE_TILES.CORNER_BOTTOM_LEFT,
+	"h-left-up": PIPE_TILES.CORNER_TOP_LEFT,
+	"v-down-right": PIPE_TILES.CORNER_TOP_LEFT,
+	"v-down-left": PIPE_TILES.CORNER_TOP_RIGHT,
+	"v-up-right": PIPE_TILES.CORNER_BOTTOM_LEFT,
+	"v-up-left": PIPE_TILES.CORNER_BOTTOM_RIGHT,
+};
 
 function pipeLine(coordinates) {
 	if (coordinates.length < 2) return [];
@@ -95,39 +108,25 @@ function pipeLine(coordinates) {
 		}
 	}
 
-	// Add corner pieces at coordinate junctions
 	for (let i = 1; i < coordinates.length - 1; i++) {
 		const prev = coordinates[i - 1];
 		const curr = coordinates[i];
 		const next = coordinates[i + 1];
 
-		let cornerTile = null;
+		let cornerKey = null;
 
-		// Horizontal to vertical turn
 		if (prev.y === curr.y && curr.x === next.x) {
-			if (prev.x < curr.x && next.y > curr.y)
-				cornerTile = PIPE_TILES.CORNER_BOTTOM_RIGHT;
-			else if (prev.x < curr.x && next.y < curr.y)
-				cornerTile = PIPE_TILES.CORNER_TOP_RIGHT;
-			else if (prev.x > curr.x && next.y > curr.y)
-				cornerTile = PIPE_TILES.CORNER_BOTTOM_LEFT;
-			else if (prev.x > curr.x && next.y < curr.y)
-				cornerTile = PIPE_TILES.CORNER_TOP_LEFT;
-		}
-		// Vertical to horizontal turn
-		else if (prev.x === curr.x && curr.y === next.y) {
-			if (prev.y < curr.y && next.x > curr.x)
-				cornerTile = PIPE_TILES.CORNER_TOP_LEFT;
-			else if (prev.y < curr.y && next.x < curr.x)
-				cornerTile = PIPE_TILES.CORNER_TOP_RIGHT;
-			else if (prev.y > curr.y && next.x > curr.x)
-				cornerTile = PIPE_TILES.CORNER_BOTTOM_LEFT;
-			else if (prev.y > curr.y && next.x < curr.x)
-				cornerTile = PIPE_TILES.CORNER_BOTTOM_RIGHT;
+			const hDir = prev.x < curr.x ? "right" : "left";
+			const vDir = next.y > curr.y ? "down" : "up";
+			cornerKey = `h-${hDir}-${vDir}`;
+		} else if (prev.x === curr.x && curr.y === next.y) {
+			const vDir = prev.y < curr.y ? "down" : "up";
+			const hDir = next.x > curr.x ? "right" : "left";
+			cornerKey = `v-${vDir}-${hDir}`;
 		}
 
-		if (cornerTile) {
-			pipeline.push({ x: curr.x, y: curr.y, value: cornerTile });
+		if (cornerKey) {
+			pipeline.push({ x: curr.x, y: curr.y, value: CORNER_LOOKUP[cornerKey] });
 		}
 	}
 

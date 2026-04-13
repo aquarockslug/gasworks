@@ -46,6 +46,8 @@ function createTileLayer(
 	return layer;
 }
 
+const GROUND_TILES_RANDOM = [ground(0), ground(1), ground(3), ground(4)];
+
 function groundLayer() {
 	const pos = vec2(-16);
 	const groundLayer = new TileCollisionLayer(pos, vec2(32));
@@ -53,10 +55,8 @@ function groundLayer() {
 
 	for (let y = 1; y < 31; y++) {
 		for (let x = 0; x < 32; x++) {
-			let t =
-				x % 4 || y % 5 || rand() < 0.5
-					? [ground(0), ground(1), ground(3), ground(4)][randInt(0, 3)]
-					: ground(2);
+			const isRandomTile = x % 4 || y % 5 || rand() < 0.5;
+			let t = isRandomTile ? GROUND_TILES_RANDOM[randInt(0, 3)] : ground(2);
 
 			if (x === 0) {
 				t = wall(13);
@@ -71,19 +71,24 @@ function groundLayer() {
 	}
 
 	for (let x = 1; x < 31; x++) {
+		const bottomWallIndex = rand() < 0.2 ? (rand() < 0.5 ? 8 : 10) : 9;
+
 		groundLayer.setCollisionData(vec2(x, 31));
-		groundLayer.setData(
-			vec2(x, 31),
-			getTileData(wall(rand() < 0.2 ? (rand() < 0.5 ? 8 : 10) : 9)),
-		);
+		groundLayer.setData(vec2(x, 31), getTileData(wall(bottomWallIndex)));
+
 		groundLayer.setCollisionData(vec2(x, 0));
 		groundLayer.setData(vec2(x, 0), getTileData(wall(3)));
 	}
 
-	groundLayer.setData(vec2(31, 31), getTileData(wall(11)));
-	groundLayer.setData(vec2(0, 31), getTileData(wall(7)));
-	groundLayer.setData(vec2(31, 0), getTileData(wall(4)));
-	groundLayer.setData(vec2(0, 0), getTileData(wall(2)));
+	const cornerWalls = [
+		[31, 31, 11],
+		[0, 31, 7],
+		[31, 0, 4],
+		[0, 0, 2],
+	];
+	for (const [x, y, idx] of cornerWalls) {
+		groundLayer.setData(vec2(x, y), getTileData(wall(idx)));
+	}
 
 	groundLayer.redraw();
 	return groundLayer;

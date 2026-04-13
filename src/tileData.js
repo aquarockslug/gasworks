@@ -157,45 +157,49 @@ const GAS_TILE_ARRAYS = {
 
 const gas = (color, index) => GAS_TILE_ARRAYS[color]?.[index];
 
-const ground = (index) =>
-	[
-		GROUND_TILES.GROUND_1,
-		GROUND_TILES.GROUND_2,
-		GROUND_TILES.GROUND_3,
-		GROUND_TILES.GROUND_4,
-	][index];
+const GROUND_TILE_ARRAY = [
+	GROUND_TILES.GROUND_1,
+	GROUND_TILES.GROUND_2,
+	GROUND_TILES.GROUND_3,
+	GROUND_TILES.GROUND_4,
+];
+const WALL_TILE_ARRAY = [
+	WALL_TILES.WALL_1,
+	WALL_TILES.WALL_2,
+	WALL_TILES.WALL_3,
+	WALL_TILES.WALL_4,
+	WALL_TILES.WALL_5,
+	WALL_TILES.WALL_6,
+	WALL_TILES.WALL_7,
+	WALL_TILES.WALL_8,
+	WALL_TILES.WALL_9,
+	WALL_TILES.WALL_10,
+	WALL_TILES.WALL_11,
+	WALL_TILES.WALL_12,
+	WALL_TILES.WALL_13,
+	WALL_TILES.WALL_14,
+	WALL_TILES.WALL_15,
+];
 
-const wall = (index) =>
-	[
-		WALL_TILES.WALL_1,
-		WALL_TILES.WALL_2,
-		WALL_TILES.WALL_3,
-		WALL_TILES.WALL_4,
-		WALL_TILES.WALL_5,
-		WALL_TILES.WALL_6,
-		WALL_TILES.WALL_7,
-		WALL_TILES.WALL_8,
-		WALL_TILES.WALL_9,
-		WALL_TILES.WALL_10,
-		WALL_TILES.WALL_11,
-		WALL_TILES.WALL_12,
-		WALL_TILES.WALL_13,
-		WALL_TILES.WALL_14,
-		WALL_TILES.WALL_15,
-	][index];
+const ground = (index) => GROUND_TILE_ARRAY[index];
+const wall = (index) => WALL_TILE_ARRAY[index];
 
 const pipe = (type, direction = null, gasColor = "red") => {
 	if (type === "straight") {
-		return gasColor !== "none"
-			? direction === "horizontal"
+		const isHorizontal = direction === "horizontal";
+		if (gasColor !== "none") {
+			return isHorizontal
 				? PIPE_TILES[`${gasColor.toUpperCase()}_GAS_HORIZONTAL_DOWN`]
-				: PIPE_TILES[`${gasColor.toUpperCase()}_GAS_VERTICAL_RIGHT`]
-			: direction === "horizontal"
-				? PIPE_TILES.STRAIGHT_HORIZONTAL
-				: direction === "vertical"
-					? PIPE_TILES.STRAIGHT_VERTICAL
-					: PIPE_TILES.STRAIGHT_HORIZONTAL;
-	} else if (type === "corner") {
+				: PIPE_TILES[`${gasColor.toUpperCase()}_GAS_VERTICAL_RIGHT`];
+		}
+		return isHorizontal
+			? PIPE_TILES.STRAIGHT_HORIZONTAL
+			: direction === "vertical"
+				? PIPE_TILES.STRAIGHT_VERTICAL
+				: PIPE_TILES.STRAIGHT_HORIZONTAL;
+	}
+
+	if (type === "corner") {
 		const corners = {
 			"top-left": PIPE_TILES.CORNER_TOP_LEFT,
 			"top-right": PIPE_TILES.CORNER_TOP_RIGHT,
@@ -203,7 +207,9 @@ const pipe = (type, direction = null, gasColor = "red") => {
 			"bottom-right": PIPE_TILES.CORNER_BOTTOM_RIGHT,
 		};
 		return corners[direction] ?? PIPE_TILES.CORNER_TOP_LEFT;
-	} else if (type === "broken" || type === "leaking") {
+	}
+
+	if (type === "broken" || type === "leaking") {
 		if (gasColor === "none") {
 			const brokenPipes = {
 				up: PIPE_TILES.BROKEN_HORIZONTAL_UP,
@@ -221,5 +227,7 @@ const pipe = (type, direction = null, gasColor = "red") => {
 			right: PIPE_TILES[`${colorKey}_GAS_VERTICAL_RIGHT`],
 		};
 		return gasPipes[direction] ?? PIPE_TILES[`${colorKey}_GAS_VERTICAL_RIGHT`];
-	} else return PIPE_TILES.STRAIGHT_HORIZONTAL;
+	}
+
+	return PIPE_TILES.STRAIGHT_HORIZONTAL;
 };

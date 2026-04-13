@@ -64,21 +64,23 @@ const pipeTileAnimation = () => {
 		createEmptyGrid(),
 	);
 
-	Array.from({ length: 32 }, (_, y) =>
+	const tiles = Array.from({ length: 32 }, (_, y) =>
 		Array.from({ length: 32 }, (_, x) => [x, y]),
-	)
-		.flat()
+	).flat();
+
+	const brokenPipes = tiles
 		.map(([x, y]) => ({
 			pos: vec2(x, y),
 			p: PIPE_BROKEN_LOOKUP[pipeGrid[y]?.[x]],
 		}))
-		.filter(({ p }) => p)
-		.forEach(({ pos, p }) => {
-			const lever = level.levers.find((l) => l.name === p.color);
-			const color = lever && lever.on ? p.color : "none";
-			const frame = color === "none" || (time | 0) % 2 === 0 ? 0 : 36;
-			pl.setData(pos, getTileData(pipe("broken", p.dir, color) + frame));
-		});
+		.filter(({ p }) => p);
+
+	for (const { pos, p } of brokenPipes) {
+		const lever = level.levers.find((l) => l.name === p.color);
+		const color = lever?.on ? p.color : "none";
+		const frame = color === "none" || (time | 0) % 2 === 0 ? 0 : 36;
+		pl.setData(pos, getTileData(pipe("broken", p.dir, color) + frame));
+	}
 
 	pl.redraw();
 };

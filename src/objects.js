@@ -71,27 +71,39 @@ class Player extends GameObject {
 		this.state = moveInput.length() > 0 ? this.walk : this.idle;
 		this.state();
 
+		const interactDistance = 1;
 		for (const lever of level.levers) {
-			if (keyWasPressed("Space") && this.pos.distance(lever.pos) < 1)
+			if (
+				keyWasPressed("Space") &&
+				this.pos.distance(lever.pos) < interactDistance
+			) {
 				lever.toggle();
+			}
 		}
 
-		if (keyWasPressed("Space") && this.pos.distance(level.exitPos) < 1)
+		if (
+			keyWasPressed("Space") &&
+			this.pos.distance(level.exitPos) < interactDistance
+		) {
 			sfx.victory.play();
+		}
 
 		if (keyWasPressed("Space")) {
 			const maskIndex = level.masks.findIndex(
-				(m) => this.pos.distance(m.pos) < 1,
+				(m) => this.pos.distance(m.pos) < interactDistance,
 			);
 			if (maskIndex !== -1) {
 				const mask = level.masks[maskIndex];
-				if (this.maskColor !== "none" && this.maskColor !== mask.name) {
+				const isCarryingMask = this.maskColor !== "none";
+				const isDifferentMask = this.maskColor !== mask.name;
+
+				if (isCarryingMask && isDifferentMask) {
 					level.masks.push(new Mask(this.pos.copy(), this.maskColor));
 				}
 				sfx.mask.play(this.pos, 0.33);
 				mask.destroy();
 				level.masks.splice(maskIndex, 1);
-				this.maskColor = this.maskColor === mask.name ? "none" : mask.name;
+				this.maskColor = isDifferentMask ? mask.name : "none";
 			}
 		}
 	}
@@ -101,35 +113,39 @@ class Player extends GameObject {
 		this.health = 100;
 		this.maskColor = "none";
 
-		// reset masks
-		level.masks.map((m) => m.destroy());
+		level.masks.forEach((m) => {
+			m.destroy();
+		});
 		level.masks = level.masksData.map((d) => new Mask(d.pos, d.value));
 
-		// reset levers
-		level.levers.map((l) => l.destroy());
+		level.levers.forEach((l) => {
+			l.destroy();
+		});
 		level.levers = level.leversData.map((d) => new Lever(d.pos, d.value));
 	}
 
 	updateGas() {
 		const currentTilePos = this.pos.floor().add(vec2(16));
-		let t = null;
-		let gasColor = "none";
+		let detectedGasColor = "none";
+
 		for (const color of MASKS.slice(1)) {
 			const gasTile = gls[color].getData(currentTilePos).tile;
 			if (gasTile) {
-				gasColor = color;
+				detectedGasColor = color;
 				break;
 			}
 		}
 
-		const newInGas = gasColor || "none";
-		if (this.inGas !== newInGas) this.inGas = newInGas;
+		if (this.inGas !== detectedGasColor) {
+			this.inGas = detectedGasColor;
+		}
 
-		// take damage
 		const leverOn = this.currentLever()?.on ?? false;
-		const wrongMask = this.inGas !== this.maskColor;
-		const shouldTakeDamage = wrongMask && leverOn;
-		const newHealth = clamp(this.health + (shouldTakeDamage ? -2 : 4), 0, 100);
+		const isWrongMask = this.inGas !== this.maskColor;
+		const shouldTakeDamage = isWrongMask && leverOn;
+		const healthDelta = shouldTakeDamage ? -2 : 4;
+		const newHealth = clamp(this.health + healthDelta, 0, 100);
+
 		if (newHealth !== this.health) {
 			this.health = newHealth;
 			if (newHealth === 0) this.die();
