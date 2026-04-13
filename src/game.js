@@ -5,6 +5,8 @@ function gameInit() {
 	objectDefaultDamping = 0.7;
 	setCanvasFixedSize(vec2(512, 512));
 	canvasClearColor = rgb().setHex("#a9b0ba");
+	touchGamepadEnable = true;
+	touchGamepadAnalog = false;
 
 	level = levels.find((level) => level.name === "level one");
 	if (!level) throw new Error("No level was loaded");

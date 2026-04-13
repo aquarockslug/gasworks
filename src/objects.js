@@ -63,7 +63,7 @@ class Player extends GameObject {
 		super.update();
 		this.updateGas();
 
-		const moveInput = keyDirection().clampLength(1);
+		const moveInput = keyDirection().add(gamepadDpad(0)).clampLength(1);
 		this.velocity = this.velocity.add(moveInput.scale(0.05));
 		this.mirror = this.velocity.x < 0;
 		cameraPos = this.pos.add(vec2(0, 2)).add(this.velocity.multiply(vec2(-1)));
