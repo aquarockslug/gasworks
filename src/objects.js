@@ -105,7 +105,9 @@ class Player extends GameObject {
 		level.masks.map((m) => m.destroy());
 		level.masks = level.masksData.map((d) => new Mask(d.pos, d.value));
 
-		// TODO reset switches
+		// reset levers
+		level.levers.map((l) => l.destroy());
+		level.levers = level.leversData.map((d) => new Lever(d.pos, d.value));
 	}
 
 	updateGas() {

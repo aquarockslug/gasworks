@@ -59,7 +59,6 @@ function gameUpdate() {
 }
 
 const pipeTileAnimation = () => {
-	const frame = (time | 0) % 2 === 0 ? 36 : 0;
 	const pipeGrid = level.pipes.reduce(
 		(acc, pipe) => addToGrid(acc, pipe.x + 16, pipe.y + 16, pipe.value, "pipe"),
 		createEmptyGrid(),
@@ -75,9 +74,10 @@ const pipeTileAnimation = () => {
 		}))
 		.filter(({ p }) => p)
 		.forEach(({ pos, p }) => {
-			// TODO find the level.levers lever with the same color as p.
-			// if the lever is not on, set color to "none"
-			pl.setData(pos, getTileData(pipe("broken", p.dir, p.color) + frame));
+			const lever = level.levers.find((l) => l.name === p.color);
+			const color = lever && lever.on ? p.color : "none";
+			const frame = color === "none" || (time | 0) % 2 === 0 ? 0 : 36;
+			pl.setData(pos, getTileData(pipe("broken", p.dir, color) + frame));
 		});
 
 	pl.redraw();
