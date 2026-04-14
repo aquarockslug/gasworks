@@ -1,16 +1,21 @@
 let player, level, pl, gls, grl;
 let debugMode = false;
 
-function gameInit() {
-	objectDefaultDamping = 0.7;
-	setCanvasFixedSize(vec2(512, 512));
-	canvasClearColor = rgb().setHex("#a9b0ba");
-	touchGamepadEnable = true;
-	touchGamepadAnalog = false;
-	touchGamepadButtonCount = 1;
+function loadLevel(levelName) {
+	if (level) {
+		level.exit?.destroy();
+		level.levers?.forEach((l) => l.destroy());
+		level.masks?.forEach((m) => m.destroy());
+		player?.destroy();
+		for (const color of MASKS.slice(1)) {
+			gls[color]?.destroy();
+		}
+		pl?.destroy();
+	}
 
-	level = levels.find((level) => level.name === "level two");
-	if (!level) throw new Error("No level was loaded");
+	const loadedLevel = levels.find((l) => l.name === levelName);
+	if (!loadedLevel) throw new Error(`Level "${levelName}" not found`);
+	level = { ...loadedLevel };
 
 	player = new Player(
 		level.startPos,
@@ -46,6 +51,19 @@ function gameInit() {
 
 	gls = gasLayers;
 	grl = groundLayer();
+
+	return level;
+}
+
+function gameInit() {
+	objectDefaultDamping = 0.7;
+	setCanvasFixedSize(vec2(512, 512));
+	canvasClearColor = rgb().setHex("#a9b0ba");
+	touchGamepadEnable = true;
+	touchGamepadAnalog = false;
+	touchGamepadButtonCount = 1;
+
+	loadLevel("level one");
 }
 
 function gameUpdate() {
@@ -53,9 +71,6 @@ function gameUpdate() {
 
 	pipeTileAnimation();
 	gasTileAnimation();
-
-	pl.pos = vec2(-16);
-	pl.redraw();
 
 	MASKS.slice(1).forEach((color) => {
 		const lever = level.levers.find((l) => l.name === color);
