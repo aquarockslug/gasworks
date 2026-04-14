@@ -9,7 +9,7 @@ function gameInit() {
 	touchGamepadAnalog = false;
 	touchGamepadButtonCount = 1;
 
-	level = levels.find((level) => level.name === "level one");
+	level = levels.find((level) => level.name === "level two");
 	if (!level) throw new Error("No level was loaded");
 
 	player = new Player(

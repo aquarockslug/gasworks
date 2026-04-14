@@ -58,4 +58,13 @@ const levels = [
 		startPos: vec2(3, -14),
 		exitPos: vec2(5, 14),
 	},
+	{
+		name: "level two",
+		pipes: [],
+		gases: [],
+		leversData: [],
+		masksData: [],
+		startPos: vec2(3, -14),
+		exitPos: vec2(5, 14),
+	},
 ];
