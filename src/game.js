@@ -62,11 +62,10 @@ function gameInit() {
 	touchGamepadEnable = true;
 	touchGamepadAnalog = false;
 	touchGamepadButtonCount = 1;
-
-	loadLevel("level one");
 }
 
 function gameUpdate() {
+	if (!level) return;
 	if (keyWasPressed("F1")) debugMode = !debugMode;
 
 	pipeTileAnimation();
@@ -81,6 +80,7 @@ function gameUpdate() {
 }
 
 const pipeTileAnimation = () => {
+	if (!level || !pl) return;
 	const pipeGrid = level.pipes.reduce(
 		(acc, pipe) => addToGrid(acc, pipe.x + 16, pipe.y + 16, pipe.value, "pipe"),
 		createEmptyGrid(),
@@ -108,6 +108,7 @@ const pipeTileAnimation = () => {
 };
 
 const gasTileAnimation = () => {
+	if (!level || !gls) return;
 	const frame = ((time * 6) | 0) % 4;
 	const gasFrame = frame === 3 ? 1 : frame;
 
@@ -130,6 +131,7 @@ const gasTileAnimation = () => {
 function gameRender() {}
 
 function postGameRender() {
+	if (!player) return;
 	const deathFade = 1 - player.health / 100;
 	if (deathFade > 0)
 		drawRect(vec2(), vec2(100), new Color(0, 0, 0, deathFade * 0.5));

@@ -107,6 +107,12 @@ class Player extends GameObject {
 			this.pos.distance(level.exitPos) < interactDistance
 		) {
 			sfx.victory.play();
+			emitParticle("victory", this.pos);
+			const currentIndex = levels.findIndex((l) => l.name === level.name);
+			const nextLevel = levels[currentIndex + 1];
+			if (nextLevel) {
+				loadLevel(nextLevel.name);
+			}
 		}
 
 		if (interactPressed()) {
@@ -192,7 +198,10 @@ class Player extends GameObject {
 
 	idle = () => this.setAnimation("idle");
 	walk = () => {
-		if ((time * 6) % 2 === 0) sfx.walk.play(this.pos, 0.1);
+		if ((time * 6) % 2 === 0) {
+			sfx.walk.play(this.pos, 0.1);
+			emitParticle("walk", this.pos);
+		}
 		this.setAnimation("walk");
 	};
 

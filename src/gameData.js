@@ -7,6 +7,92 @@ const sfx = {
 	mask: new Sound([ 1.1, , 796, 0.02, 0.01, 0.04, 2, 1.6, 27, -25, , , , , , 0.1, , 0.67,]), // Blip 79
 };
 
+const particleConfigs = {
+	walk: {
+		emitSize: 0.3,
+		emitRate: 30,
+		emitTime: 0.15,
+		emitConeAngle: PI * 2,
+		colorStartA: rgb(0.4, 0.35, 0.3, 0.5),
+		colorStartB: rgb(0.3, 0.25, 0.2, 0.3),
+		colorEndA: rgb(0, 0, 0, 0),
+		colorEndB: rgb(0, 0, 0, 0),
+		particleTime: 0.3,
+		sizeStart: 0.15,
+		sizeEnd: 0.05,
+		speed: 0.05,
+		angleSpeed: 0,
+		damping: 0.98,
+		angleDamping: 1,
+		gravityScale: 0,
+		particleConeAngle: PI,
+		fadeRate: 0.5,
+		randomness: 0.3,
+		collideTiles: false,
+		additive: false,
+		randomColorLinear: true,
+		renderOrder: -1,
+	},
+	victory: {
+		emitSize: 1,
+		emitRate: 200,
+		emitTime: 0.5,
+		emitConeAngle: PI * 2,
+		colorStartA: rgb(1, 1, 0.5, 1),
+		colorStartB: rgb(1, 0.5, 0, 0.8),
+		colorEndA: rgb(1, 0.2, 0, 0),
+		colorEndB: rgb(0.5, 0, 0, 0),
+		particleTime: 0.8,
+		sizeStart: 0.4,
+		sizeEnd: 0.1,
+		speed: 0.5,
+		angleSpeed: 0.1,
+		damping: 0.96,
+		angleDamping: 1,
+		gravityScale: -0.5,
+		particleConeAngle: PI * 2,
+		fadeRate: 0.2,
+		randomness: 0.15,
+		collideTiles: false,
+		additive: true,
+		randomColorLinear: true,
+		renderOrder: 2,
+	},
+};
+
+function emitParticle(type, pos) {
+	const p = particleConfigs[type];
+	if (!p) return;
+	new ParticleEmitter(
+		pos,
+		0,
+		p.emitSize,
+		p.emitTime,
+		p.emitRate,
+		p.emitConeAngle,
+		undefined,
+		p.colorStartA.copy(),
+		p.colorStartB.copy(),
+		p.colorEndA.copy(),
+		p.colorEndB.copy(),
+		p.particleTime,
+		p.sizeStart,
+		p.sizeEnd,
+		p.speed,
+		p.angleSpeed,
+		p.damping,
+		p.angleDamping,
+		p.gravityScale,
+		p.particleConeAngle,
+		p.fadeRate,
+		p.randomness,
+		p.collideTiles,
+		p.additive,
+		p.randomColorLinear,
+		p.renderOrder,
+	);
+}
+
 const MASKS = ["none", "red", "blue", "green", "yellow"];
 const TILE_DATA_CACHE = {};
 
