@@ -39,6 +39,10 @@ function showMenu() {
         btn.onclick = () => startGame(index);
         container.appendChild(btn);
     });
+
+    if (isTouchDevice) {
+        window.mobileStart = true;
+    }
 })();
 </script>
 </body>

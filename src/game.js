@@ -62,16 +62,21 @@ function gameInit() {
 	touchGamepadEnable = true;
 	touchGamepadAnalog = false;
 	touchGamepadButtonCount = 1;
+
+	if (window.mobileStart) {
+		startGame(0);
+	}
 }
 
 function gameUpdate() {
-	if (!level) return;
+	if (!level || !level.levers) return;
 	if (keyWasPressed("F1")) debugMode = !debugMode;
 
 	pipeTileAnimation();
 	gasTileAnimation();
 
 	MASKS.slice(1).forEach((color) => {
+		if (!level.levers) return;
 		const lever = level.levers.find((l) => l.name === color);
 		const isOn = lever?.on ?? false;
 		gls[color].pos = vec2(-16).add(isOn ? vec2(0) : vec2(1000));
