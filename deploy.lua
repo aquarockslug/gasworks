@@ -15,7 +15,6 @@ build({
 	"./assets/tiles.png",
 	"./assets/gorm.png",
 	"./src/game.js",
-	"./src/grid.js",
 	"./src/objects.js",
 	"./src/gameData.js",
 	"./src/levels.js",

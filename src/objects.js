@@ -19,12 +19,31 @@ class Lever extends GameObject {
 		this.on = on;
 		this.name = name;
 		this.color = color;
+		this.shakeTimer = new Timer();
 	}
 	toggle() {
 		this.on = !this.on;
 		this.tileInfo = tile(vec2(9, 10), vec2(16)).frame(this.on ? this.color : 0);
 		sfx.lever.play(this.pos, 0.66);
-		setTimeout(() => sfx.gas.play(this.pos, this.on ? 0.33 : 0.1), 100);
+		this.shakeTimer.set(0.3);
+		setTimeout(() => sfx.gas.play(this.pos, this.on ? 0.5 : 0.25), 100);
+	}
+	update() {
+		super.update();
+		if (this.shakeTimer.active()) {
+			pl.pos = vec2(-16).add(
+				vec2(
+					oscillate(20, lerp(0.25, 0, this.shakeTimer.getPercent())),
+					oscillate(
+						20,
+						lerp(0.25, 0, this.shakeTimer.getPercent()),
+						this.shakeTimer.getPercent() + 0.25,
+					),
+				),
+			);
+		} else {
+			pl.pos = vec2(-16);
+		}
 	}
 }
 

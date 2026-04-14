@@ -1,4 +1,4 @@
-let player, pl, gls, grl, level;
+let player, level, pl, gls, grl;
 let debugMode = false;
 
 function gameInit() {
@@ -21,6 +21,7 @@ function gameInit() {
 	level.exit = new Exit(level.exitPos);
 	level.levers = level.leversData.map((d) => new Lever(d.pos, d.value));
 	level.masks = level.masksData.map((d) => new Mask(d.pos, d.value));
+
 	gasLayers = MASKS.slice(1);
 	for (const color of gasLayers) {
 		const data = level.gases
@@ -52,6 +53,9 @@ function gameUpdate() {
 
 	pipeTileAnimation();
 	gasTileAnimation();
+
+	pl.pos = vec2(-16);
+	pl.redraw();
 
 	MASKS.slice(1).forEach((color) => {
 		const lever = level.levers.find((l) => l.name === color);
