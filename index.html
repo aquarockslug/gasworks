@@ -4,32 +4,42 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <link rel="stylesheet" href="./lib/tiny-brutalism.css">
-<style>
-* { touch-action: none; }
-body { margin: 0; overflow: hidden; background: #a9b0ba; }
-#menu { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; background: #a9b0ba; z-index: 100; }
-#menu.hidden { display: none; }
-h1 { font-size: 2rem; text-transform: uppercase; letter-spacing: 0.1em; }
-.btn { font-size: 1.2rem; padding: 0.5rem 1rem; }
-</style>
+<link rel="stylesheet" href="./src/style.css">
 </head>
 <body>
 <div id="menu">
-<h1>Gas Game</h1>
-<button class="btn" onclick="startGame('level one')">Level One</button>
-<button class="btn" onclick="startGame('level two')">Level Two</button>
+<h1>Gasworks</h1>
+<div id="level-buttons"></div>
 </div>
-<script>
-function startGame(levelName) {
-    document.getElementById('menu').classList.add('hidden');
-    loadLevel(levelName);
-}
-</script>
+<button id="menu-btn" class="btn hidden" onclick="showMenu()">Menu</button>
 <script src="./lib/littlejs.js"></script>
 <script src="./src/tileData.js"></script>
 <script src="./src/gameData.js"></script>
 <script src="./src/objects.js"></script>
 <script src="./src/levels.js"></script>
 <script src="./src/game.js"></script>
+<script>
+function startGame(levelIndex) {
+    document.getElementById('menu').classList.add('hidden');
+    document.getElementById('menu-btn').classList.remove('hidden');
+    loadLevel(levels[levelIndex].name);
+}
+
+function showMenu() {
+    document.getElementById('menu').classList.remove('hidden');
+    document.getElementById('menu-btn').classList.add('hidden');
+}
+
+(function generateLevelButtons() {
+    const container = document.getElementById('level-buttons');
+    levels.forEach((level, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn';
+        btn.innerHTML = `${index + 1}<br>${level.name}`;
+        btn.onclick = () => startGame(index);
+        container.appendChild(btn);
+    });
+})();
+</script>
 </body>
 </html>

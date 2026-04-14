@@ -1,6 +1,6 @@
 const levels = [
 	{
-		name: "level one",
+		name: "first level",
 		pipes: [
 			...pipeLine([
 				vec2(-3, -16),
@@ -59,12 +59,32 @@ const levels = [
 		exitPos: vec2(5, 14),
 	},
 	{
-		name: "level two",
+		name: "interact test",
 		pipes: [],
 		gases: [],
-		leversData: [],
+		leversData: [
+			{ value: "red", pos: vec2(-3, 0) },
+			{ value: "blue", pos: vec2(0, 0) },
+			{ value: "yellow", pos: vec2(3, 0) },
+		],
+		masksData: [
+			{ value: "red", pos: vec2(-3, 3) },
+			{ value: "blue", pos: vec2(0, 3) },
+			{ value: "yellow", pos: vec2(3, 3) },
+		],
+		startPos: vec2(0, -5),
+		exitPos: vec2(0, 5),
+	},
+	{
+		name: "lever test",
+		pipes: [
+			...pipeLine([vec2(-5, 0), vec2(5, 0)]),
+			{ x: 0, y: 0, value: pipe("leaking", "up", "red") },
+		],
+		gases: [...cloud("red", vec2(-2, 3), vec2(2, 1))],
+		leversData: [{ value: "red", pos: vec2(0, -1) }],
 		masksData: [],
-		startPos: vec2(3, -14),
-		exitPos: vec2(5, 14),
+		startPos: vec2(-6, 0),
+		exitPos: vec2(6, 0),
 	},
 ];
