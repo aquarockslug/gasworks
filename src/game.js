@@ -63,6 +63,8 @@ function gameInit() {
 	touchGamepadAnalog = false;
 	touchGamepadButtonCount = 1;
 
+	// new PostProcessPlugin(tvShader);
+
 	if (window.mobileStart) {
 		startGame(0);
 	}
