@@ -63,10 +63,12 @@ function gameInit() {
 	touchGamepadAnalog = false;
 	touchGamepadButtonCount = 1;
 
-	loadLevel("level one");
+	createMainMenu();
 }
 
 function gameUpdate() {
+	if (gameState !== 'playing') return;
+
 	if (keyWasPressed("F1")) debugMode = !debugMode;
 
 	pipeTileAnimation();
@@ -130,6 +132,7 @@ const gasTileAnimation = () => {
 function gameRender() {}
 
 function postGameRender() {
+	if (!player) return;
 	const deathFade = 1 - player.health / 100;
 	if (deathFade > 0)
 		drawRect(vec2(), vec2(100), new Color(0, 0, 0, deathFade * 0.5));
