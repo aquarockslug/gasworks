@@ -64,7 +64,7 @@ const levels = [
 		gases: [],
 		leversData: [],
 		masksData: [],
-		startPos: vec2(3, -14),
-		exitPos: vec2(5, 14),
+		startPos: vec2(0, -4),
+		exitPos: vec2(3, 3),
 	},
 ];

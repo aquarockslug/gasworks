@@ -11,10 +11,12 @@ end
 
 build({
 	"./index.html",
+	"./baskarstc.otf",
 	"./assets/masks.png",
 	"./assets/tiles.png",
 	"./assets/gorm.png",
 	"./src/game.js",
+	"./src/menu.js",
 	"./src/objects.js",
 	"./src/gameData.js",
 	"./src/levels.js",

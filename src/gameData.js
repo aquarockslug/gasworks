@@ -1,3 +1,15 @@
+const hex = (s) => new Color().setHex(`#${s}`);
+const color = {
+	bg: hex("101010"),
+	fg: hex("E0E0E0"),
+	blue: hex("6F8FB0"),
+	green: hex("8FD8A3"),
+	red: hex("E05A47"),
+	yellow: hex("D98C3A"),
+	grey: hex("A9B0BA"),
+	light_grey: hex("BBC3CA")
+};
+
 // biome-ignore format: sfx
 const sfx = {
 	walk: new Sound([2, , 459, 0.01, 0.01, 0.002, 3, 2, , , , , , , 15, 0.1, 0.22, 0.83, 0.01,]),
@@ -184,11 +196,11 @@ function pipeLine(coordinates) {
 		const end = coordinates[i + 1];
 
 		if (start.x === end.x) {
-			const length = Math.abs(end.y - start.y);
+			const length = Math.abs(end.y - start.y) + 1;
 			const startY = Math.min(start.y, end.y);
 			pipeline.push(pipeSection(start.x, startY, length, "vertical"));
 		} else if (start.y === end.y) {
-			const length = Math.abs(end.x - start.x);
+			const length = Math.abs(end.x - start.x) + 1;
 			const startX = Math.min(start.x, end.x);
 			pipeline.push(pipeSection(startX, start.y, length, "horizontal"));
 		}

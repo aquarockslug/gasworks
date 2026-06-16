@@ -62,6 +62,7 @@ function gameInit() {
 	touchGamepadEnable = true;
 	touchGamepadAnalog = false;
 	touchGamepadButtonCount = 1;
+	setFontDefault("Baskar Stc");
 
 	createMainMenu();
 }
