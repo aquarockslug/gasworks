@@ -71,11 +71,10 @@ const levels = [
 		name: "long hall",
 		unfinished: true,
 		pipes: [
-			...pipeLine([vec2(-15, -10), vec2(14, -10)]),
+			...pipeLine([vec2(-15, -10), vec2(4, -10), vec2(4, 8)]),
 			...pipeLine([vec2(-15, -4), vec2(14, -4)]),
 			...pipeLine([vec2(-15, 2), vec2(14, 2)]),
 			...pipeLine([vec2(-15, 8), vec2(14, 8)]),
-			...pipeLine([vec2(4, 2), vec2(4, 8)]),
 		],
 		gases: [...cloud("red", vec2(-4, 7), vec2(2, 3))],
 		leversData: [{ value: "red", pos: vec2(-0.5, 5.5) }],

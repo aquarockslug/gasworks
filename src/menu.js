@@ -147,7 +147,7 @@ function createLevelSelect() {
 		const x = startX + col * (buttonWidth + gapX);
 		const y = startY + row * (buttonHeight + gapY);
 
-		if (!level.unfinished) {
+		if (!level.unfinished || debugMode) {
 			const displayName =
 				level.name.charAt(0).toUpperCase() + level.name.slice(1);
 			const btn = makeButton(
