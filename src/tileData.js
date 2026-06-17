@@ -240,9 +240,10 @@ function createEmptyGrid(width = 32, height = 32) {
 
 function addToGrid(gridData, x, y, value, gridName = "grid") {
 	if (x < 0 || x >= gridData[0].length || y < 0 || y >= gridData.length) {
-		console.warn(
-			`Invalid ${gridName} position: (${x}, ${y}). Must be within bounds.`,
-		);
+		if (debugMode)
+			console.warn(
+				`Invalid ${gridName} position: (${x}, ${y}). Must be within bounds.`,
+			);
 		return gridData;
 	}
 

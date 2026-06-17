@@ -1,4 +1,5 @@
-const interactPressed = () => keyWasPressed("Space") || gamepadWasPressed(0);
+const interactPressed = () =>
+	keyWasPressed("Space") || keyWasPressed("Enter") || gamepadWasPressed(0);
 
 class GameObject extends EngineObject {
 	update() {
@@ -58,12 +59,17 @@ class Mask extends GameObject {
 		super(pos, vec2(0.5), tile(vec2(10, 10), vec2(16), 0));
 		this.name = name;
 		this.color = MASKS.indexOf(name);
+		this.shine = { delay: 24, frames: 4, speed: 12 };
 	}
 	update() {
 		super.update();
-		let step = ((time * 6) % 8) | 0;
+		let step =
+			(((time * this.shine.speed) % this.shine.delay) + this.shine.frames) | 0;
 		this.tileInfo = tile(
-			vec2(this.color - 1, step < 4 ? 0 : step - 4),
+			vec2(
+				this.color - 1,
+				step < this.shine.delay ? 0 : step - this.shine.delay,
+			),
 			vec2(8, 10),
 			2,
 		);
@@ -77,6 +83,7 @@ class Player extends GameObject {
 		this.maskColor = MASKS[0];
 		this.inGas = "none";
 		this.health = 100;
+		this.hurtTimer = new Timer();
 		this.setCollision();
 	}
 
@@ -107,6 +114,7 @@ class Player extends GameObject {
 			this.pos.distance(level.exitPos) < interactDistance
 		) {
 			sfx.victory.play();
+			setTimeout(returnToLevelSelect, 1200);
 		}
 
 		if (interactPressed()) {
@@ -169,6 +177,10 @@ class Player extends GameObject {
 
 		if (newHealth !== this.health) {
 			this.health = newHealth;
+			if (shouldTakeDamage && !this.hurtTimer.active()) {
+				sfx.hurt.play(this.pos, 0.5);
+				this.hurtTimer.set(0.3);
+			}
 			if (newHealth === 0) this.die();
 		}
 	}

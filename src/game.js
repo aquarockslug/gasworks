@@ -4,8 +4,8 @@ let debugMode = false;
 function loadLevel(levelName) {
 	if (level) {
 		level.exit?.destroy();
-		level.levers?.forEach((l) => l.destroy());
-		level.masks?.forEach((m) => m.destroy());
+		for (const l of level.levers ?? []) l.destroy();
+		for (const m of level.masks ?? []) m.destroy();
 		player?.destroy();
 		for (const color of MASKS.slice(1)) {
 			gls[color]?.destroy();
@@ -14,7 +14,7 @@ function loadLevel(levelName) {
 	}
 
 	const loadedLevel = levels.find((l) => l.name === levelName);
-	if (!loadedLevel) throw new Error(`Level "${levelName}" not found`);
+	if (!loadedLevel || debugMode) console.warn(`Level "${levelName}" not found`);
 	level = { ...loadedLevel };
 
 	player = new Player(
@@ -58,7 +58,7 @@ function loadLevel(levelName) {
 function gameInit() {
 	objectDefaultDamping = 0.7;
 	setCanvasFixedSize(vec2(512, 512));
-	canvasClearColor = rgb().setHex("#a9b0ba");
+	canvasClearColor = color.grey;
 	touchGamepadEnable = true;
 	touchGamepadAnalog = false;
 	touchGamepadButtonCount = 1;
@@ -68,9 +68,14 @@ function gameInit() {
 }
 
 function gameUpdate() {
-	if (gameState !== 'playing') return;
-
 	if (keyWasPressed("F1")) debugMode = !debugMode;
+	if (keyWasPressed("Escape")) {
+		returnToLevelSelect();
+		return;
+	}
+	if (gameState !== "playing") return;
+
+	cameraScale = debugMode ? 12 : 32
 
 	pipeTileAnimation();
 	gasTileAnimation();
@@ -133,6 +138,7 @@ const gasTileAnimation = () => {
 function gameRender() {}
 
 function postGameRender() {
+	drawRect(vec2(0, -15.7), vec2(32, 1), color.grey); // hide pipelayer behind wall
 	if (!player) return;
 	const deathFade = 1 - player.health / 100;
 	if (deathFade > 0)
@@ -184,4 +190,5 @@ engineInit(gameInit, gameUpdate, null, gameRender, postGameRender, [
 	"assets/tiles.png",
 	"assets/gorm.png",
 	"assets/masks.png",
+	"assets/concrete.jpg",
 ]);

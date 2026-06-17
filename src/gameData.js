@@ -7,7 +7,7 @@ const color = {
 	red: hex("E05A47"),
 	yellow: hex("D98C3A"),
 	grey: hex("A9B0BA"),
-	light_grey: hex("BBC3CA")
+	light_grey: hex("BBC3CA"),
 };
 
 // biome-ignore format: sfx
@@ -17,6 +17,8 @@ const sfx = {
 	gas: new Sound([ 1.3, , 98, 0.03, 0.15, 0.23, 4, 1.1, 1.9, -4, , 0.01, -0.02, 1.4, 1, 0.4, 0.25, 0.41, 0.11, , 1367, ]), // Explosion 61 - Mutation 5
 	victory: new Sound([ , , 595, 0.09, 0.11, 0.32, , 2.7, , , -151, 0.12, , , , , , 0.53, 0.27, ]), // Powerup 67
 	mask: new Sound([ 1.1, , 796, 0.02, 0.01, 0.04, 2, 1.6, 27, -25, , , , , , 0.1, , 0.67,]), // Blip 79
+	click: new Sound([ , , 800, 0.01, 0.02, 0.04, 2, 2, , , , , , , , , 0.5, 0.01, ]),
+	hurt: new Sound([ , , 160, 0.05, 0.05, 0.15, 2, 1.5, , , , , , , , , 0.5, 0.5, ]),
 };
 
 const particleConfigs = {
@@ -229,6 +231,69 @@ function pipeLine(coordinates) {
 	}
 
 	return pipeline.flat();
+}
+
+function generateMaze({
+	cols = 8,
+	rows = 8,
+	cellSize = 3,
+	offsetX = -15,
+	offsetY = -15,
+	loops = 0,
+} = {}) {
+	const visited = Array.from({ length: rows }, () => Array(cols).fill(false));
+	const tiles = [];
+
+	const shuffle = (arr) => {
+		for (let i = arr.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[arr[i], arr[j]] = [arr[j], arr[i]];
+		}
+		return arr;
+	};
+
+	// Connect two adjacent cells with a pipe segment
+	const connect = (c1, r1, c2, r2) => {
+		const x1 = offsetX + c1 * cellSize;
+		const y1 = offsetY + r1 * cellSize;
+		const x2 = offsetX + c2 * cellSize;
+		const y2 = offsetY + r2 * cellSize;
+		tiles.push(...pipeLine([vec2(x1, y1), vec2(x2, y2)]));
+	};
+
+	const dfs = (col, row) => {
+		visited[row][col] = true;
+		const dirs = shuffle([
+			[1, 0],
+			[-1, 0],
+			[0, 1],
+			[0, -1],
+		]);
+
+		for (const [dc, dr] of dirs) {
+			const nc = col + dc;
+			const nr = row + dr;
+			if (nc >= 0 && nc < cols && nr >= 0 && nr < rows && !visited[nr][nc]) {
+				connect(col, row, nc, nr);
+				dfs(nc, nr);
+			}
+		}
+	};
+
+	dfs(0, 0);
+
+	// Add random connections to create loops (bypasses in the maze)
+	for (let i = 0; i < loops; i++) {
+		const col = Math.floor(Math.random() * (cols - 1));
+		const row = Math.floor(Math.random() * (rows - 1));
+		if (Math.random() < 0.5) {
+			connect(col, row, col + 1, row);
+		} else {
+			connect(col, row, col, row + 1);
+		}
+	}
+
+	return tiles;
 }
 
 const tvShader = `

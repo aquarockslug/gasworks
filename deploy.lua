@@ -15,6 +15,7 @@ build({
 	"./assets/masks.png",
 	"./assets/tiles.png",
 	"./assets/gorm.png",
+	"./assets/concrete.jpg",
 	"./src/game.js",
 	"./src/menu.js",
 	"./src/objects.js",
