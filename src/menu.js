@@ -147,25 +147,25 @@ function createLevelSelect() {
 		const x = startX + col * (buttonWidth + gapX);
 		const y = startY + row * (buttonHeight + gapY);
 
-		if (!level.unfinished || debugMode) {
-			const displayName =
-				level.name.charAt(0).toUpperCase() + level.name.slice(1);
-			const btn = makeButton(
-				vec2(x, y),
-				vec2(buttonWidth, buttonHeight),
-				displayName,
-				color.red.scale(0.9),
-				color.red,
-				() => {
-					setTimeout(() => {
-						uiSystem.destroyObjects();
-						gameState = "playing";
-						loadLevel(level.name);
-					});
-				},
-			);
-			btn.textHeight = 16;
-		}
+		// if (!level.unfinished || debugMode) {
+		const displayName =
+			level.name.charAt(0).toUpperCase() + level.name.slice(1);
+		const btn = makeButton(
+			vec2(x, y),
+			vec2(buttonWidth, buttonHeight),
+			displayName,
+			color.red.scale(0.9),
+			color.red,
+			() => {
+				setTimeout(() => {
+					uiSystem.destroyObjects();
+					gameState = "playing";
+					loadLevel(level.name);
+				});
+			},
+		);
+		btn.textHeight = 16;
+		// }
 	});
 }
 
