@@ -1,6 +1,7 @@
 const levels = [
 	{
 		name: "Scramble",
+		unfinished: false,
 		pipes: [
 			...pipeLine([
 				vec2(-3, -16),
@@ -68,6 +69,7 @@ const levels = [
 	},
 	{
 		name: "long hall",
+		unfinished: true,
 		pipes: [
 			...pipeLine([vec2(-15, -10), vec2(14, -10)]),
 			...pipeLine([vec2(-15, -4), vec2(14, -4)]),
@@ -83,6 +85,7 @@ const levels = [
 	},
 	{
 		name: "the column",
+		unfinished: true,
 		pipes: [
 			...pipeLine([vec2(-10, -15), vec2(-10, 14)]),
 			...pipeLine([vec2(-2, -15), vec2(-2, 14)]),
@@ -99,6 +102,7 @@ const levels = [
 	},
 	{
 		name: "the cross",
+		unfinished: true,
 		pipes: [
 			...pipeLine([vec2(-15, -5), vec2(14, -5)]),
 			...pipeLine([vec2(-15, 5), vec2(14, 5)]),
@@ -114,6 +118,7 @@ const levels = [
 	},
 	{
 		name: "zigzag",
+		unfinished: true,
 		pipes: [
 			...pipeLine([
 				vec2(-15, -12),
@@ -136,6 +141,7 @@ const levels = [
 	},
 	{
 		name: "the frame",
+		unfinished: true,
 		pipes: [
 			...pipeLine([
 				vec2(-15, -14),
@@ -156,6 +162,7 @@ const levels = [
 	},
 	{
 		name: "ladders",
+		unfinished: true,
 		pipes: [
 			...pipeLine([vec2(-12, -15), vec2(-12, 14)]),
 			...pipeLine([vec2(-4, -15), vec2(-4, 14)]),
@@ -173,6 +180,7 @@ const levels = [
 	},
 	{
 		name: "meander",
+		unfinished: true,
 		pipes: [
 			...pipeLine([
 				vec2(-15, -12),
@@ -194,6 +202,7 @@ const levels = [
 	},
 	{
 		name: "branches",
+		unfinished: true,
 		pipes: [
 			...pipeLine([vec2(2, -15), vec2(2, 14)]),
 			...pipeLine([vec2(-15, -8), vec2(2, -8)]),
@@ -209,6 +218,7 @@ const levels = [
 	},
 	{
 		name: "switchback",
+		unfinished: true,
 		pipes: [
 			...pipeLine([
 				vec2(-15, -12),
@@ -232,6 +242,7 @@ const levels = [
 	},
 	{
 		name: "grid",
+		unfinished: true,
 		pipes: [
 			...pipeLine([vec2(-15, -10), vec2(14, -10)]),
 			...pipeLine([vec2(-15, 0), vec2(14, 0)]),
@@ -248,6 +259,7 @@ const levels = [
 	},
 	{
 		name: "the slide",
+		unfinished: true,
 		pipes: [
 			...pipeLine([
 				vec2(-15, -14),
@@ -270,6 +282,7 @@ const levels = [
 	},
 	{
 		name: "spokes",
+		unfinished: true,
 		pipes: [
 			...pipeLine([vec2(-15, -2), vec2(14, -2)]),
 			...pipeLine([vec2(-15, 6), vec2(14, 6)]),
