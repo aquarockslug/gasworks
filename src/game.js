@@ -52,6 +52,8 @@ function loadLevel(levelName) {
 	gls = gasLayers;
 	grl = groundLayer();
 
+	createPauseButton();
+
 	return level;
 }
 
@@ -69,20 +71,31 @@ function gameInit() {
 
 function gameUpdate() {
 	if (keyWasPressed("F1")) debugMode = !debugMode;
+
 	if (keyWasPressed("Escape")) {
-		returnToLevelSelect();
-		return;
+		if (gameState === "playing") {
+			pauseGame();
+			return;
+		}
+		if (gameState === "paused") {
+			uiSystem.destroyObjects();
+			createPauseButton();
+			gameState = "playing";
+			return;
+		}
 	}
+
 	if (gameState !== "playing") return;
 
-	cameraScale = debugMode ? 12 : 32
+	cameraScale = debugMode ? 12 : 32;
+	debugOverlay = false;
 
 	pipeTileAnimation();
 	gasTileAnimation();
 
 	MASKS.slice(1).forEach((color) => {
 		const lever = level.levers.find((l) => l.name === color);
-		const isOn = lever?.on ?? false;
+		const isOn = lever?.on ?? true;
 		gls[color].pos = vec2(-16).add(isOn ? vec2(0) : vec2(1000));
 		gls[color].redraw();
 	});
@@ -107,7 +120,7 @@ const pipeTileAnimation = () => {
 
 	for (const { pos, p } of brokenPipes) {
 		const lever = level.levers.find((l) => l.name === p.color);
-		const color = lever?.on ? p.color : "none";
+		const color = (lever?.on ?? true) ? p.color : "none";
 		const frame = color === "none" || (time | 0) % 2 === 0 ? 0 : 36;
 		pl.setData(pos, getTileData(pipe("broken", p.dir, color) + frame));
 	}
@@ -184,6 +197,89 @@ function postGameRender() {
 		16,
 		new Color(0, 0, 0, 1),
 	);
+}
+
+function pauseGame() {
+	gameState = "paused";
+	uiSystem.destroyObjects();
+	createPauseMenu();
+}
+
+function createPauseButton() {
+	const btn = makeButton(
+		vec2(-225, 225),
+		vec2(55, 30),
+		"MENU",
+		new Color(0, 0, 0, 0.5),
+		new Color(0, 0, 0, 0.8),
+		pauseGame,
+	);
+	btn.textHeight = 14;
+}
+
+function createPauseMenu() {
+	const bg = new UIObject(vec2(), vec2());
+	bg.color = new Color(0, 0, 0, 0.7);
+	bg.gradientColor = undefined;
+	bg.lineWidth = 0;
+	bg.shadowColor = new Color(0, 0, 0, 0);
+	bg.canBeHover = false;
+	bg.isMouseOverlapping = () => true;
+	bg.onRender = function () {
+		const c = uiSystem.screenToNative(mainCanvasSize.scale(0.5));
+		uiSystem.drawRect(c, vec2(512, 512), this.color, 0, BLACK, 0);
+	};
+
+	makeText(vec2(0, -100), vec2(400, 80), "PAUSED", color.red, 80);
+
+	const resumeBtn = makeButton(
+		vec2(0, 0),
+		vec2(300, 60),
+		"RESUME",
+		CLEAR_BLACK,
+		CLEAR_BLACK,
+		() => {
+			setTimeout(() => {
+				uiSystem.destroyObjects();
+				createPauseButton();
+				gameState = "playing";
+			});
+		},
+	);
+	resumeBtn.textColor = color.red;
+	resumeBtn.lineColor = color.red;
+	resumeBtn.onEnter = function () {
+		this.textColor = BLACK;
+		this.lineColor = BLACK;
+	};
+	resumeBtn.onLeave = function () {
+		this.textColor = color.red;
+		this.lineColor = color.red;
+	};
+
+	const quitBtn = makeButton(
+		vec2(0, 80),
+		vec2(300, 60),
+		"QUIT",
+		CLEAR_BLACK,
+		CLEAR_BLACK,
+		() => {
+			setTimeout(() => {
+				uiSystem.destroyObjects();
+				returnToLevelSelect();
+			});
+		},
+	);
+	quitBtn.textColor = color.red;
+	quitBtn.lineColor = color.red;
+	quitBtn.onEnter = function () {
+		this.textColor = BLACK;
+		this.lineColor = BLACK;
+	};
+	quitBtn.onLeave = function () {
+		this.textColor = color.red;
+		this.lineColor = color.red;
+	};
 }
 
 engineInit(gameInit, gameUpdate, null, gameRender, postGameRender, [

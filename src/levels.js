@@ -1,6 +1,6 @@
 const levels = [
 	{
-		name: "level one",
+		name: "Scramble",
 		pipes: [
 			...pipeLine([
 				vec2(-3, -16),
@@ -57,7 +57,6 @@ const levels = [
 		leversData: [
 			{ value: "red", pos: vec2(13.5, -10) },
 			{ value: "blue", pos: vec2(13, 13) },
-			{ value: "yellow" },
 		],
 		masksData: [
 			{ value: "red", pos: vec2(-9, -9) },
