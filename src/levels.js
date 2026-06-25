@@ -68,29 +68,46 @@ const levels = [
 		exitPos: vec2(5, 14),
 	},
 	{
-		name: "long hall",
+		name: "long hallways",
 		unfinished: true,
 		pipes: [
-			...pipeLine([vec2(-15, -10), vec2(4, -10), vec2(4, 8)]),
-			...pipeLine([vec2(-15, -4), vec2(14, -4)]).filter(t => !(t.x === 13 && t.y === -4)),
-			...pipeLine([vec2(-15, 2), vec2(14, 2)]).filter(t => !(t.x === 13 && t.y === 2)),
-			...pipeLine([vec2(-15, 8), vec2(14, 8)]).filter(t => !(t.x === 13 && t.y === 8)),
+			...pipeLine([vec2(-10, -10), vec2(9, -10)]),
+			...pipeLine([vec2(-15, -4), vec2(9, -4)]),
+			...pipeLine([vec2(-10, 2), vec2(9, 2)]),
+			...pipeLine([vec2(-15, 8), vec2(9, 8)]),
 		],
-		gases: [...cloud("red", vec2(-4, 7), vec2(2, 3))],
-		leversData: [{ value: "red", pos: vec2(-0.5, 5.5) }],
-		masksData: [{ value: "red", pos: vec2(-14, -14) }],
-		startPos: vec2(-14, -13),
-		exitPos: vec2(13, 13),
+		gases: [
+			...cloud("red", vec2(5, -5), vec2(9, -9)),
+			...cloud("red", vec2(-4, 7), vec2(2, 3)),
+			...cloud("green", vec2(-15, -5), vec2(-5, -9)),
+		],
+		leversData: [],
+		masksData: [
+			{ value: "red", pos: vec2(-14, 0) },
+			{ value: "green", pos: vec2(0, -7) },
+		],
+		startPos: vec2(0, -13),
+		exitPos: vec2(-14, 14),
 	},
 	{
 		name: "the column",
 		unfinished: true,
 		pipes: [
-			...pipeLine([vec2(-10, -15), vec2(-10, 14)]).filter(t => !(t.x === -10 && t.y === 13)),
-			...pipeLine([vec2(-2, -15), vec2(-2, 14)]).filter(t => !(t.x === -2 && t.y === 13)),
-			...pipeLine([vec2(6, -15), vec2(6, 14)]).filter(t => !(t.x === 6 && t.y === 13)),
-			...pipeLine([vec2(12, -15), vec2(12, 14)]).filter(t => !(t.x === 12 && t.y === 13)),
-			...pipeLine([vec2(-15, -4), vec2(-10, -4)]).filter(t => !(t.x === -11 && t.y === -4)),
+			...pipeLine([vec2(-10, -15), vec2(-10, 14)]).filter(
+				(t) => !(t.x === -10 && t.y === 13),
+			),
+			...pipeLine([vec2(-2, -15), vec2(-2, 14)]).filter(
+				(t) => !(t.x === -2 && t.y === 13),
+			),
+			...pipeLine([vec2(6, -15), vec2(6, 14)]).filter(
+				(t) => !(t.x === 6 && t.y === 13),
+			),
+			...pipeLine([vec2(12, -15), vec2(12, 14)]).filter(
+				(t) => !(t.x === 12 && t.y === 13),
+			),
+			...pipeLine([vec2(-15, -4), vec2(-10, -4)]).filter(
+				(t) => !(t.x === -11 && t.y === -4),
+			),
 			...pipeLine([vec2(-2, 5), vec2(6, 5)]),
 		],
 		gases: [...cloud("red", vec2(-10, 4), vec2(-2, -3))],
@@ -103,10 +120,18 @@ const levels = [
 		name: "the cross",
 		unfinished: true,
 		pipes: [
-			...pipeLine([vec2(-15, -5), vec2(14, -5)]).filter(t => !(t.x === -6 && t.y === -5)),
-			...pipeLine([vec2(-15, 5), vec2(14, 5)]).filter(t => !(t.x === -6 && t.y === 5)),
-			...pipeLine([vec2(-5, -15), vec2(-5, 14)]).filter(t => !(t.x === -5 && t.y === 13)),
-			...pipeLine([vec2(5, -15), vec2(5, 14)]).filter(t => !(t.x === 5 && t.y === 13)),
+			...pipeLine([vec2(-15, -5), vec2(14, -5)]).filter(
+				(t) => !(t.x === -6 && t.y === -5),
+			),
+			...pipeLine([vec2(-15, 5), vec2(14, 5)]).filter(
+				(t) => !(t.x === -6 && t.y === 5),
+			),
+			...pipeLine([vec2(-5, -15), vec2(-5, 14)]).filter(
+				(t) => !(t.x === -5 && t.y === 13),
+			),
+			...pipeLine([vec2(5, -15), vec2(5, 14)]).filter(
+				(t) => !(t.x === 5 && t.y === 13),
+			),
 			...pipeLine([vec2(-5, -5), vec2(5, 5)]),
 		],
 		gases: [...cloud("red", vec2(-4, 3), vec2(4, -4))],
@@ -128,7 +153,9 @@ const levels = [
 				vec2(12, 2),
 				vec2(12, 9),
 				vec2(-6, 9),
-			]).filter(t => !(t.x === -7 && t.y === -12) && !(t.x === 11 && t.y === 9)),
+			]).filter(
+				(t) => !(t.x === -7 && t.y === -12) && !(t.x === 11 && t.y === 9),
+			),
 			...pipeLine([vec2(-6, -15), vec2(-6, -12)]),
 			...pipeLine([vec2(-2, 9), vec2(-2, 14)]),
 		],
@@ -149,9 +176,15 @@ const levels = [
 				vec2(-15, 14),
 				vec2(-15, -8),
 			]),
-			...pipeLine([vec2(-15, -2), vec2(14, -2)]).filter(t => !(t.x === -7 && t.y === -2)),
-			...pipeLine([vec2(-6, -14), vec2(-6, 14)]).filter(t => !(t.x === -6 && t.y === 13)),
-			...pipeLine([vec2(6, -2), vec2(6, 14)]).filter(t => !(t.x === 6 && t.y === 13)),
+			...pipeLine([vec2(-15, -2), vec2(14, -2)]).filter(
+				(t) => !(t.x === -7 && t.y === -2),
+			),
+			...pipeLine([vec2(-6, -14), vec2(-6, 14)]).filter(
+				(t) => !(t.x === -6 && t.y === 13),
+			),
+			...pipeLine([vec2(6, -2), vec2(6, 14)]).filter(
+				(t) => !(t.x === 6 && t.y === 13),
+			),
 		],
 		gases: [...cloud("red", vec2(-5, -3), vec2(5, -13))],
 		leversData: [{ value: "red", pos: vec2(-0.5, -9.5) }],
@@ -163,10 +196,18 @@ const levels = [
 		name: "ladders",
 		unfinished: true,
 		pipes: [
-			...pipeLine([vec2(-12, -15), vec2(-12, 14)]).filter(t => !(t.x === -12 && t.y === 13)),
-			...pipeLine([vec2(-4, -15), vec2(-4, 14)]).filter(t => !(t.x === -4 && t.y === 13)),
-			...pipeLine([vec2(4, -15), vec2(4, 14)]).filter(t => !(t.x === 4 && t.y === 13)),
-			...pipeLine([vec2(12, -15), vec2(12, 14)]).filter(t => !(t.x === 12 && t.y === 13)),
+			...pipeLine([vec2(-12, -15), vec2(-12, 14)]).filter(
+				(t) => !(t.x === -12 && t.y === 13),
+			),
+			...pipeLine([vec2(-4, -15), vec2(-4, 14)]).filter(
+				(t) => !(t.x === -4 && t.y === 13),
+			),
+			...pipeLine([vec2(4, -15), vec2(4, 14)]).filter(
+				(t) => !(t.x === 4 && t.y === 13),
+			),
+			...pipeLine([vec2(12, -15), vec2(12, 14)]).filter(
+				(t) => !(t.x === 12 && t.y === 13),
+			),
 			...pipeLine([vec2(-12, 8), vec2(12, 8)]),
 			...pipeLine([vec2(-12, 0), vec2(12, 0)]),
 			...pipeLine([vec2(-12, -8), vec2(12, -8)]),
@@ -190,7 +231,12 @@ const levels = [
 				vec2(-4, 6),
 				vec2(-4, 14),
 			]),
-			...pipeLine([vec2(4, 6), vec2(14, 6), vec2(14, -10), vec2(2, -10)]).filter(t => !(t.x === 13 && t.y === 6)),
+			...pipeLine([
+				vec2(4, 6),
+				vec2(14, 6),
+				vec2(14, -10),
+				vec2(2, -10),
+			]).filter((t) => !(t.x === 13 && t.y === 6)),
 			...pipeLine([vec2(-10, 14), vec2(-4, 14)]),
 		],
 		gases: [...cloud("red", vec2(-7, 5), vec2(-3, -1))],
@@ -203,8 +249,12 @@ const levels = [
 		name: "branches",
 		unfinished: true,
 		pipes: [
-			...pipeLine([vec2(2, -15), vec2(2, 14)]).filter(t => !(t.x === 2 && t.y === 13)),
-			...pipeLine([vec2(-15, -8), vec2(2, -8)]).filter(t => !(t.x === 1 && t.y === -8)),
+			...pipeLine([vec2(2, -15), vec2(2, 14)]).filter(
+				(t) => !(t.x === 2 && t.y === 13),
+			),
+			...pipeLine([vec2(-15, -8), vec2(2, -8)]).filter(
+				(t) => !(t.x === 1 && t.y === -8),
+			),
 			...pipeLine([vec2(-10, 0), vec2(2, 0), vec2(14, 0)]),
 			...pipeLine([vec2(-6, 8), vec2(2, 8), vec2(14, 8)]),
 			...pipeLine([vec2(10, -15), vec2(10, -8)]),
@@ -228,10 +278,12 @@ const levels = [
 				vec2(0, 0),
 				vec2(0, 6),
 				vec2(14, 6),
-			]).filter(t => !(t.x === -13 && t.y === -12)),
+			]).filter((t) => !(t.x === -13 && t.y === -12)),
 			...pipeLine([vec2(-12, -15), vec2(-12, -12)]),
 			...pipeLine([vec2(-8, 6), vec2(-8, 14)]),
-			...pipeLine([vec2(6, 6), vec2(6, 14)]).filter(t => !(t.x === 6 && t.y === 13)),
+			...pipeLine([vec2(6, 6), vec2(6, 14)]).filter(
+				(t) => !(t.x === 6 && t.y === 13),
+			),
 		],
 		gases: [...cloud("red", vec2(-11, -7), vec2(-5, -11))],
 		leversData: [{ value: "red", pos: vec2(-7.5, -8.5) }],
@@ -243,12 +295,24 @@ const levels = [
 		name: "grid",
 		unfinished: true,
 		pipes: [
-			...pipeLine([vec2(-15, -10), vec2(14, -10)]).filter(t => !(t.x === -11 && t.y === -10)),
-			...pipeLine([vec2(-15, 0), vec2(14, 0)]).filter(t => !(t.x === -11 && t.y === 0)),
-			...pipeLine([vec2(-15, 10), vec2(14, 10)]).filter(t => !(t.x === -11 && t.y === 10)),
-			...pipeLine([vec2(-10, -15), vec2(-10, 14)]).filter(t => !(t.x === -10 && t.y === 13)),
-			...pipeLine([vec2(0, -15), vec2(0, 14)]).filter(t => !(t.x === 0 && t.y === 13)),
-			...pipeLine([vec2(10, -15), vec2(10, 14)]).filter(t => !(t.x === 10 && t.y === 13)),
+			...pipeLine([vec2(-15, -10), vec2(14, -10)]).filter(
+				(t) => !(t.x === -11 && t.y === -10),
+			),
+			...pipeLine([vec2(-15, 0), vec2(14, 0)]).filter(
+				(t) => !(t.x === -11 && t.y === 0),
+			),
+			...pipeLine([vec2(-15, 10), vec2(14, 10)]).filter(
+				(t) => !(t.x === -11 && t.y === 10),
+			),
+			...pipeLine([vec2(-10, -15), vec2(-10, 14)]).filter(
+				(t) => !(t.x === -10 && t.y === 13),
+			),
+			...pipeLine([vec2(0, -15), vec2(0, 14)]).filter(
+				(t) => !(t.x === 0 && t.y === 13),
+			),
+			...pipeLine([vec2(10, -15), vec2(10, 14)]).filter(
+				(t) => !(t.x === 10 && t.y === 13),
+			),
 		],
 		gases: [...cloud("red", vec2(-9, -1), vec2(-1, -9))],
 		leversData: [{ value: "red", pos: vec2(-4.5, -5.5) }],
@@ -270,7 +334,9 @@ const levels = [
 				vec2(4, 4),
 				vec2(14, 4),
 			]),
-			...pipeLine([vec2(-5, -14), vec2(-5, 14)]).filter(t => !(t.x === -5 && t.y === 13)),
+			...pipeLine([vec2(-5, -14), vec2(-5, 14)]).filter(
+				(t) => !(t.x === -5 && t.y === 13),
+			),
 			...pipeLine([vec2(14, -8), vec2(14, 4)]),
 		],
 		gases: [cloud("red", vec2(5, -3), vec2(13, -7))],
@@ -283,10 +349,18 @@ const levels = [
 		name: "spokes",
 		unfinished: true,
 		pipes: [
-			...pipeLine([vec2(-15, -2), vec2(14, -2)]).filter(t => !(t.x === -5 && t.y === -2)),
-			...pipeLine([vec2(-15, 6), vec2(14, 6)]).filter(t => !(t.x === -5 && t.y === 6)),
-			...pipeLine([vec2(-4, -15), vec2(-4, 14)]).filter(t => !(t.x === -4 && t.y === 13)),
-			...pipeLine([vec2(6, -15), vec2(6, 14)]).filter(t => !(t.x === 6 && t.y === 13)),
+			...pipeLine([vec2(-15, -2), vec2(14, -2)]).filter(
+				(t) => !(t.x === -5 && t.y === -2),
+			),
+			...pipeLine([vec2(-15, 6), vec2(14, 6)]).filter(
+				(t) => !(t.x === -5 && t.y === 6),
+			),
+			...pipeLine([vec2(-4, -15), vec2(-4, 14)]).filter(
+				(t) => !(t.x === -4 && t.y === 13),
+			),
+			...pipeLine([vec2(6, -15), vec2(6, 14)]).filter(
+				(t) => !(t.x === 6 && t.y === 13),
+			),
 			...pipeLine([vec2(-4, -2), vec2(6, 6)]),
 		],
 		gases: [...cloud("red", vec2(-3, 5), vec2(5, -1))],

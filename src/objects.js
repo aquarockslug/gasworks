@@ -169,8 +169,8 @@ class Player extends GameObject {
 			this.inGas = detectedGasColor;
 		}
 
-		const leverOn = this.currentLever()?.on ?? false;
-		const isWrongMask = this.inGas !== this.maskColor;
+		const leverOn = this.currentLever()?.on ?? true;
+		const isWrongMask = this.inGas !== this.maskColor && this.inGas !== "none";
 		const shouldTakeDamage = isWrongMask && leverOn;
 		const healthDelta = shouldTakeDamage ? -2 : 4;
 		const newHealth = clamp(this.health + healthDelta, 0, 100);
