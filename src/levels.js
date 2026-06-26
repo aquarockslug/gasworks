@@ -1,7 +1,32 @@
 const levels = [
 	{
+		name: "Hallways",
+		finished: true,
+		pipes: [
+			...pipeLine([vec2(-10, -10), vec2(9, -10)]),
+			...pipeLine([vec2(-15, -4), vec2(9, -4)]),
+			...pipeLine([vec2(-6, -1), vec2(-11, -1), vec2(-11, 2), vec2(12, 2), vec2(12, -4)]),
+			...pipeLine([vec2(-15, 8), vec2(10, 8), vec2(10, 5), vec2(5, 5)]),
+		],
+		gases: [
+			...cloud("red", vec2(0, -5), vec2(9, -9)),
+			...cloud("red", vec2(-10, 7), vec2(9, 3)),
+			...cloud("yellow", vec2(-10, 1), vec2(9, -3)),
+			...cloud("green", vec2(-15, -5), vec2(-5, -9)),
+			...cloud("green", vec2(-10, 14), vec2(14, 9)),
+		],
+		leversData: [],
+		masksData: [
+			{ value: "red", pos: vec2(-13.5, 2.5) },
+			{ value: "green", pos: vec2(-2, -7) },
+			{ value: "yellow", pos: vec2(12.5, 6) },
+		],
+		startPos: vec2(0, -13),
+		exitPos: vec2(-14, 14),
+	},
+	{
 		name: "Scramble",
-		unfinished: false,
+		finished: true,
 		pipes: [
 			...pipeLine([
 				vec2(-3, -16),
@@ -68,30 +93,8 @@ const levels = [
 		exitPos: vec2(5, 14),
 	},
 	{
-		name: "long hallways",
-		unfinished: true,
-		pipes: [
-			...pipeLine([vec2(-10, -10), vec2(9, -10)]),
-			...pipeLine([vec2(-15, -4), vec2(9, -4)]),
-			...pipeLine([vec2(-10, 2), vec2(9, 2)]),
-			...pipeLine([vec2(-15, 8), vec2(9, 8)]),
-		],
-		gases: [
-			...cloud("red", vec2(5, -5), vec2(9, -9)),
-			...cloud("red", vec2(-4, 7), vec2(2, 3)),
-			...cloud("green", vec2(-15, -5), vec2(-5, -9)),
-		],
-		leversData: [],
-		masksData: [
-			{ value: "red", pos: vec2(-14, 0) },
-			{ value: "green", pos: vec2(0, -7) },
-		],
-		startPos: vec2(0, -13),
-		exitPos: vec2(-14, 14),
-	},
-	{
 		name: "the column",
-		unfinished: true,
+		finished: false,
 		pipes: [
 			...pipeLine([vec2(-10, -15), vec2(-10, 14)]).filter(
 				(t) => !(t.x === -10 && t.y === 13),
@@ -118,7 +121,7 @@ const levels = [
 	},
 	{
 		name: "the cross",
-		unfinished: true,
+		finished: false,
 		pipes: [
 			...pipeLine([vec2(-15, -5), vec2(14, -5)]).filter(
 				(t) => !(t.x === -6 && t.y === -5),
@@ -142,7 +145,7 @@ const levels = [
 	},
 	{
 		name: "zigzag",
-		unfinished: true,
+		finished: false,
 		pipes: [
 			...pipeLine([
 				vec2(-15, -12),
@@ -167,7 +170,7 @@ const levels = [
 	},
 	{
 		name: "the frame",
-		unfinished: true,
+		finished: false,
 		pipes: [
 			...pipeLine([
 				vec2(-15, -14),
@@ -194,7 +197,7 @@ const levels = [
 	},
 	{
 		name: "ladders",
-		unfinished: true,
+		finished: false,
 		pipes: [
 			...pipeLine([vec2(-12, -15), vec2(-12, 14)]).filter(
 				(t) => !(t.x === -12 && t.y === 13),
@@ -220,7 +223,7 @@ const levels = [
 	},
 	{
 		name: "meander",
-		unfinished: true,
+		finished: false,
 		pipes: [
 			...pipeLine([
 				vec2(-15, -12),
@@ -247,7 +250,7 @@ const levels = [
 	},
 	{
 		name: "branches",
-		unfinished: true,
+		finished: false,
 		pipes: [
 			...pipeLine([vec2(2, -15), vec2(2, 14)]).filter(
 				(t) => !(t.x === 2 && t.y === 13),
@@ -267,7 +270,7 @@ const levels = [
 	},
 	{
 		name: "switchback",
-		unfinished: true,
+		finished: false,
 		pipes: [
 			...pipeLine([
 				vec2(-15, -12),
@@ -293,7 +296,7 @@ const levels = [
 	},
 	{
 		name: "grid",
-		unfinished: true,
+		finished: false,
 		pipes: [
 			...pipeLine([vec2(-15, -10), vec2(14, -10)]).filter(
 				(t) => !(t.x === -11 && t.y === -10),
@@ -322,7 +325,7 @@ const levels = [
 	},
 	{
 		name: "the slide",
-		unfinished: true,
+		finished: false,
 		pipes: [
 			...pipeLine([
 				vec2(-15, -14),
@@ -347,7 +350,7 @@ const levels = [
 	},
 	{
 		name: "spokes",
-		unfinished: true,
+		finished: false,
 		pipes: [
 			...pipeLine([vec2(-15, -2), vec2(14, -2)]).filter(
 				(t) => !(t.x === -5 && t.y === -2),
