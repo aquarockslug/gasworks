@@ -11,7 +11,7 @@ end
 
 build({
 	"./index.html",
-	"./baskarstc.otf",
+	"./assets/baskarstc.otf",
 	"./assets/masks.png",
 	"./assets/tiles.png",
 	"./assets/gorm.png",
